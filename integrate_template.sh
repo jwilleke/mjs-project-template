@@ -20,40 +20,100 @@ else
   TEMPLATE_DIR="$(dirname "$0")"
   CLEANUP_TEMP_DIR=false
 fi
-DEST_DIR="$(pwd)"
+
+# Determine the destination directory
+if [ -n "$2" ]; then
+  DEST_DIR="$2"
+else
+  DEST_DIR="$(pwd)"
+fi
+
+# Ensure the destination directory exists
+mkdir -p "$DEST_DIR"
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to create destination directory $DEST_DIR."
+  if [ "$CLEANUP_TEMP_DIR" = true ]; then
+    rm -rf "$TEMP_DIR"
+  fi
+  exit 1
+fi
+
 
 echo "Integrating template from: $TEMPLATE_DIR"
 echo "Into current directory: $DEST_DIR"
 
-# Check for files that would be overwritten
-OVERWRITTEN_FILES=()
+# Categorize files: overwritten and new
+ALL_TEMPLATE_FILES=()
 for file in "$TEMPLATE_DIR"/*; do
-  if [ -e "$DEST_DIR/$(basename "$file")" ]; then
-    OVERWRITTEN_FILES+=("$(basename "$file")")
+  BASENAME=$(basename "$file")
+  if [ "$BASENAME" != "integrate_template.sh" ]; then
+    ALL_TEMPLATE_FILES+=("$BASENAME")
   fi
 done
 
+OVERWRITTEN_FILES=()
+NEW_FILES=()
+for file in "${ALL_TEMPLATE_FILES[@]}"; do
+  if [ -e "$DEST_DIR/$file" ]; then
+    OVERWRITTEN_FILES+=("$file")
+  else
+    NEW_FILES+=("$file")
+  fi
+done
+
+echo ""
 if [ ${#OVERWRITTEN_FILES[@]} -gt 0 ]; then
-  echo "\nWarning: The following files in the destination directory will be overwritten:"
+  echo "Warning: The following files in the destination directory will be overwritten:"
   for file in "${OVERWRITTEN_FILES[@]}"; do
     echo "- $file"
   done
-  read -p "Do you want to proceed and overwrite these files? (y/N) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Integration cancelled."
-    exit 1
-  fi
 fi
 
-# Use rsync to copy files, excluding the script itself if it exists in the template
-# and ensuring directories are merged not replaced
-# -a: archive mode (preserves permissions, timestamps, etc.)
-# -v: verbose
-# --exclude=integrate_template.sh: don't copy the script itself
-# "$TEMPLATE_DIR/" ensures the *contents* are copied, not the directory itself
+if [ ${#NEW_FILES[@]} -gt 0 ]; then
+  echo "Info: The following new files will be copied to the destination directory:"
+  for file in "${NEW_FILES[@]}"; do
+    echo "- $file"
+  done
+fi
 
-rsync -av --exclude="integrate_template.sh" "$TEMPLATE_DIR/" "$DEST_DIR"
+if [ ${#OVERWRITTEN_FILES[@]} -gt 0 ] || [ ${#NEW_FILES[@]} -gt 0 ]; then
+  echo "\nChoose an action:"
+  echo "  [C]ancel integration"
+  echo "  [N]ormal copy (copy new files, skip existing)"
+  echo "  [O]verwrite all (copy all files, overwrite existing)"
+  read -p "Enter your choice (C/N/O): " -n 1 -r
+  echo
+
+  case "$REPLY" in
+    [Cc] )
+      echo "Integration cancelled."
+      if [ "$CLEANUP_TEMP_DIR" = true ]; then
+        rm -rf "$TEMP_DIR"
+      fi
+      exit 1
+      ;;
+    [Nn] )
+      echo "Proceeding with normal copy (copying new files, skipping existing)."
+      # Copy only new files
+      # Use rsync with --ignore-existing to not overwrite
+      rsync -av --ignore-existing --exclude="integrate_template.sh" "$TEMPLATE_DIR/" "$DEST_DIR"
+      ;;
+    [Oo] )
+      echo "Proceeding to overwrite all files."
+      # Overwrite all files
+      rsync -av --exclude="integrate_template.sh" "$TEMPLATE_DIR/" "$DEST_DIR"
+      ;;
+    * )
+      echo "Invalid choice. Integration cancelled."
+      if [ "$CLEANUP_TEMP_DIR" = true ]; then
+        rm -rf "$TEMP_DIR"
+      fi
+      exit 1
+      ;;
+  esac
+else
+  echo "No template files to integrate."
+fi
 
 echo "\nProject template integrated successfully!"
 

@@ -72,8 +72,7 @@ Frameworks/Libraries:
 
 ### High Priority
 
-- [ ] [Task 1]
-- [ ] [Task 2]
+- [ ] Fill out Project Overview, Description, and Goals in AGENTS.md
 
 ### Medium Priority
 
