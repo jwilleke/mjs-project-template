@@ -54,6 +54,7 @@ src/
 ## Code Quality Standards
 
 All code must adhere to standards defined in `CODE_STANDARDS.md`:
+
 - TypeScript strict mode
 - ESLint linting
 - Prettier formatting

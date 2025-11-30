@@ -22,23 +22,27 @@ Thank you for your interest in contributing to this project! This document provi
 ### Initial Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd <project-name>
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Verify setup**
+
    ```bash
    npm run lint
    npm run build
@@ -49,12 +53,14 @@ Thank you for your interest in contributing to this project! This document provi
 ### Read Project Context First
 
 Before starting work, read `AGENTS.md` to understand:
+
 - Project goals and current status
 - Architecture and tech stack
 - Known blockers or issues
 - Priority tasks
 
 Use the slash command:
+
 ```bash
 /context
 ```
@@ -71,6 +77,7 @@ Branch naming: `type/description`
 ### Make Changes
 
 Follow the code standards in `CODE_STANDARDS.md`:
+
 - TypeScript strict mode
 - Naming conventions (kebab-case files, camelCase functions)
 - Single quotes, 2-space indentation
@@ -110,6 +117,7 @@ footer
 **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 
 **Example:**
+
 ```
 feat(auth): add JWT token refresh
 
