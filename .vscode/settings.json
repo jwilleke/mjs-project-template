@@ -1,0 +1,7 @@
+{
+  "markdownlint.enable": true,
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  }
+}
