@@ -94,6 +94,7 @@ This template is designed for teams and AI agents to collaborate efficiently:
 ## Git Configuration
 
 The repository is initialized with:
+
 - Initial commit with all template files
 - `.git/` for version control
 - Ready to push to GitHub
