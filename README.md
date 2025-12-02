@@ -2,6 +2,8 @@
 
 A comprehensive Node.js/TypeScript project template with production-ready tooling, code standards, and documentation.
 
+**IMPORTANT: Read ~/GLOBAL-CODE-PREFERENCES.md first** - Contains overarching principles for all code, documentation, and interactions.
+
 ## Quick Start
 
 ```bash

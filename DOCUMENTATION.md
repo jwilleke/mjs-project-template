@@ -2,14 +2,30 @@
 
 This guide helps you find the right documentation for your needs. We follow the **DRY (Don't Repeat Yourself) principle** to keep documentation maintainable and in sync.
 
+## ⭐ START HERE: Global Preferences
+
+**Read ~/GLOBAL-CODE-PREFERENCES.md first** - Contains overarching principles for:
+
+- Writing concise, DRY code and documentation
+- Progressive iteration (core features first)
+- Secret management (NEVER unencrypted secrets in Git)
+- Project logging with project_log.md
+- GitHub CLI as primary interaction method
+- Using markdownlint, .editorconfig, .prettierrc.json
+
+This applies to ALL work on this project.
+
 ## By Topic
 
 ### Getting Started
+
 - **First time?** Start with [README.md](./README.md)
+- **CRITICAL:** Read ~/GLOBAL-CODE-PREFERENCES.md for project principles
 - **Setting up locally?** Follow [SETUP.md](./SETUP.md)
 - **Understanding the project?** Read [AGENTS.md](./AGENTS.md)
 
 ### Development
+
 - **Code standards & conventions:** [CODE_STANDARDS.md](./CODE_STANDARDS.md)
   - Naming conventions (files, classes, functions, constants)
   - Code formatting (Prettier, ESLint)
@@ -31,6 +47,7 @@ This guide helps you find the right documentation for your needs. We follow the 
   - Code review
 
 ### Security
+
 - **Security practices:** [SECURITY.md](./SECURITY.md)
   - Secret management (development & production)
   - Dependency auditing
@@ -40,6 +57,7 @@ This guide helps you find the right documentation for your needs. We follow the 
   - Deployment security
 
 ### DevOps & CI/CD
+
 - **GitHub Actions workflows:** [.github/workflows/README.md](.github/workflows/README.md)
   - CI/CD pipeline setup
   - Automated testing & linting
@@ -48,6 +66,7 @@ This guide helps you find the right documentation for your needs. We follow the 
   - Secret management in GitHub
 
 ### AI Agent Collaboration
+
 - **Project context & status:** [AGENTS.md](./AGENTS.md)
   - Current project status
   - Goals and priorities
@@ -83,7 +102,7 @@ README.md                          # Start here
 ## Source of Truth by Topic
 
 | Topic | Source of Truth | Related Docs |
-|-------|-----------------|--------------|
+| --- | --- | --- |
 | **Naming conventions** | CODE_STANDARDS.md | ARCHITECTURE.md (references it) |
 | **File structure** | ARCHITECTURE.md | README.md (references it) |
 | **Code formatting** | CODE_STANDARDS.md | CONTRIBUTING.md (references it) |
@@ -98,26 +117,35 @@ README.md                          # Start here
 ## Quick Links by Role
 
 ### New Developer
-1. Read [SETUP.md](./SETUP.md)
-2. Read [AGENTS.md](./AGENTS.md) for project context
-3. Read [CODE_STANDARDS.md](./CODE_STANDARDS.md) for coding rules
-4. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow
+
+1. **CRITICAL:** Read ~/GLOBAL-CODE-PREFERENCES.md for project principles
+2. Read [SETUP.md](./SETUP.md)
+3. Read [AGENTS.md](./AGENTS.md) for project context
+4. Read [CODE_STANDARDS.md](./CODE_STANDARDS.md) for coding rules
+5. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow
 
 ### Security Review
-1. Read [SECURITY.md](./SECURITY.md)
-2. Check [.github/workflows/README.md](.github/workflows/README.md) for CI/CD security
-3. Review [CODE_STANDARDS.md](./CODE_STANDARDS.md#review-checklist)
+
+1. Read ~/GLOBAL-CODE-PREFERENCES.md (especially "NEVER put unencrypted Secrets in Git")
+2. Read [SECURITY.md](./SECURITY.md)
+3. Check [.github/workflows/README.md](.github/workflows/README.md) for CI/CD security
+4. Review [CODE_STANDARDS.md](./CODE_STANDARDS.md#review-checklist)
 
 ### Project Lead / Manager
-1. Check [AGENTS.md](./AGENTS.md) for current status
-2. Review [CONTRIBUTING.md](./CONTRIBUTING.md) for team workflow
-3. Check [.github/workflows/README.md](.github/workflows/README.md) for deployment
+
+1. Read ~/GLOBAL-CODE-PREFERENCES.md for project governance
+2. Check [AGENTS.md](./AGENTS.md) for current status
+3. Review [CONTRIBUTING.md](./CONTRIBUTING.md) for team workflow
+4. Check [.github/workflows/README.md](.github/workflows/README.md) for deployment
 
 ### AI Agent (Claude / Gemini)
-1. Run `/context` command to read AGENTS.md
-2. Run `/check-todos` to see priorities
-3. Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md)
-4. Run `/update-agents` when done
+
+1. **CRITICAL:** Read ~/GLOBAL-CODE-PREFERENCES.md first (overarching principles)
+2. Run `/context` command to read AGENTS.md
+3. Run `/check-todos` to see priorities
+4. Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md) and all standards
+5. Use project_log.md to track all work (per GLOBAL-CODE-PREFERENCES)
+6. Run `/update-agents` when done
 
 ## DRY Principles Applied
 
@@ -135,6 +163,7 @@ Each topic has **one source of truth**, preventing conflicting or outdated guida
 ## Contributing to Documentation
 
 When updating documentation:
+
 1. Identify the **authoritative source** for that topic (see "Source of Truth" table above)
 2. Update only that source document
 3. Add cross-references from related documents

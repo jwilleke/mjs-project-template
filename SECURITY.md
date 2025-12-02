@@ -1,6 +1,6 @@
 # Security Guidelines
 
-This document outlines security best practices and policies for this project. All contributors must follow these guidelines.
+This document outlines security best practices and policies for this project. All contributors must follow these guidelines. **Security practices are governed by ~/GLOBAL-CODE-PREFERENCES.md which emphasizes: "NEVER put unencrypted 'Secrets' in Git"**
 
 ## Table of Contents
 
@@ -35,6 +35,7 @@ This document outlines security best practices and policies for this project. Al
 **Local Development:**
 
 1. Copy `.env.example` to `.env`:
+
    ```bash
    cp .env.example .env
    ```
@@ -56,6 +57,7 @@ This document outlines security best practices and policies for this project. Al
    - Production secrets with restricted access
 
 3. Reference in workflows:
+
    ```yaml
    - name: Deploy
      env:
@@ -77,10 +79,12 @@ If you accidentally commit a secret:
 
 1. **Immediately rotate the secret** (change the password/key)
 2. Remove from git history:
+
    ```bash
    git filter-branch --tree-filter 'rm -f .env' HEAD
    # Or use git-filter-repo for better results
    ```
+
 3. Force push only if you're the only one with local copies
 4. Notify team and rotate all related credentials
 
@@ -112,12 +116,14 @@ This project includes GitHub Actions workflows that automatically audit dependen
 ### Updating Dependencies
 
 1. **Regular updates:**
+
    ```bash
    npm update
    npm outdated  # See what can be updated
    ```
 
 2. **Patch security issues immediately:**
+
    ```bash
    npm audit fix
    ```
@@ -128,6 +134,7 @@ This project includes GitHub Actions workflows that automatically audit dependen
    - Update code if necessary
 
 4. **Audit before commit:**
+
    ```bash
    npm audit
    npm run lint
@@ -167,6 +174,7 @@ logger.info('User authentication attempt', { userId });
 ```
 
 **If you need logging:**
+
 - Use structured logging library (Winston, Pino, Bunyan)
 - Never log sensitive data (passwords, tokens, API keys)
 - Use appropriate log levels (info, warn, error)

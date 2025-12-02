@@ -2,6 +2,15 @@
 
 This file serves as the single source of truth for project context and state. Both Claude and Gemini should read this file first when working on this project.
 
+**CRITICAL: Read ~/GLOBAL-CODE-PREFERENCES.md first** - This contains overarching principles that govern all work on this project:
+
+- Be concise and DRY in code and documentation
+- Iterate progressively, start with core features
+- NEVER put unencrypted secrets in Git
+- Use project_log.md to track all work
+- GitHub CLI is the primary method for interactions
+- Use markdownlint, .editorconfig, .prettierrc.json standards
+
 **Quick navigation:**
 
 - [CODE_STANDARDS.md](./CODE_STANDARDS.md) - Coding guidelines and conventions

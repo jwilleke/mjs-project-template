@@ -1,8 +1,10 @@
 # Contributing
 
-Thank you for your interest in contributing to this project! This document provides guidelines for developers and AI agents working on this codebase.
+Thank you for your interest in contributing to this project! This document provides guidelines for developers and AI agents working on this codebase. **All contributions must follow ~/GLOBAL-CODE-PREFERENCES.md**
 
 **Before you start:**
+
+- Read ~/GLOBAL-CODE-PREFERENCES.md for overarching project principles
 - Read [AGENTS.md](./AGENTS.md) for project context and status
 - Review [CODE_STANDARDS.md](./CODE_STANDARDS.md) for coding guidelines
 - Check [SECURITY.md](./SECURITY.md) for security practices
@@ -83,6 +85,7 @@ Branch naming: `type/description`
 ### Make Changes
 
 Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md) for all code conventions:
+
 - TypeScript strict mode
 - Naming conventions (kebab-case files, camelCase functions)
 - Single quotes, 2-space indentation

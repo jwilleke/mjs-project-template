@@ -1,8 +1,9 @@
 # Code Standards
 
-This document outlines the coding standards and best practices for this project.
+This document outlines the coding standards and best practices for this project. **All standards here follow the principles in ~/GLOBAL-CODE-PREFERENCES.md**
 
 **Related documents:**
+
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Project structure and architectural patterns
 - [SECURITY.md](./SECURITY.md) - Security guidelines and dependency management
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development workflow and contribution process
@@ -186,6 +187,7 @@ Keep dependencies minimal, well-maintained, and secure.
 For complete dependency security guidance, see [SECURITY.md](./SECURITY.md#dependency-management).
 
 Quick checklist:
+
 - Regularly audit: `npm audit`
 - Document why each dependency is needed
 - Use exact versions for critical dependencies
