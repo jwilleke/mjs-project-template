@@ -22,51 +22,31 @@ This file serves as the single source of truth for project context and state. Bo
 
 ## Architecture & Tech Stack
 
-Language will all be done in English (US)
+see [ARCHITECTURE.md](./ARCHITECTURE.md)
 
-### DRY principle
+## Coding Standards
 
-The coding standard for "do not repeat yourself" is the **DRY principle**, which states that every piece of knowledge should have a single, unambiguous, authoritative representation in a system.
-
-Generrally, if you see repated logic more than two times it should be refractered into reusable components.
-
-To achieve this, developers should abstract repeated logic into reusable components like functions, classes, or modules, and avoid duplicating code to improve maintainability, reduce bugs, and simplify updates
-
-Frameworks/Libraries:
-
-- [Framework/Library 1]
-- [Framework/Library 2]
+see [CODE_STANDARDS.md](./CODE_STANDARDS.md)
 
 ### Key Technologies
 
-- Node using typescript
+- (example) Node using typescript
 - [Technology 2]
 
-## Key Decisions
+## Project Log
 
-## Completed Work
+Always create project_log.md file as a log of work done on the project in format
 
-### Session: [Date]
-
+- yyyy-MM-dd
 - Agent: [Claude/Gemini/Crush]
-- Work Done:
-  - [Task 1]
-  - [Task 2]
-- Files Modified: [file1.ext, file2.ext]
-
-### Session
-
-- Session: [Date]
-- Agent: [Claude/Gemini/Crush]
-- Work Done:
-  - [Task 1]
-  - [Task 2]
-- Files Modified: [file1.ext, file2.ext]
-
-## Current Issues & Blockers
-
-- Issue 1: [Description and impact]
-- Issue 2: [Description and impact]
+- Subject:
+  - Key Decision
+  - Current Issues
+  - Work Done:
+    - [Task 1]
+    - [Task 2]
+    - GitHub commit ID (If applicaable)
+    - Files Modified: [file1.ext, file2.ext]
 
 ## TODO & Next Steps
 
@@ -92,7 +72,8 @@ Frameworks/Libraries:
 
 For All Agents
 
-- Read this file first before starting any work
+- Read [GLOBAL-CODE-PREFERENCES](~/GLOBAL-CODE-PREFERENCES.md)
+- Read this [AGENTS.md](./AGENTS.md) first before starting any work
 - Update sections after completing tasks
 - Note your session in the "Completed Work" section
 
