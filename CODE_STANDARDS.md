@@ -2,6 +2,11 @@
 
 This document outlines the coding standards and best practices for this project.
 
+**Related documents:**
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Project structure and architectural patterns
+- [SECURITY.md](./SECURITY.md) - Security guidelines and dependency management
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Development workflow and contribution process
+
 ## Overview
 
 We follow the **DRY (Don't Repeat Yourself) principle** - every piece of knowledge should have a single, unambiguous, authoritative representation. If you see repeated logic more than twice, refactor it into reusable components.
@@ -176,10 +181,15 @@ npm run lint
 
 ## Package Standards
 
-- Keep dependencies minimal and well-maintained
-- Regularly audit for security vulnerabilities: `npm audit`
+Keep dependencies minimal, well-maintained, and secure.
+
+For complete dependency security guidance, see [SECURITY.md](./SECURITY.md#dependency-management).
+
+Quick checklist:
+- Regularly audit: `npm audit`
 - Document why each dependency is needed
 - Use exact versions for critical dependencies
+- Update promptly when security issues are found
 
 ## Environment Variables
 
@@ -199,7 +209,8 @@ npm run lint
 - Keep README up to date
 - Document complex algorithms
 - Add examples for public APIs
-- Update AGENTS.md when making significant changes
+- Update [AGENTS.md](./AGENTS.md) when making significant changes
+- See [ARCHITECTURE.md](./ARCHITECTURE.md) for architectural documentation standards
 
 ## Review Checklist
 

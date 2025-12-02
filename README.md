@@ -22,26 +22,26 @@ See [SETUP.md](SETUP.md) for detailed setup instructions.
 
 ## Documentation
 
+**New to the project?** Start with [AGENTS.md](AGENTS.md) for project context, then check [SETUP.md](SETUP.md).
+
+**Need to find something specific?** See [DOCUMENTATION.md](DOCUMENTATION.md) for a navigation guide.
+
+**All documentation:**
+
 - **[SETUP.md](SETUP.md)** - Environment setup and installation
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute and development workflow
+- **[AGENTS.md](AGENTS.md)** - Project context, goals, and status (for AI agents and team collaboration)
 - **[CODE_STANDARDS.md](CODE_STANDARDS.md)** - Code quality and style guidelines
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Project structure and patterns
-- **[AGENTS.md](AGENTS.md)** - Project context, goals, and status (for AI agents and team collaboration)
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute and development workflow
+- **[SECURITY.md](SECURITY.md)** - Security guidelines and best practices
+- **[.github/workflows/README.md](.github/workflows/README.md)** - CI/CD pipeline setup and configuration
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Guide to navigating all documentation
 
 ## What's Included
 
 ### Project Structure
 
-```
-src/
-├── controllers/     # HTTP handlers / API routes
-├── services/        # Business logic
-├── models/          # Data types and interfaces
-├── middleware/      # Express middleware, etc.
-├── utils/           # Utility functions
-├── types/           # TypeScript type definitions
-└── index.ts         # Entry point
-```
+See [ARCHITECTURE.md](ARCHITECTURE.md#project-structure) for the complete project structure and directory conventions.
 
 ### Code Quality Tools
 
@@ -91,6 +91,16 @@ This template is designed for teams and AI agents to collaborate efficiently:
 - **CONTRIBUTING.md** defines the workflow
 - **Slash commands in `.claude/`** provide quick access to context
 
+### Claude MCP Commands
+
+When working with Claude, use these slash commands to stay synchronized:
+
+- `/context` - Read AGENTS.md to understand project state
+- `/check-todos` - View prioritized tasks and blockers
+- `/update-agents` - Document your session's progress
+
+See [.claude/README.md](.claude/README.md) for details on using these commands.
+
 ## Git Configuration
 
 The repository is initialized with:
@@ -108,6 +118,8 @@ Review and customize:
 3. **package.json** - Update project name and dependencies
 4. **.env.example** - Add your required environment variables
 5. **ARCHITECTURE.md** - Document your specific architecture
+6. **SECURITY.md** - Review and customize security policies
+7. **.github/workflows/** - Configure CI/CD for your deployment target
 
 ## Next Steps
 
@@ -116,6 +128,8 @@ Review and customize:
 3. **Read [CODE_STANDARDS.md](CODE_STANDARDS.md)** for coding guidelines
 4. **Check [ARCHITECTURE.md](ARCHITECTURE.md)** for project structure
 5. **Review [CONTRIBUTING.md](CONTRIBUTING.md)** for workflow
+6. **Review [SECURITY.md](SECURITY.md)** for security practices
+7. **Configure [.github/workflows/](./github/workflows/)** for your deployment target
 
 ## Features
 
@@ -127,10 +141,15 @@ Review and customize:
 - VS Code settings and recommendations
 - Environment variable templating
 - Comprehensive documentation
+- GitHub Actions CI/CD workflows (lint, test, build, audit)
+- Security guidelines and best practices
+- Multi-agent collaboration framework
 
 ## Support
 
 - Check the documentation files for answers
-- Review CODE_STANDARDS.md for coding guidelines
-- See CONTRIBUTING.md for development workflow
-- Check AGENTS.md for project status and priorities
+- Review [CODE_STANDARDS.md](CODE_STANDARDS.md) for coding guidelines
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow
+- Check [AGENTS.md](AGENTS.md) for project status and priorities
+- Review [SECURITY.md](SECURITY.md) for security questions
+- Check [.github/workflows/README.md](.github/workflows/README.md) for CI/CD help

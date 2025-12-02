@@ -2,6 +2,12 @@
 
 Thank you for your interest in contributing to this project! This document provides guidelines for developers and AI agents working on this codebase.
 
+**Before you start:**
+- Read [AGENTS.md](./AGENTS.md) for project context and status
+- Review [CODE_STANDARDS.md](./CODE_STANDARDS.md) for coding guidelines
+- Check [SECURITY.md](./SECURITY.md) for security practices
+- See [ARCHITECTURE.md](./ARCHITECTURE.md) for project structure
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
@@ -76,8 +82,7 @@ Branch naming: `type/description`
 
 ### Make Changes
 
-Follow the code standards in `CODE_STANDARDS.md`:
-
+Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md) for all code conventions:
 - TypeScript strict mode
 - Naming conventions (kebab-case files, camelCase functions)
 - Single quotes, 2-space indentation
@@ -104,33 +109,21 @@ npm run test:coverage     # Check coverage
 
 ## Commit Guidelines
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+See [CODE_STANDARDS.md](./CODE_STANDARDS.md#git-commit-messages) for detailed commit message guidelines.
 
-```
-type(scope): subject
+Quick reference:
 
-body
-
-footer
+```bash
+git commit -m "type(scope): description"
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
-
-**Example:**
-
-```
-feat(auth): add JWT token refresh
-
-Implement automatic token refresh with exponential backoff.
-
-Closes #123
-```
+Examples: `feat(auth): add JWT refresh`, `fix(api): handle null response`, `docs: update README`
 
 ## Pull Requests
 
 ### Before Creating a PR
 
-1. Update branch: `git fetch origin && git rebase origin/main`
+1. Update branch: `git fetch origin && git rebase origin/master`
 2. Run tests: `npm run lint && npm run test && npm run build`
 3. Update `AGENTS.md` if making significant changes
 

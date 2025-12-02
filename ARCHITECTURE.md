@@ -2,6 +2,12 @@
 
 This document outlines the project structure and architectural decisions.
 
+**Related documents:**
+- [CODE_STANDARDS.md](./CODE_STANDARDS.md) - Coding standards and conventions
+- [SECURITY.md](./SECURITY.md) - Security guidelines and best practices
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Development workflow
+- [AGENTS.md](./AGENTS.md) - Project context and goals
+
 ## Project Structure
 
 ```
@@ -26,11 +32,7 @@ src/
 
 ## Naming Conventions
 
-- **Files**: kebab-case (e.g., `user-service.ts`, `auth-controller.ts`)
-- **Classes**: PascalCase (e.g., `UserService`, `AuthController`)
-- **Functions**: camelCase (e.g., `getUserById`, `validateEmail`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
-- **Private members**: Prefix with underscore (e.g., `_internalState`)
+See [CODE_STANDARDS.md](./CODE_STANDARDS.md#naming-conventions) for complete naming conventions.
 
 ## Technology Stack
 
@@ -90,10 +92,7 @@ All code must adhere to standards defined in `CODE_STANDARDS.md`:
 
 ## Performance Considerations
 
-- Avoid N+1 queries in loops
-- Use async/await properly to prevent blocking
-- Cache expensive operations when appropriate
-- Profile before optimizing
+See [CODE_STANDARDS.md](./CODE_STANDARDS.md#performance-considerations) for performance guidelines.
 
 ## Security Considerations
 
@@ -105,10 +104,7 @@ All code must adhere to standards defined in `CODE_STANDARDS.md`:
 
 ## Testing Strategy
 
-- Unit tests for services and utilities
-- Integration tests for API endpoints
-- Aim for >80% code coverage
-- Test behavior, not implementation details
+See [CODE_STANDARDS.md](./CODE_STANDARDS.md#testing) for testing standards and guidelines.
 
 ## Deployment
 
