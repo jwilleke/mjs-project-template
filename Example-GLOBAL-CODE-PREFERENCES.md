@@ -2,6 +2,7 @@
 
 In all interactions and commit messages
 
+- READ AGENTS.MD file
 - Be concise and sacrifice grammar for consistion
 - DRY (Don't Repeat Yourself) principle in Documentation and Code. Refer to other Documents.
 - Iterate Progressively. Start with Core features only: Gather feedback.

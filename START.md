@@ -1,12 +1,40 @@
-# START.md - Claude Session Initialization
+# START.md - AGENTS Session Initialization
 
-**Copy and paste this entire prompt at the start of each Claude session.**
+**First:** Read "GLOBAL-CODE-PREFERENCES.md" for project principles before starting. The file "GLOBAL-CODE-PREFERENCES.md" is located at:
 
----
+```bash
+smb://tank.nerdsbythehour.com/jims/data/systems/GLOBAL-CODE-PREFERENCES.md
+or
+nfs://tank.nerdsbythehour.com/jims/data/systems/GLOBAL-CODE-PREFERENCES.md
+```
 
-You are working on a project that uses multiple AI agents. All agents share a single source of truth for project context and state.
+## Initialization
 
-## CRITICAL: Read Project Context First
+First agent should copy from [GitHub](https://github.com/jwilleke/mjs-project-template) to root of project folder:
+
+- AGENTS.md
+- .vscode
+- .editorconfig
+- .eslintrc.json
+- .markdownlint.json
+- .prettierignore
+- .prettierrc.json
+
+For Developer projects:
+
+- ARCHITECTURE.md
+- DOCUMENTATION.md
+- CONTRIBUTING.md
+- CODE_STANDARDS.md
+
+After copying, Read AGENTS.md and project folder and modify the following to fit project:
+
+- AGENTS.md
+- ARCHITECTURE.md
+
+## After Initialization
+
+### CRITICAL: Read Project Context First
 
 Please read and analyze the `AGENTS.md` file completely. This file contains:
 

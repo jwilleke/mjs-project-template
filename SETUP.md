@@ -2,11 +2,11 @@
 
 Step-by-step instructions to set up the project locally for development.
 
-**First:** Read ~/GLOBAL-CODE-PREFERENCES.md for project principles before starting.
+**First:** Read "GLOBAL-CODE-PREFERENCES.md" for project principles before starting.
 
 ## System Requirements
 
-### Required
+### Required for Node Projects
 
 - **Node.js**: v18 or higher
   - Check: `node --version`
@@ -16,15 +16,13 @@ Step-by-step instructions to set up the project locally for development.
 - **Git**: Latest version
   - Check: `git --version`
 
-### Recommended
+### Recommended for Node Projects
 
 - VS Code with TypeScript support
 - 4GB+ RAM
 - 500MB+ disk space
 
-## Installation
-
-### Step 1: Clone Repository
+## Step 1: Clone Repository
 
 ```bash
 git clone <repository-url>
