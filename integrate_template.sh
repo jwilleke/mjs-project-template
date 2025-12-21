@@ -2,6 +2,11 @@
 
 # This script integrates the project template into the current directory.
 # It should be run from within an existing project folder.
+#
+# Usage:
+#   ./integrate_template.sh                           # Integrate from current template directory
+#   ./integrate_template.sh <github-url>              # Clone and integrate from GitHub
+#   ./integrate_template.sh <github-url> <dest-dir>   # Clone and integrate to specific directory
 
 # If a GitHub URL is provided as the first argument, clone it.
 if [ -n "$1" ]; then
@@ -96,12 +101,24 @@ if [ ${#OVERWRITTEN_FILES[@]} -gt 0 ] || [ ${#NEW_FILES[@]} -gt 0 ]; then
       echo "Proceeding with normal copy (copying new files, skipping existing)."
       # Copy only new files
       # Use rsync with --ignore-existing to not overwrite
-      rsync -av --ignore-existing --exclude="integrate_template.sh" "$TEMPLATE_DIR/" "$DEST_DIR"
+      rsync -av --ignore-existing \
+        --exclude="integrate_template.sh" \
+        --exclude=".git" \
+        --exclude="node_modules" \
+        --exclude="dist" \
+        --exclude=".env" \
+        "$TEMPLATE_DIR/" "$DEST_DIR"
       ;;
     [Oo] )
       echo "Proceeding to overwrite all files."
       # Overwrite all files
-      rsync -av --exclude="integrate_template.sh" "$TEMPLATE_DIR/" "$DEST_DIR"
+      rsync -av \
+        --exclude="integrate_template.sh" \
+        --exclude=".git" \
+        --exclude="node_modules" \
+        --exclude="dist" \
+        --exclude=".env" \
+        "$TEMPLATE_DIR/" "$DEST_DIR"
       ;;
     * )
       echo "Invalid choice. Integration cancelled."
@@ -122,3 +139,39 @@ if [ "$CLEANUP_TEMP_DIR" = true ]; then
   echo "Cleaning up temporary directory: $TEMP_DIR"
   rm -rf "$TEMP_DIR"
 fi
+
+echo ""
+echo "==================================================================="
+echo "Next Steps:"
+echo "==================================================================="
+echo ""
+echo "1. Install dependencies:"
+echo "   cd $DEST_DIR"
+echo "   npm install"
+echo ""
+echo "2. Update project-specific values:"
+echo "   - Edit .env.example and create .env with your values"
+echo "   - Update AGENTS.md:"
+echo "     - Set PROJECT_NAME in Context Overview"
+echo "     - Update project_state, last_updated in YAML frontmatter"
+echo "     - Add your project description"
+echo "     - Update Architecture & Tech Stack section"
+echo "   - Update package.json:"
+echo "     - name, version, description, author, license"
+echo "   - Update README.md with project-specific information"
+echo ""
+echo "3. Verify setup:"
+echo "   npm run lint          # Check code and markdown quality"
+echo "   npm run typecheck     # Verify TypeScript configuration"
+echo "   npm run build         # Test build process"
+echo ""
+echo "4. Initialize git hooks (if not already done):"
+echo "   npm run prepare       # Sets up Husky pre-commit hooks"
+echo ""
+echo "5. Review documentation:"
+echo "   - GLOBAL-CODE-PREFERENCES.md - Project principles"
+echo "   - CODE_STANDARDS.md - Coding standards"
+echo "   - ARCHITECTURE.md - Update with your architecture"
+echo "   - SECURITY.md - Review security practices"
+echo ""
+echo "==================================================================="

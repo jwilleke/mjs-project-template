@@ -81,11 +81,38 @@ npm run test:coverage    # Coverage report
 
 ## Using This Template
 
-1. **Click "Use this template"** on GitHub or clone it
+### For New Projects
+
+1. **Clone this template**
 2. **Run SETUP.md** to install dependencies
 3. **Update AGENTS.md** with your project context
 4. **Update README.md** with your project details
 5. **Start developing** following CODE_STANDARDS.md
+
+### For Existing Projects
+
+**Use the smart merge utility** to intelligently combine template improvements with your existing content:
+
+```bash
+# Clone template
+git clone https://github.com/jwilleke/mjs-project-template /tmp/template
+
+# Install merge tools
+cd /tmp/template/tools && npm install
+
+# Run smart merge (preview first)
+npx ts-node merge-template.ts \
+  --template-dir /tmp/template \
+  --project-dir /path/to/your/project \
+  --dry-run
+
+# Apply merge
+npx ts-node merge-template.ts \
+  --template-dir /tmp/template \
+  --project-dir /path/to/your/project
+```
+
+See [TEMPLATE_INTEGRATION.md](TEMPLATE_INTEGRATION.md) for complete integration guide.
 
 ## For Teams
 
