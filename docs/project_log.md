@@ -1,15 +1,24 @@
 # Project Log
 
-Log of all work done on this project. Updated after each session to maintain continuity across agent sessions.
+This document tracks ongoing work and session history for the MJS Cookbook project.
 
-## Required Format
+## Current Status
+
+- Phase:  (EXAMPLE) Phase 4 Complete - Web UI Live
+- Build Status: (EXAMPLE) All tests passing (11 tests)
+- Last Updated:  (EXAMPLE) 2025-12-21
+- Overall Health:  (EXAMPLE) Stable - No known blockers
+
+## Session Logs
+
+### Session Log Required Format
 
 ```
-## yyyy-MM-dd-##
+### yyyy-MM-dd-##
 
-- Agent-model: [Claude/Gemini/etc]
+- Agent: [Claude/Gemini/Other]
 - Subject: [Brief description]
-- Current Task (or Issue)
+- Current Issue: [issue]
 - Work Done: 
   - [task 1]
   - [task 2]
@@ -18,14 +27,3 @@ Log of all work done on this project. Updated after each session to maintain con
   - [file1.js]
   - [file2.md]
 ```
-
-## Session History Format
-
-```markdown
-### 2025-12-XX-## - [Agent Name]
-```
-
-### Next Steps
-
-- Update your project-specific goals in AGENTS.md
-- Create initial source files in src/ directory
