@@ -1,6 +1,6 @@
 # Code Standards
 
-This document outlines the coding standards and best practices for this project. All standards here follow the principles in ~/GLOBAL-CODE-PREFERENCES.md
+This document outlines the coding standards and best practices for this project. All standards here follow the principles in [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md)
 
 Related documents:
 
@@ -74,13 +74,52 @@ Key rules:
 Run linting:
 
 ```bash
-npm run lint
+npm run lint          # Runs both code and markdown linting
+npm run lint:code     # ESLint only
 ```
 
 Auto-fix fixable issues:
 
 ```bash
-npm run lint:fix
+npm run lint:fix      # Fixes both code and markdown
+npm run lint:code:fix # ESLint only
+```
+
+### Markdownlint
+
+We use Markdownlint to ensure consistent and well-formatted documentation.
+
+Configuration: `.markdownlint.json`
+
+Key rules:
+
+- Consistent heading style
+- 2-space indentation for lists
+- Line length limits (300 chars general, 80 for headings)
+- Blank lines around lists and code blocks
+- Consistent list marker style
+- **No bold text as headings (MD036)** - Use proper heading syntax (`##`, `###`, etc.) instead of `**Bold:**`
+
+Run markdown linting:
+
+```bash
+npm run lint:md       # Check all markdown files
+npm run lint:md:fix   # Auto-fix markdown issues (note: MD036 requires manual fix)
+```
+
+**Heading vs Bold Text:**
+
+```markdown
+<!-- ❌ Bad - bold text used as heading -->
+**Update Requirements:**
+- Item 1
+- Item 2
+
+<!-- ✅ Good - proper heading -->
+### Update Requirements
+
+- Item 1
+- Item 2
 ```
 
 ## Naming Conventions
@@ -94,17 +133,6 @@ npm run lint:fix
 ## Code Organization
 
 ### File Structure
-
-```
-src/
-├── controllers/     # HTTP request handlers
-├── services/       # Business logic
-├── models/         # Data models and types
-├── middleware/     # Express middleware
-├── utils/          # Utility functions
-├── types/          # TypeScript type definitions
-└── index.ts        # Entry point
-```
 
 ### Function Length
 
@@ -121,7 +149,7 @@ src/
 Example:
 
 ```typescript
-/
+/**
  * Validates user email format
  * @param email - The email to validate
  * @returns true if valid RFC 5322 format
@@ -172,12 +200,17 @@ Closes #123
 
 ## Pre-commit Hooks
 
-Husky is configured to run linting before commits. Commits with linting errors will be rejected.
+Husky is configured to run both code and markdown linting before commits. Commits with linting errors will be rejected.
 
-Run the pre-commit hook manually:
+The pre-commit hook runs:
+
+- ESLint on TypeScript files
+- Markdownlint on all markdown files
+
+Run the pre-commit check manually:
 
 ```bash
-npm run lint
+npm run lint          # Runs both code and markdown linting
 ```
 
 ## Package Standards
@@ -213,15 +246,17 @@ Quick checklist:
 - Add examples for public APIs
 - Update [AGENTS.md](./AGENTS.md) when making significant changes
 - See [ARCHITECTURE.md](./ARCHITECTURE.md) for architectural documentation standards
+- All markdown files must pass markdownlint (`npm run lint:md`)
 
 ## Review Checklist
 
 Before submitting code for review:
 
-- [ ] Code passes linting (`npm run lint`)
+- [ ] Code passes linting (`npm run lint` - includes both code and markdown)
 - [ ] Code is formatted (`npm run format`)
 - [ ] Tests pass and coverage is adequate
 - [ ] TypeScript compiles without errors
+- [ ] Markdown files pass linting (included in `npm run lint`)
 - [ ] No console.log statements in production code
 - [ ] Commit message follows conventions
 - [ ] AGENTS.md updated if applicable

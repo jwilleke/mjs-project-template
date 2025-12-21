@@ -2,7 +2,7 @@
 
 A comprehensive Node.js/TypeScript project template with production-ready tooling, code standards, and documentation.
 
-**IMPORTANT: Read ~/GLOBAL-CODE-PREFERENCES.md first** - Contains overarching principles for all code, documentation, and interactions.
+**IMPORTANT: Read [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md) first** - Contains overarching principles for all code, documentation, and interactions.
 
 ## Quick Start
 
@@ -24,11 +24,11 @@ See [SETUP.md](SETUP.md) for detailed setup instructions.
 
 ## Documentation
 
-**New to the project?** Start with [AGENTS.md](AGENTS.md) for project context, then check [SETUP.md](SETUP.md).
+New to the project? Start with [AGENTS.md](AGENTS.md) for project context, then check [SETUP.md](SETUP.md).
 
-**Need to find something specific?** See [DOCUMENTATION.md](DOCUMENTATION.md) for a navigation guide.
+Need to find something specific? See [DOCUMENTATION.md](DOCUMENTATION.md) for a navigation guide.
 
-**All documentation:**
+### All Documentation
 
 - **[SETUP.md](SETUP.md)** - Environment setup and installation
 - **[AGENTS.md](AGENTS.md)** - Project context, goals, and status (for AI agents and team collaboration)
@@ -50,6 +50,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md#project-structure) for the complete projec
 - **TypeScript** - Strict type checking
 - **ESLint** - Code quality with TypeScript support
 - **Prettier** - Automatic code formatting
+- **Markdownlint** - Documentation consistency
 - **EditorConfig** - Cross-editor consistency
 - **Husky** - Git pre-commit hooks
 
@@ -58,8 +59,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md#project-structure) for the complete projec
 ```bash
 npm run dev              # Start development server
 npm run build            # Build project
-npm run lint             # Check code quality
-npm run lint:fix         # Auto-fix issues
+npm run lint             # Check code quality (code + markdown)
+npm run lint:fix         # Auto-fix issues (code + markdown)
+npm run lint:md          # Check markdown files only
 npm run format           # Format code with Prettier
 npm run test             # Run tests
 npm run test:watch       # Watch mode
@@ -70,6 +72,7 @@ npm run test:coverage    # Coverage report
 
 - `.eslintrc.json` - ESLint rules
 - `.prettierrc.json` - Prettier formatting
+- `.markdownlint.json` - Markdown linting rules
 - `tsconfig.json` - TypeScript settings
 - `.editorconfig` - Editor settings
 - `.env.example` - Environment template

@@ -19,13 +19,13 @@ Log of all work done on this project. Updated after each session to maintain con
   - [file2.md]
 ```
 
-## Session History Fomat
+## Session History Format
 
 ```markdown
-### 2024-12-XX-## - [Agent Name]
+### 2025-12-XX-## - [Agent Name]
 ```
 
 ### Next Steps
 
-- Update out project-specific goals in AGENTS.md
+- Update your project-specific goals in AGENTS.md
 - Create initial source files in src/ directory
