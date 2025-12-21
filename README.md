@@ -155,13 +155,12 @@ Review and customize:
 
 ## Next Steps
 
+See [docs/project_log.md](docs/project_log.md) for current next steps and project status.
+
+**First-time setup:**
 1. **Read [SETUP.md](SETUP.md)** for environment setup
 2. **Read [AGENTS.md](AGENTS.md)** to understand project context
 3. **Read [CODE_STANDARDS.md](CODE_STANDARDS.md)** for coding guidelines
-4. **Check [ARCHITECTURE.md](ARCHITECTURE.md)** for project structure
-5. **Review [CONTRIBUTING.md](CONTRIBUTING.md)** for workflow
-6. **Review [SECURITY.md](SECURITY.md)** for security practices
-7. **Configure [.github/workflows/](./github/workflows/)** for your deployment target
 
 ## Features
 
