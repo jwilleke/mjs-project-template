@@ -12,6 +12,7 @@ This document outlines the project structure and architectural decisions. **All 
 ## Project Structure
 
 ```
+docs/ - Developer documentation
 src/
 ├── controllers/     # HTTP request handlers / API routes
 ├── services/        # Business logic and core functionality
@@ -24,12 +25,12 @@ src/
 
 ## Directory Conventions
 
-- **controllers/** - Handle incoming requests and orchestrate responses
-- **services/** - Contain business logic, database operations, external API calls
-- **models/** - Data structures, interfaces, type definitions
-- **middleware/** - Authentication, logging, error handling, validation
-- **utils/** - Pure functions, helpers, shared utilities
-- **types/** - TypeScript interfaces and types (can also inline in files if small)
+- controllers/ - Handle incoming requests and orchestrate responses
+- services/ - Contain business logic, database operations, external API calls
+- models/** - Data structures, interfaces, type definitions
+- middleware/ - Authentication, logging, error handling, validation
+- utils/ - Pure functions, helpers, shared utilities
+- types/ - TypeScript interfaces and types (can also inline in files if small)
 
 ## Naming Conventions
 
@@ -37,9 +38,9 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#naming-conventions) for complete nam
 
 ## Technology Stack
 
-- **Runtime**: Node.js (v18+)
-- **Language**: TypeScript
-- **Package Manager**: npm
+- Runtime: Node.js (v18+)
+- Language: TypeScript
+- Package Manager: npm
 - [Add project-specific technologies]
 
 ## Key Dependencies

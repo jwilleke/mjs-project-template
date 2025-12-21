@@ -1,87 +1,60 @@
 # Project Context for AI Agents
 
-This file serves as the single source of truth for project context and state. Both Claude and Gemini should read this file first when working on this project.
+This file serves as the single source of truth for project context and state. All Experts should read this and update file when working on this project.
 
-**CRITICAL: Read ~/GLOBAL-CODE-PREFERENCES.md first** - This contains overarching principles that govern all work on this project:
+## CRITICAL
 
-- Be concise and DRY in code and documentation
-- Iterate progressively, start with core features
-- NEVER put unencrypted secrets in Git
-- Use project_log.md to track all work
-- GitHub CLI is the primary method for interactions
-- Use markdownlint, .editorconfig, .prettierrc.json standards
+- Read GLOBAL-CODE-PREFERENCES.md first - This contains overarching principles that govern all work on this project:
 
-**Quick navigation:**
+## Quick navigation Entries
 
+We always want to have these Documents for project
+
+- Create GLOBAL-CODE-PREFERENCES.md from <https://github.com/jwilleke/mjs-project-template>
 - [CODE_STANDARDS.md](./CODE_STANDARDS.md) - Coding guidelines and conventions
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Project structure and patterns
 - [SECURITY.md](./SECURITY.md) - Security practices and guidelines
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development workflow
+- [project_log.md](docs/project_log.md) - as a quick and historical record of work done on the project.
+
+And some aucillary documents will be created intially or as the project progresses.
+
 - [.github/workflows/README.md](.github/workflows/README.md) - CI/CD pipelines
 
-## Project Overview
+## Context Overview
 
-**Project Name:** `$PROJECT_NAME` (from .env.example)
+- Project Name: `$PROJECT_NAME` (from .env.example)
+- Description: A brief description of what this project does and its primary purpose.
+- Example Project (for reference):
+  - Project Name: `user-auth-service`
+  - Description: A secure authentication microservice that handles user registration, login, JWT token management, and password reset flows for distributed applications.
 
-**Description:** A brief description of what this project does and its primary purpose.
+## Key Decisions
 
-**Example Project (for reference):**
-
-**Project Name:** `user-auth-service`
-
-**Description:** A secure authentication microservice that handles user registration, login, JWT token management, and password reset flows for distributed applications.
-
-**Goals:**
-
-- Implement secure JWT-based authentication with refresh token rotation
-- Provide REST API endpoints for user registration, login, and token refresh
-- Integrate with PostgreSQL for user data persistence and audit logging
-- Support OAuth2 integration for third-party authentication providers
-
-## Current Status
-
-- Overall Progress: 30% complete
-- Last Updated: 2024-12-02
-- Updated By: Template Setup
-
-**Example Status (for reference):**
-
-- Overall Progress: 65% complete - Core authentication working, OAuth integration in progress
-- Last Updated: 2024-12-01
-- Updated By: Claude
+These maybe done intially or as the project progresses include "Decision and rationale"
 
 ## Architecture & Tech Stack
 
-see [ARCHITECTURE.md](./ARCHITECTURE.md)
+see [ARCHITECTURE.md](./ARCHITECTURE.md) and use primarly structure and headings.
 
 ## Coding Standards
 
-see [CODE_STANDARDS.md](./CODE_STANDARDS.md)
+see [CODE_STANDARDS.md](./CODE_STANDARDS.md) and use primarly structure and headings.
 
-### Key Technologies
+## Project Constrains
 
-- Node.js with TypeScript
-- Express.js for REST API
-- PostgreSQL for data persistence
-- JWT for authentication
-
-**Example Stack (for reference):**
-
-- Node.js v18+ with TypeScript (strict mode)
-- Express.js for REST API endpoints
-- PostgreSQL 15+ with Prisma ORM
-- Redis for session/token caching
-- Jest for unit testing
-- Docker for containerization
+These maybe done intially or as the project progresses.
 
 ## Project Log
 
-Always create project_log.md file as a log of work done on the project in format
+Always create docs/project_log.md file as a quick and historical record of work done on the project and Next Steps
+docs/project_log.md should contain:
+
+docs/project_log.md should use the following format
 
 - yyyy-MM-dd
 - Agent: [Claude/Gemini/Crush]
 - Subject:
-  - Key Decision
   - Current Issues
   - Work Done:
     - [Task 1]
@@ -89,43 +62,15 @@ Always create project_log.md file as a log of work done on the project in format
     - GitHub commit ID (If applicaable)
     - Files Modified: [file1.ext, file2.ext]
 
-## TODO & Next Steps
+### TODO & Next Steps
 
-### High Priority
+in [project_log.md](docs/project_log.md) at the top keep a List of Next Steps ranked as:
 
-- [ ] Fill out Project Overview, Description, and Goals in AGENTS.md with your specific project details
-- [ ] Update .env.example with required environment variables for your project
-- [ ] Create initial source files in src/ directory following ARCHITECTURE.md structure
+- High Priority
+- Medium Priority
+- Low Priority
 
-**Example High Priority (for reference):**
-
-- [ ] Implement OAuth2 Google integration for sign-up flow
-- [ ] Add password strength validation and hashing with bcrypt
-- [ ] Create integration tests for login endpoint
-
-### Medium Priority
-
-- [ ] Set up CI/CD pipeline with GitHub Actions
-- [ ] Add monitoring and error logging (Sentry/LogRocket)
-- [ ] Document API endpoints with OpenAPI/Swagger
-
-**Example Medium Priority (for reference):**
-
-- [ ] Implement rate limiting on authentication endpoints
-- [ ] Add email verification flow for new registrations
-- [ ] Create admin dashboard for user management
-
-### Low Priority
-
-- [ ] Performance optimization and caching strategy
-- [ ] Add analytics for authentication metrics
-- [ ] Create video tutorial for API usage
-
-**Example Low Priority (for reference):**
-
-- [ ] Support SAML authentication provider
-- [ ] Add biometric authentication option
-- [ ] Create mobile SDK wrapper for authentication
+Remove as completed.
 
 ## Notes & Context
 
@@ -141,9 +86,9 @@ Add any additional notes, context, or information that agents should know here. 
 
 For All Agents
 
-- Read [GLOBAL-CODE-PREFERENCES](~/GLOBAL-CODE-PREFERENCES.md)
+- Read GLOBAL-CODE-PREFERENCES at the top of
 - Read this [AGENTS.md](./AGENTS.md) first before starting any work
 - Update sections after completing tasks
 - Note your session in the "Completed Work" section
 
-Important: Keep this file synchronized and updated. It's the bridge between different agents working on the same project.
+Important: Keep this file synchronized and updated. This is the bridge between different experts working on the same project.
