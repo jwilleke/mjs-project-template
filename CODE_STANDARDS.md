@@ -258,6 +258,6 @@ Before submitting code for review:
 - [ ] TypeScript compiles without errors
 - [ ] Markdown files pass linting (included in `npm run lint`)
 - [ ] No console.log statements in production code
-- [ ] Commit message follows conventions
-- [ ] AGENTS.md updated if applicable
+- [ ] Commit message follows [conventions](#git-commit-messages)
+- [ ] [AGENTS.md](./AGENTS.md) updated if applicable
 - [ ] No hardcoded secrets or credentials

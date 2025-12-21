@@ -73,15 +73,12 @@ npm run test:coverage     # Check coverage
 
 ## Commit Guidelines
 
-See [CODE_STANDARDS.md](./CODE_STANDARDS.md#git-commit-messages) for detailed commit message guidelines.
+**All commit messages must follow the format specified in [CODE_STANDARDS.md - Git Commit Messages](./CODE_STANDARDS.md#git-commit-messages).**
 
-Quick reference:
-
-```bash
-git commit -m "type(scope): description"
-```
-
-Examples: `feat(auth): add JWT refresh`, `fix(api): handle null response`, `docs: update README`
+This includes:
+- Conventional commits format (type, scope, description)
+- Required types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+- Pre-commit hooks that enforce linting standards
 
 ## Pull Requests
 
@@ -89,16 +86,16 @@ Examples: `feat(auth): add JWT refresh`, `fix(api): handle null response`, `docs
 
 1. Update branch: `git fetch origin && git rebase origin/master`
 2. Run tests: `npm run lint && npm run test && npm run build`
-3. Update `AGENTS.md` if making significant changes
+3. Update [AGENTS.md](./AGENTS.md) if making significant changes
 
 ### PR Checklist
 
-- [ ] Code follows CODE_STANDARDS.md
+- [ ] Code follows [CODE_STANDARDS.md](./CODE_STANDARDS.md)
 - [ ] Tests pass
 - [ ] Linting passes
 - [ ] No hardcoded secrets
-- [ ] Commit messages follow conventions
-- [ ] AGENTS.md updated if applicable
+- [ ] Commit messages follow [CODE_STANDARDS.md conventions](./CODE_STANDARDS.md#git-commit-messages)
+- [ ] [AGENTS.md](./AGENTS.md) updated if applicable
 
 ## Code Review Process
 
