@@ -2,7 +2,7 @@
 
 Step-by-step instructions to set up the project locally for development.
 
-**First:** Read "GLOBAL-CODE-PREFERENCES.md" for project principles before starting.
+**First:** Read [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md) for project principles before starting.
 
 ## System Requirements
 

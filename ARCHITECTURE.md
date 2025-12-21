@@ -1,6 +1,6 @@
 # Architecture
 
-This document outlines the project structure and architectural decisions. All architectural decisions follow the principles in ~/GLOBAL-CODE-PREFERENCES.md
+This document outlines the project structure and architectural decisions. All architectural decisions follow the principles in [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md)
 
 Related documents:
 
@@ -58,22 +58,11 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#naming-conventions) for complete nam
 
 ## Code Quality Standards
 
-All code must adhere to standards defined in `CODE_STANDARDS.md`:
-
-- TypeScript strict mode
-- ESLint linting
-- Prettier formatting
-- Unit tests for functionality
-- DRY principle (Don't Repeat Yourself)
+See [CODE_STANDARDS.md](./CODE_STANDARDS.md) for all code quality standards including TypeScript configuration, linting rules, formatting, testing requirements, and the DRY principle.
 
 ## Development Workflow
 
-1. Read context: Check `AGENTS.md` for project status and priorities
-2. Create branch: `git checkout -b feature/name`
-3. Make changes: Follow `CODE_STANDARDS.md`
-4. Test and lint: `npm run lint && npm run test`
-5. Commit: Follow conventional commit format
-6. Push and PR: Create pull request with clear description
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the complete development workflow including branching strategy, making changes, testing, and pull request process.
 
 ## Common Patterns
 
@@ -99,11 +88,7 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#performance-considerations) for perf
 
 ## Security Considerations
 
-- Never commit `.env` files or secrets
-- Validate all user input
-- Use parameterized queries for database operations
-- Follow OWASP guidelines
-- Keep dependencies updated
+See [SECURITY.md](./SECURITY.md) for comprehensive security guidelines including secret management, input validation, database security, authentication practices, and OWASP compliance.
 
 ## Testing Strategy
 
@@ -132,11 +117,7 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#testing) for testing standards and g
 
 ## Dependencies and Maintenance
 
-- Review dependencies regularly
-- Run `npm audit` to check for vulnerabilities
-- Update dependencies thoughtfully
-- Document why each dependency is needed
-- Remove unused dependencies
+See [SECURITY.md](./SECURITY.md#dependency-management) for dependency security practices including regular audits, vulnerability scanning, and update procedures.
 
 ## Related Documents
 

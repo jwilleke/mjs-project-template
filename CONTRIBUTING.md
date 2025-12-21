@@ -1,10 +1,10 @@
 # Contributing
 
-Thank you for your interest in contributing to this project! This document provides guidelines for developers and AI agents working on this codebase. **All contributions must follow ~/GLOBAL-CODE-PREFERENCES.md**
+Thank you for your interest in contributing to this project! This document provides guidelines for developers and AI agents working on this codebase. All contributions must follow [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md).
 
-**Before you start:**
+## Before You Start
 
-- Read ~/GLOBAL-CODE-PREFERENCES.md for overarching project principles
+- Read [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md) for overarching project principles
 - Read [AGENTS.md](./AGENTS.md) for project context and status
 - Review [CODE_STANDARDS.md](./CODE_STANDARDS.md) for coding guidelines
 - Check [SECURITY.md](./SECURITY.md) for security practices
@@ -21,40 +21,7 @@ Thank you for your interest in contributing to this project! This document provi
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn
-- Git
-
-### Initial Setup
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd <project-name>
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Verify setup**
-
-   ```bash
-   npm run lint
-   npm run build
-   ```
+See [SETUP.md](./SETUP.md) for complete installation and setup instructions including prerequisites, cloning, dependency installation, environment configuration, and verification steps.
 
 ## Development Workflow
 
@@ -84,13 +51,7 @@ Branch naming: `type/description`
 
 ### Make Changes
 
-Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md) for all code conventions:
-
-- TypeScript strict mode
-- Naming conventions (kebab-case files, camelCase functions)
-- Single quotes, 2-space indentation
-- Explicit return types
-- DRY principle
+Follow [CODE_STANDARDS.md](./CODE_STANDARDS.md) for all code conventions including TypeScript strict mode, naming conventions, formatting rules, and the DRY principle.
 
 ## Making Changes
 

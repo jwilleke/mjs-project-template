@@ -1,6 +1,6 @@
 # Security Guidelines
 
-This document outlines security best practices and policies for this project. All contributors must follow these guidelines. **Security practices are governed by ~/GLOBAL-CODE-PREFERENCES.md which emphasizes: "NEVER put unencrypted 'Secrets' in Git"**
+This document outlines security best practices and policies for this project. All contributors must follow these guidelines. **Security practices are governed by [GLOBAL-CODE-PREFERENCES.md](GLOBAL-CODE-PREFERENCES.md) which emphasizes: "NEVER put unencrypted 'Secrets' in Git"**
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ This document outlines security best practices and policies for this project. Al
 
 ### How to Handle Secrets
 
-**Local Development:**
+#### Local Development
 
 1. Copy `.env.example` to `.env`:
 
@@ -46,7 +46,7 @@ This document outlines security best practices and policies for this project. Al
 
 4. Each developer has their own `.env` with different values
 
-**Production Deployment:**
+#### Production Deployment
 
 1. Use GitHub repository secrets:
    - Go to **Settings → Secrets and variables → Actions**
@@ -173,7 +173,7 @@ console.log('User password:', password);
 logger.info('User authentication attempt', { userId });
 ```
 
-**If you need logging:**
+#### If You Need Logging
 
 - Use structured logging library (Winston, Pino, Bunyan)
 - Never log sensitive data (passwords, tokens, API keys)
@@ -191,7 +191,7 @@ logger.info('User authentication attempt', { userId });
 
 ### Always Validate Input
 
-**Server-side validation (required):**
+#### Server-Side Validation (Required)
 
 ```typescript
 // ✅ Good - validate all user input
@@ -208,7 +208,7 @@ function createUser(email: string, password: string): User {
 }
 ```
 
-**Client-side validation (convenience only):**
+#### Client-Side Validation (Convenience Only)
 
 - Use for better UX
 - Never rely on it for security
@@ -253,7 +253,7 @@ const PASSWORD_REQUIREMENTS = {
 
 ### Password Hashing
 
-**Never store plain text passwords:**
+#### Never Store Plain Text Passwords
 
 ```typescript
 import bcrypt from 'bcrypt';
