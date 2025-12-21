@@ -1,8 +1,8 @@
 # Code Standards
 
-This document outlines the coding standards and best practices for this project. **All standards here follow the principles in ~/GLOBAL-CODE-PREFERENCES.md**
+This document outlines the coding standards and best practices for this project. All standards here follow the principles in ~/GLOBAL-CODE-PREFERENCES.md
 
-**Related documents:**
+Related documents:
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Project structure and architectural patterns
 - [SECURITY.md](./SECURITY.md) - Security guidelines and dependency management
@@ -10,13 +10,13 @@ This document outlines the coding standards and best practices for this project.
 
 ## Overview
 
-We follow the **DRY (Don't Repeat Yourself) principle** - every piece of knowledge should have a single, unambiguous, authoritative representation. If you see repeated logic more than twice, refactor it into reusable components.
+We follow the DRY (Don't Repeat Yourself) principle - every piece of knowledge should have a single, unambiguous, authoritative representation. If you see repeated logic more than twice, refactor it into reusable components.
 
 ## Language & Environment
 
-- **Language:** English (US) for all code and documentation
-- **Runtime:** Node.js with TypeScript
-- **Target:** ES2020
+- Language: English (US) for all code and documentation
+- Runtime: Node.js with TypeScript
+- Target: ES2020
 
 ## TypeScript Configuration
 
@@ -36,7 +36,7 @@ See `tsconfig.json` for full configuration.
 
 Automatic code formatting using Prettier ensures consistency across the codebase.
 
-**Key settings:**
+Key settings:
 
 - Single quotes for strings
 - 2-space indentation
@@ -60,7 +60,7 @@ EditorConfig settings (`.editorconfig`) ensure consistent editor behavior across
 
 We use ESLint with TypeScript support to catch code quality issues.
 
-**Key rules:**
+Key rules:
 
 - Prefer `const` over `let` and `var`
 - Unused variables must be prefixed with `_`
@@ -85,11 +85,11 @@ npm run lint:fix
 
 ## Naming Conventions
 
-- **Files:** Use kebab-case for file names (e.g., `user-service.ts`, `auth-controller.ts`)
-- **Classes:** Use PascalCase (e.g., `UserService`, `AuthController`)
-- **Functions/Variables:** Use camelCase (e.g., `getUserById`, `isActive`)
-- **Constants:** Use UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
-- **Private members:** Prefix with underscore (e.g., `_internalState`, `_validateInput()`)
+- Files: Use kebab-case for file names (e.g., `user-service.ts`, `auth-controller.ts`)
+- Classes: Use PascalCase (e.g., `UserService`, `AuthController`)
+- Functions/Variables: Use camelCase (e.g., `getUserById`, `isActive`)
+- Constants: Use UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- Private members: Prefix with underscore (e.g., `_internalState`, `_validateInput()`)
 
 ## Code Organization
 
@@ -121,7 +121,7 @@ src/
 Example:
 
 ```typescript
-/**
+/
  * Validates user email format
  * @param email - The email to validate
  * @returns true if valid RFC 5322 format
@@ -157,7 +157,7 @@ type(scope): description
 [optional footer]
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 
 Example:
 

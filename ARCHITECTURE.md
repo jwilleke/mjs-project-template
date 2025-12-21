@@ -1,8 +1,8 @@
 # Architecture
 
-This document outlines the project structure and architectural decisions. **All architectural decisions follow the principles in ~/GLOBAL-CODE-PREFERENCES.md**
+This document outlines the project structure and architectural decisions. All architectural decisions follow the principles in ~/GLOBAL-CODE-PREFERENCES.md
 
-**Related documents:**
+Related documents:
 
 - [CODE_STANDARDS.md](./CODE_STANDARDS.md) - Coding standards and conventions
 - [SECURITY.md](./SECURITY.md) - Security guidelines and best practices
@@ -11,8 +11,9 @@ This document outlines the project structure and architectural decisions. **All 
 
 ## Project Structure
 
-```
-docs/ - Developer documentation
+```text
+EXAMPLE
+docs/ - Developer documentation 
 src/
 ├── controllers/     # HTTP request handlers / API routes
 ├── services/        # Business logic and core functionality
@@ -27,7 +28,7 @@ src/
 
 - controllers/ - Handle incoming requests and orchestrate responses
 - services/ - Contain business logic, database operations, external API calls
-- models/** - Data structures, interfaces, type definitions
+- models/ - Data structures, interfaces, type definitions
 - middleware/ - Authentication, logging, error handling, validation
 - utils/ - Pure functions, helpers, shared utilities
 - types/ - TypeScript interfaces and types (can also inline in files if small)
@@ -49,11 +50,11 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#naming-conventions) for complete nam
 
 ## Configuration Files
 
-- **tsconfig.json** - TypeScript compiler configuration (strict mode enabled)
-- **.eslintrc.json** - ESLint rules for code quality
-- **.prettierrc.json** - Prettier rules for code formatting
-- **.env** - Environment variables (not committed)
-- **package.json** - Project metadata and scripts
+- tsconfig.json - TypeScript compiler configuration (strict mode enabled)
+- .eslintrc.json - ESLint rules for code quality
+- .prettierrc.json - Prettier rules for code formatting
+- .env - Environment variables (not committed)
+- package.json - Project metadata and scripts
 
 ## Code Quality Standards
 
@@ -67,12 +68,12 @@ All code must adhere to standards defined in `CODE_STANDARDS.md`:
 
 ## Development Workflow
 
-1. **Read context**: Check `AGENTS.md` for project status and priorities
-2. **Create branch**: `git checkout -b feature/name`
-3. **Make changes**: Follow `CODE_STANDARDS.md`
-4. **Test and lint**: `npm run lint && npm run test`
-5. **Commit**: Follow conventional commit format
-6. **Push and PR**: Create pull request with clear description
+1. Read context: Check `AGENTS.md` for project status and priorities
+2. Create branch: `git checkout -b feature/name`
+3. Make changes: Follow `CODE_STANDARDS.md`
+4. Test and lint: `npm run lint && npm run test`
+5. Commit: Follow conventional commit format
+6. Push and PR: Create pull request with clear description
 
 ## Common Patterns
 
@@ -139,8 +140,8 @@ See [CODE_STANDARDS.md](./CODE_STANDARDS.md#testing) for testing standards and g
 
 ## Related Documents
 
-- **README.md** - Project overview and quick start
-- **SETUP.md** - Environment setup instructions
-- **CONTRIBUTING.md** - How to contribute
-- **CODE_STANDARDS.md** - Code quality and style guidelines
-- **AGENTS.md** - Project context and status (shared across AI agents)
+- README.md - Project overview and quick start
+- SETUP.md - Environment setup instructions
+- CONTRIBUTING.md - How to contribute
+- CODE_STANDARDS.md - Code quality and style guidelines
+- AGENTS.md - Project context and status (shared across AI agents)
