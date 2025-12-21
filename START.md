@@ -1,6 +1,6 @@
 # START.md - AGENTS Session Initialization
 
-**First:** Read "GLOBAL-CODE-PREFERENCES.md" for project principles before starting. The file "GLOBAL-CODE-PREFERENCES.md" is located at:
+First: Read "GLOBAL-CODE-PREFERENCES.md" for project principles before starting. The file "GLOBAL-CODE-PREFERENCES.md" is located at:
 
 ```bash
 smb://tank.nerdsbythehour.com/jims/data/systems/GLOBAL-CODE-PREFERENCES.md
@@ -47,15 +47,15 @@ Please read and analyze the `AGENTS.md` file completely. This file contains:
 
 ## Your Tasks for This Session
 
-1. **Read `AGENTS.md`** - Understand the full current state
-2. **Assess Status** - Report back on:
+1. Read `AGENTS.md` - Understand the full current state
+2. Assess Status - Report back on:
    - What is the current project status?
    - What work has been completed?
    - What are the current blockers or issues?
    - What are the high-priority tasks?
-3. **Plan Work** - Recommend which tasks we should focus on this session
-4. **Execute** - Work on the prioritized tasks
-5. **Update AGENTS.md** - When work is complete, update the file with:
+3. Plan Work - Recommend which tasks we should focus on this session
+4. Execute - Work on the prioritized tasks
+5. Update AGENTS.md - When work is complete, update the file with:
    - What you accomplished
    - Files you modified
    - Any new issues discovered
@@ -64,7 +64,7 @@ Please read and analyze the `AGENTS.md` file completely. This file contains:
 
 ## Key Files
 
-- `AGENTS.md` - **READ THIS FIRST** - Shared context for all agents
+- `AGENTS.md` - READ THIS FIRST - Shared context for all agents
 - Project files and directories as described in AGENTS.md
 
 ## Expected Workflow
