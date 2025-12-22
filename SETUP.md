@@ -142,6 +142,7 @@ After setup, read these files to understand the project:
 For current project-specific next steps, see [docs/project_log.md](docs/project_log.md).
 
 **After initial setup:**
+
 1. Read `AGENTS.md` for project context
 2. Read `CODE_STANDARDS.md` for coding guidelines
 3. Check `CONTRIBUTING.md` for workflow

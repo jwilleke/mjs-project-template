@@ -10,10 +10,10 @@
     "start": "node dist/index.js",
     "lint": "npm run lint:code && npm run lint:md",
     "lint:code": "eslint src/**/*.ts",
-    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
+    "lint:md": "npx markdownlint \"**/*.md\" --ignore node_modules",
+    "lint:md:fix": "npx markdownlint \"**/*.md\" --ignore node_modules --fix",
     "lint:fix": "npm run lint:code:fix && npm run lint:md:fix",
     "lint:code:fix": "eslint src/**/*.ts --fix",
-    "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -37,12 +37,11 @@
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "husky": "^8.0.0",
-    "markdownlint-cli": "^0.39.0",
+    "markdownlint-cli": "^0.47.0",
     "prettier": "^3.0.0",
     "ts-node": "^10.0.0",
     "typescript": "^5.0.0"
   },
-  "dependencies": {},
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
