@@ -124,12 +124,14 @@ npx ts-node merge-template.ts \
 ### What Smart Merge Does
 
 **For AGENTS.md:**
+
 - ✅ Adds NEW sections: Agent Context Protocol, Priority Matrix, Known Limitations
 - ✅ Keeps EXISTING content: Your project name, description, custom sections
 - ✅ Updates YAML frontmatter: Merges intelligently
 - ✅ Preserves custom sections: Any sections you added
 
 **For package.json:**
+
 - ✅ Adds NEW scripts: lint:md, lint:md:fix, typecheck
 - ✅ Adds NEW dependencies: markdownlint-cli, husky
 - ✅ Keeps YOUR metadata: name, version, description, author

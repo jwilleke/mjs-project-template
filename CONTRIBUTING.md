@@ -76,6 +76,7 @@ npm run test:coverage     # Check coverage
 **All commit messages must follow the format specified in [CODE_STANDARDS.md - Git Commit Messages](./CODE_STANDARDS.md#git-commit-messages).**
 
 This includes:
+
 - Conventional commits format (type, scope, description)
 - Required types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 - Pre-commit hooks that enforce linting standards
