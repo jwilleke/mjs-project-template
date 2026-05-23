@@ -6,13 +6,13 @@ This guide explains how to apply this project template to your existing or new p
 
 The integration script applies all improvements from this template:
 
-- **Documentation standards** (DRY principle, Single Source of Truth)
-- **Agent Context Protocol** (YAML frontmatter, priority matrix)
-- **Markdownlint enforcement** (MD036 rule, consistent formatting)
-- **Complete package.json** with all quality tooling
-- **Config files** (eslint.config.mjs, .prettierrc.json, .markdownlint.json, tsconfig.json)
-- **Pre-commit hooks** (Husky with code + markdown linting)
-- **Documentation templates** (AGENTS.md, CODE_STANDARDS.md, etc.)
+- Documentation standards (DRY principle, Single Source of Truth)
+- Agent Context Protocol (YAML frontmatter, priority matrix)
+- Markdownlint enforcement (MD036 rule, consistent formatting)
+- Complete package.json with all quality tooling
+- Config files (eslint.config.mjs, .prettierrc.json, .markdownlint.json, tsconfig.json)
+- Pre-commit hooks (Husky with code + markdown linting)
+- Documentation templates (AGENTS.md, CODE_STANDARDS.md, etc.)
 
 ## Integration Methods
 
@@ -75,24 +75,24 @@ When running the script, you'll see three options:
 
 ### [N] Normal Copy (Safe for existing projects)
 
-- **Copies:** Only NEW files that don't exist in your project
-- **Skips:** All existing files (won't overwrite your code)
-- **Use when:** Adding template to existing project with custom code
-- **Safe:** Yes - won't touch your existing files
-- **⚠️ Limitation:** You'll miss new sections added to existing files (like AGENTS.md improvements)
+- Copies: Only NEW files that don't exist in your project
+- Skips: All existing files (won't overwrite your code)
+- Use when: Adding template to existing project with custom code
+- Safe: Yes - won't touch your existing files
+- ⚠️ Limitation: You'll miss new sections added to existing files (like AGENTS.md improvements)
 
 ### [O] Overwrite All (Destructive!)
 
-- **Copies:** ALL template files
-- **Overwrites:** Any existing files with same names
-- **Use when:** You want to completely reset to template standards
-- **Safe:** No - destroys custom content!
-- **⚠️ Warning:** You'll lose project-specific content in AGENTS.md, package.json, etc.
+- Copies: ALL template files
+- Overwrites: Any existing files with same names
+- Use when: You want to completely reset to template standards
+- Safe: No - destroys custom content!
+- ⚠️ Warning: You'll lose project-specific content in AGENTS.md, package.json, etc.
 
 ### [C] Cancel
 
-- **Does:** Nothing
-- **Use when:** You want to review what would change first
+- Does: Nothing
+- Use when: You want to review what would change first
 
 ## BETTER OPTION: Smart Merge (Recommended for Existing Projects)
 
@@ -123,21 +123,21 @@ npx ts-node merge-template.ts \
 
 ### What Smart Merge Does
 
-**For AGENTS.md:**
+#### For AGENTS.md
 
 - ✅ Adds NEW sections: Agent Context Protocol, Priority Matrix, Known Limitations
 - ✅ Keeps EXISTING content: Your project name, description, custom sections
 - ✅ Updates YAML frontmatter: Merges intelligently
 - ✅ Preserves custom sections: Any sections you added
 
-**For package.json:**
+#### For package.json
 
 - ✅ Adds NEW scripts: lint:md, lint:md:fix, typecheck
 - ✅ Adds NEW dependencies: markdownlint-cli, husky
 - ✅ Keeps YOUR metadata: name, version, description, author
 - ✅ Merges dependencies: Combines template + your existing deps
 
-**Example:**
+#### Example
 
 ```markdown
 <!-- Your existing AGENTS.md -->
@@ -271,10 +271,10 @@ npm run prepare
 
 Update these files for your project:
 
-- **ARCHITECTURE.md** - Document your actual architecture
-- **SECURITY.md** - Review and customize security policies
-- **README.md** - Add project-specific information
-- **CONTRIBUTING.md** - Adjust workflow if needed
+- ARCHITECTURE.md - Document your actual architecture
+- SECURITY.md - Review and customize security policies
+- README.md - Add project-specific information
+- CONTRIBUTING.md - Adjust workflow if needed
 
 ## Troubleshooting
 
@@ -312,31 +312,31 @@ git status                # See all changes
 
 ### For Existing Projects with Custom Content
 
-1. **Use Smart Merge** - Intelligently combines template + your content
-2. **Run with --dry-run first** - Preview changes before applying
-3. **Review backups** - Smart merge creates .backup files
-4. **Test thoroughly** - Run `npm run lint` after merge
+1. Use Smart Merge - Intelligently combines template + your content
+2. Run with --dry-run first - Preview changes before applying
+3. Review backups - Smart merge creates .backup files
+4. Test thoroughly - Run `npm run lint` after merge
 
 ### For Existing Projects (Simple/New)
 
-1. **Use Normal Copy [N]** - If you have minimal custom content
-2. **Review new files** before committing
-3. **Manually update** key files like AGENTS.md if needed
-4. **Test thoroughly** after integration
+1. Use Normal Copy [N] - If you have minimal custom content
+2. Review new files before committing
+3. Manually update key files like AGENTS.md if needed
+4. Test thoroughly after integration
 
 ### For New Projects
 
-1. **Clone template directly** (Method 3)
-2. **Update all project-specific values**
-3. **Delete unused files** (if any)
-4. **Start coding** with best practices built-in
+1. Clone template directly (Method 3)
+2. Update all project-specific values
+3. Delete unused files (if any)
+4. Start coding with best practices built-in
 
 ### For Team Projects
 
-1. **Create feature branch** for integration
-2. **Review changes** with team
-3. **Update docs together** to match your workflow
-4. **Merge after approval**
+1. Create feature branch for integration
+2. Review changes with team
+3. Update docs together to match your workflow
+4. Merge after approval
 
 ## What You Get
 

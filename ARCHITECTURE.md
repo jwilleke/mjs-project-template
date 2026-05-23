@@ -26,22 +26,22 @@ docs/                # Developer documentation
 
 ## Directory Conventions
 
-- **controllers/** - Handle incoming requests and orchestrate responses
-- **services/** - Contain business logic, database operations, external API calls
-- **models/** - Data structures, interfaces, type definitions
-- **middleware/** - Authentication, logging, error handling, validation
-- **utils/** - Pure functions, helpers, shared utilities
-- **types/** - TypeScript interfaces and types (can also inline in files if small)
+- controllers/ - Handle incoming requests and orchestrate responses
+- services/ - Contain business logic, database operations, external API calls
+- models/ - Data structures, interfaces, type definitions
+- middleware/ - Authentication, logging, error handling, validation
+- utils/ - Pure functions, helpers, shared utilities
+- types/ - TypeScript interfaces and types (can also inline in files if small)
 
 ## Technology Stack
 
-- **Runtime:** Node.js (v18+)
-- **Language:** TypeScript (strict mode, ESM)
-- **Package Manager:** npm
-- **Testing:** Vitest
-- **Linting:** ESLint 9 (flat config) + Prettier + Markdownlint
-- **Dev runner:** tsx (ESM-native TypeScript execution)
-- **Hooks:** Husky + lint-staged
+- Runtime: Node.js (v18+)
+- Language: TypeScript (strict mode, ESM)
+- Package Manager: npm
+- Testing: Vitest
+- Linting: ESLint 9 (flat config) + Prettier + Markdownlint
+- Dev runner: tsx (ESM-native TypeScript execution)
+- Hooks: Husky + lint-staged
 
 ## Configuration Files
 

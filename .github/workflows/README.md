@@ -2,7 +2,7 @@
 
 This directory contains CI/CD pipeline definitions for automated testing, linting, security checks, and deployments.
 
-**Related documentation:**
+#### Related documentation
 
 - [SECURITY.md](../../SECURITY.md) - Secret management and security best practices
 - [CODE_STANDARDS.md](../../CODE_STANDARDS.md) - Code quality standards that CI/CD enforces
@@ -12,35 +12,35 @@ This directory contains CI/CD pipeline definitions for automated testing, lintin
 
 ### `ci.yml` - Continuous Integration
 
-**Triggered on:** Push to `master` or `develop`, Pull Requests
+Triggered on: Push to `master` or `develop`, Pull Requests
 
-**What it does:**
+#### What it does
 
-1. **Lint and Test** (Node 20.x and 22.x)
+1. Lint and Test (Node 20.x and 22.x)
    - Installs dependencies
    - Runs ESLint for code quality
    - Type-checks with TypeScript
    - Runs test suite
    - Generates coverage reports
 
-2. **Security Audit**
+2. Security Audit
    - Audits npm dependencies for vulnerabilities
    - Checks for known security issues
    - Runs in parallel with other checks
 
-3. **Build**
+3. Build
    - Builds the TypeScript project
    - Uploads build artifacts for verification
 
-**When it passes:** All code quality checks pass, tests pass, builds successfully
+When it passes: All code quality checks pass, tests pass, builds successfully
 
-**When it fails:** Will block PR merges and notify on push
+When it fails: Will block PR merges and notify on push
 
 ### `deploy.yml` - Deployment Pipeline
 
-**Triggered on:** Push to `master` branch or manual workflow_dispatch
+Triggered on: Push to `master` branch or manual workflow_dispatch
 
-**What it does:**
+#### What it does
 
 1. Sets up Node.js environment
 2. Installs dependencies
@@ -48,7 +48,7 @@ This directory contains CI/CD pipeline definitions for automated testing, lintin
 4. Builds project
 5. Placeholder for deployment steps (configure for your platform)
 
-**Deployment Targets (configure as needed):**
+#### Deployment Targets (configure as needed)
 
 - AWS Lambda, EC2, or Elastic Beanstalk
 - Heroku
@@ -58,7 +58,7 @@ This directory contains CI/CD pipeline definitions for automated testing, lintin
 - Kubernetes clusters
 - Docker registries
 
-**How to configure:** Edit the deployment steps section in `deploy.yml` for your platform
+How to configure: Edit the deployment steps section in `deploy.yml` for your platform
 
 ## Setting Up Secrets
 
@@ -74,7 +74,7 @@ Quick setup:
    - `DOCKER_REGISTRY_TOKEN`
    - `DATABASE_URL` (for migrations)
 
-**Example usage in workflow:**
+#### Example usage in workflow
 
 ```yaml
 - name: Deploy to Heroku

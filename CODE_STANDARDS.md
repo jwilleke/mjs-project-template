@@ -10,18 +10,18 @@ Related documents:
 
 ## Guiding Principles
 
-- **DRY** (Don't Repeat Yourself) - Every piece of knowledge should have a single, unambiguous, authoritative representation. Refactor repeated logic into reusable components.
-- **Iterate progressively** - Start with core features only. Gather feedback.
-- **No secrets in Git** - NEVER put unencrypted secrets in Git or other CMS systems.
-- **GitHub CLI** - Primary method for interacting with GitHub.
-- **Think first** - Present options before implementing. On larger objectives, present a phased plan.
-- **Markdown style** - Use bullet points, not numbered lists for content (section headers like `## Step 1` are fine). No bold text as a heading or pseudo-heading — see Markdownlint MD036 below.
+- DRY (Don't Repeat Yourself) - Every piece of knowledge should have a single, unambiguous, authoritative representation. Refactor repeated logic into reusable components.
+- Iterate progressively - Start with core features only. Gather feedback.
+- No secrets in Git - NEVER put unencrypted secrets in Git or other CMS systems.
+- GitHub CLI - Primary method for interacting with GitHub.
+- Think first - Present options before implementing. On larger objectives, present a phased plan.
+- Markdown style - Use bullet points, not numbered lists for content (section headers like `## Step 1` are fine). No bold text as a heading or pseudo-heading — see Markdownlint MD036 below.
 
 ## Language & Environment
 
-- **Language:** English (US) for all code and documentation
-- **Runtime:** Node.js with TypeScript
-- **Target:** ES2020
+- Language: English (US) for all code and documentation
+- Runtime: Node.js with TypeScript
+- Target: ES2020
 
 ## TypeScript Configuration
 
@@ -105,7 +105,7 @@ Key rules:
 - Line length limits (300 chars general, 80 for headings)
 - Blank lines around lists and code blocks
 - Consistent list marker style
-- **No bold text as headings (MD036)** - Use proper heading syntax (`##`, `###`, etc.) instead of `**Bold:**`
+- No bold text as headings (MD036) - Use proper heading syntax (`##`, `###`, etc.) instead of `**Bold:**`
 
 Run markdown linting:
 
@@ -131,11 +131,11 @@ npm run lint:md:fix   # Auto-fix markdown issues (note: MD036 requires manual fi
 
 ## Naming Conventions
 
-- **Files:** Use kebab-case for file names (e.g., `user-service.ts`, `auth-controller.ts`)
-- **Classes:** Use PascalCase (e.g., `UserService`, `AuthController`)
-- **Functions/Variables:** Use camelCase (e.g., `getUserById`, `isActive`)
-- **Constants:** Use UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
-- **Private members:** Prefix with underscore (e.g., `_internalState`, `_validateInput()`)
+- Files: Use kebab-case for file names (e.g., `user-service.ts`, `auth-controller.ts`)
+- Classes: Use PascalCase (e.g., `UserService`, `AuthController`)
+- Functions/Variables: Use camelCase (e.g., `getUserById`, `isActive`)
+- Constants: Use UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- Private members: Prefix with underscore (e.g., `_internalState`, `_validateInput()`)
 
 ## Code Organization
 
