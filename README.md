@@ -6,9 +6,9 @@ A Node.js/TypeScript project template with production-ready tooling, code standa
 
 ### Prerequisites
 
-- **Node.js** v18+ (`node --version`) — [download](https://nodejs.org/)
-- **npm** v9+ (`npm --version`)
-- **Git** (`git --version`)
+- Node.js v18+ (`node --version`) — [download](https://nodejs.org/)
+- npm v9+ (`npm --version`)
+- Git (`git --version`)
 
 ### Setup
 
@@ -48,24 +48,24 @@ npm run typecheck        # TypeScript type checking without emit
 
 ## Documentation
 
-- **[AGENTS.md](AGENTS.md)** - Project context, status, and AI agent collaboration
-- **[CODE_STANDARDS.md](CODE_STANDARDS.md)** - Code quality, style, and guiding principles
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Project structure and patterns
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development workflow and PRs
-- **[SECURITY.md](SECURITY.md)** - Security guidelines and best practices
-- **[.github/workflows/README.md](.github/workflows/README.md)** - CI/CD pipelines
+- [AGENTS.md](AGENTS.md) - Project context, status, and AI agent collaboration
+- [CODE_STANDARDS.md](CODE_STANDARDS.md) - Code quality, style, and guiding principles
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Project structure and patterns
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow and PRs
+- [SECURITY.md](SECURITY.md) - Security guidelines and best practices
+- [.github/workflows/README.md](.github/workflows/README.md) - CI/CD pipelines
 
 ## What's Included
 
 ### Code Quality Tools
 
-- **TypeScript** - Strict type checking
-- **ESLint 9** - Code quality with flat config (`eslint.config.mjs`)
-- **Vitest** - Fast test runner
-- **Prettier** - Automatic code formatting
-- **Markdownlint** - Documentation consistency
-- **EditorConfig** - Cross-editor consistency
-- **Husky + lint-staged** - Pre-commit hooks on changed files only
+- TypeScript - Strict type checking
+- ESLint 9 - Code quality with flat config (`eslint.config.mjs`)
+- Vitest - Fast test runner
+- Prettier - Automatic code formatting
+- Markdownlint - Documentation consistency
+- EditorConfig - Cross-editor consistency
+- Husky + lint-staged - Pre-commit hooks on changed files only
 
 ### Configuration Files
 
@@ -82,20 +82,20 @@ npm run typecheck        # TypeScript type checking without emit
 
 ### GitHub Integration
 
-- **CI workflow** - Lint, typecheck, test, build, security audit
-- **Deploy workflow** - Production deployment template
-- **PR template** - Standardized pull request format
-- **Issue templates** - Bug reports and feature requests
+- CI workflow - Lint, typecheck, test, build, security audit
+- Deploy workflow - Production deployment template
+- PR template - Standardized pull request format
+- Issue templates - Bug reports and feature requests
 
 ## Using This Template
 
 ### For New Projects
 
-- **Clone** this template
-- **Run** `npm install`
-- **Update** AGENTS.md with your project context
-- **Update** README.md with your project details
-- **Start developing** following CODE_STANDARDS.md
+- Clone this template
+- Run `npm install`
+- Update AGENTS.md with your project context
+- Update README.md with your project details
+- Start developing following CODE_STANDARDS.md
 
 ### For Existing Projects
 
@@ -105,10 +105,10 @@ See [TEMPLATE_INTEGRATION.md](TEMPLATE_INTEGRATION.md) for the smart merge utili
 
 This template supports teams and AI agents collaborating:
 
-- **AGENTS.md** - Single source of truth for project state (works with any AI agent)
-- **CLAUDE.md** - Thin pointer to AGENTS.md (auto-loaded by Claude Code)
-- **CODE_STANDARDS.md** - Coding rules and guiding principles
-- **CONTRIBUTING.md** - Development workflow
+- AGENTS.md - Single source of truth for project state (works with any AI agent)
+- CLAUDE.md - Thin pointer to AGENTS.md (auto-loaded by Claude Code)
+- CODE_STANDARDS.md - Coding rules and guiding principles
+- CONTRIBUTING.md - Development workflow
 
 ## Troubleshooting
 
@@ -135,10 +135,10 @@ PORT=3001 npm run dev
 
 ## Customization
 
-- **README.md** - Add project-specific information
-- **CODE_STANDARDS.md** - Adjust rules for your team
-- **package.json** - Update project name and dependencies
-- **.env.example** - Add your required environment variables
-- **ARCHITECTURE.md** - Document your specific architecture
-- **SECURITY.md** - Review and customize security policies
-- **.github/workflows/** - Configure CI/CD for your deployment target
+- README.md - Add project-specific information
+- CODE_STANDARDS.md - Adjust rules for your team
+- package.json - Update project name and dependencies
+- .env.example - Add your required environment variables
+- ARCHITECTURE.md - Document your specific architecture
+- SECURITY.md - Review and customize security policies
+- .github/workflows/ - Configure CI/CD for your deployment target
