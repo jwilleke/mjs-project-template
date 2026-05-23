@@ -72,7 +72,7 @@ npm run test:coverage     # Check coverage
 
 ## Commit Guidelines
 
-**All commit messages must follow the format specified in [CODE_STANDARDS.md - Git Commit Messages](./CODE_STANDARDS.md#git-commit-messages).**
+All commit messages must follow the format specified in [CODE_STANDARDS.md - Git Commit Messages](./CODE_STANDARDS.md#git-commit-messages).
 
 This includes:
 

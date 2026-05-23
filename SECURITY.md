@@ -17,7 +17,7 @@ This document outlines security best practices and policies for this project. Al
 
 ### Never Commit Secrets
 
-**Critical Rule:** Never commit passwords, API keys, tokens, or other secrets to version control.
+Critical Rule: Never commit passwords, API keys, tokens, or other secrets to version control.
 
 ### What Counts as a Secret
 
@@ -77,7 +77,7 @@ This document outlines security best practices and policies for this project. Al
 
 If you accidentally commit a secret:
 
-1. **Immediately rotate the secret** (change the password/key)
+1. Immediately rotate the secret (change the password/key)
 2. Remove from git history:
 
    ```bash
@@ -115,25 +115,25 @@ This project includes GitHub Actions workflows that automatically audit dependen
 
 ### Updating Dependencies
 
-1. **Regular updates:**
+1. Regular updates:
 
    ```bash
    npm update
    npm outdated  # See what can be updated
    ```
 
-2. **Patch security issues immediately:**
+2. Patch security issues immediately:
 
    ```bash
    npm audit fix
    ```
 
-3. **Major version updates:**
+3. Major version updates:
    - Test thoroughly before merging
    - Check changelog for breaking changes
    - Update code if necessary
 
-4. **Audit before commit:**
+4. Audit before commit:
 
    ```bash
    npm audit
@@ -320,18 +320,18 @@ const isValid = await bcrypt.compare(inputPassword, storedHash);
 
 Maintain separate environments:
 
-- **Development**: Local, lenient security
-- **Staging**: Production-like, test environment
-- **Production**: Maximum security, restricted access
+- Development: Local, lenient security
+- Staging: Production-like, test environment
+- Production: Maximum security, restricted access
 
 ### Secure Deployment
 
-1. **Code review required** before production deployment
-2. **Automated tests must pass** (CI/CD pipeline)
-3. **Security scans must pass** (no high/critical vulnerabilities)
-4. **Secrets injected at runtime** (never in code)
-5. **Immutable deployments** (rollback capability)
-6. **Monitoring and alerting enabled**
+1. Code review required before production deployment
+2. Automated tests must pass (CI/CD pipeline)
+3. Security scans must pass (no high/critical vulnerabilities)
+4. Secrets injected at runtime (never in code)
+5. Immutable deployments (rollback capability)
+6. Monitoring and alerting enabled
 
 ### Access Control
 
@@ -356,10 +356,10 @@ Maintain separate environments:
 
 If you discover a vulnerability:
 
-1. **Do not** create a public GitHub issue
-2. **Do not** commit details in code comments
-3. **Do** email security contact privately
-4. **Do** provide:
+1. Do not create a public GitHub issue
+2. Do not commit details in code comments
+3. Do email security contact privately
+4. Do provide:
    - Detailed description
    - Steps to reproduce
    - Severity assessment
@@ -367,10 +367,10 @@ If you discover a vulnerability:
 
 ### Vulnerability Response Timeline
 
-- **Critical (CVSS 9.0-10)**: Fix within 24 hours
-- **High (CVSS 7.0-8.9)**: Fix within 1 week
-- **Medium (CVSS 4.0-6.9)**: Fix within 2 weeks
-- **Low (CVSS 0.1-3.9)**: Fix within 30 days
+- Critical (CVSS 9.0-10): Fix within 24 hours
+- High (CVSS 7.0-8.9): Fix within 1 week
+- Medium (CVSS 4.0-6.9): Fix within 2 weeks
+- Low (CVSS 0.1-3.9): Fix within 30 days
 
 ### Public Disclosure
 
@@ -407,11 +407,11 @@ Before deploying to production:
 
 ### Security Tools
 
-- **npm audit** - Check for known vulnerabilities
-- **OWASP ZAP** - Automated security scanning
-- **Snyk** - Continuous vulnerability scanning
-- **GitHub Advanced Security** - Code scanning and secret scanning
-- **Dependabot** - Automated dependency updates
+- npm audit - Check for known vulnerabilities
+- OWASP ZAP - Automated security scanning
+- Snyk - Continuous vulnerability scanning
+- GitHub Advanced Security - Code scanning and secret scanning
+- Dependabot - Automated dependency updates
 
 ### Learning Resources
 
