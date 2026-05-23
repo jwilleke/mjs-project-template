@@ -15,7 +15,7 @@ Related documents:
 - **No secrets in Git** - NEVER put unencrypted secrets in Git or other CMS systems.
 - **GitHub CLI** - Primary method for interacting with GitHub.
 - **Think first** - Present options before implementing. On larger objectives, present a phased plan.
-- **Markdown style** - Use **bold** at start of list items. Use bullet points, not numbered lists (section headers like `## Step 1` are fine).
+- **Markdown style** - Use bullet points, not numbered lists for content (section headers like `## Step 1` are fine). No bold text as a heading or pseudo-heading — see Markdownlint MD036 below.
 
 ## Language & Environment
 
@@ -114,7 +114,7 @@ npm run lint:md       # Check all markdown files
 npm run lint:md:fix   # Auto-fix markdown issues (note: MD036 requires manual fix)
 ```
 
-**Heading vs Bold Text:**
+#### Heading vs Bold Text
 
 ```markdown
 <!-- Bad - bold text used as heading -->
