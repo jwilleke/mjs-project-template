@@ -23,5 +23,5 @@ labels: bug
 
 ## Environment
 
-- **Node version**: <!-- e.g. 20.x -->
-- **OS**: <!-- e.g. macOS 15, Ubuntu 24.04 -->
+- Node version: <!-- e.g. 20.x -->
+- OS: <!-- e.g. macOS 15, Ubuntu 24.04 -->

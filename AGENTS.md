@@ -28,12 +28,12 @@ See YAML frontmatter above for current project state.
 
 ### Core Documentation (Single Source of Truth)
 
-- [README.md](./README.md) - **Single Source of Truth:** Project overview, setup, and quick start
-- [CODE_STANDARDS.md](./CODE_STANDARDS.md) - **Single Source of Truth:** Guiding principles, naming, formatting, linting, testing, commits
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - **Single Source of Truth:** Project structure, directory conventions, technology stack
-- [SECURITY.md](./SECURITY.md) - **Single Source of Truth:** Secret management, dependency security, authentication, encryption
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - **Single Source of Truth:** Development workflow, branching strategy, pull request process
-- [project_log.md](docs/project_log.md) - **Single Source of Truth:** Historical record of work done, next steps, session tracking
+- [README.md](./README.md) - Single Source of Truth: Project overview, setup, and quick start
+- [CODE_STANDARDS.md](./CODE_STANDARDS.md) - Single Source of Truth: Guiding principles, naming, formatting, linting, testing, commits
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Single Source of Truth: Project structure, directory conventions, technology stack
+- [SECURITY.md](./SECURITY.md) - Single Source of Truth: Secret management, dependency security, authentication, encryption
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Single Source of Truth: Development workflow, branching strategy, pull request process
+- [project_log.md](docs/project_log.md) - Single Source of Truth: Historical record of work done, next steps, session tracking
 
 ### Auxiliary Documentation
 
@@ -181,9 +181,9 @@ See [project_log.md](docs/project_log.md) for the required format, historical wo
 
 ### Agent Behavior Rules
 
-- **Eagerness** - Do not jump into implementation or change files unless clearly instructed. When intent is ambiguous, default to research and recommendations rather than action. Only proceed with edits when the user explicitly requests them.
-- **No speculation** - Never speculate about code you have not opened. Read relevant files BEFORE answering questions. Never make claims about code before investigating.
-- **Parallel tool calls** - If calling multiple tools with no dependencies between them, make all independent calls in parallel. Never use placeholders or guess missing parameters.
+- Eagerness - Do not jump into implementation or change files unless clearly instructed. When intent is ambiguous, default to research and recommendations rather than action. Only proceed with edits when the user explicitly requests them.
+- No speculation - Never speculate about code you have not opened. Read relevant files BEFORE answering questions. Never make claims about code before investigating.
+- Parallel tool calls - If calling multiple tools with no dependencies between them, make all independent calls in parallel. Never use placeholders or guess missing parameters.
 
 ## Commands
 
@@ -211,11 +211,11 @@ npm run typecheck        # TypeScript type checking without emit
 
 ## Key Standards (Quick Reference)
 
-- **TypeScript strict mode** - No implicit any, strict null checks
-- **Prettier** - Single quotes, 2-space indent, 100-char width, no trailing commas
-- **ESLint** - Prefer const, unused vars prefixed with `_`, no floating promises
-- **Commits** - Conventional format: `type(scope): description`
-- **Branches** - Format: `type/description` (e.g., `feature/user-auth`, `fix/login-bug`)
+- TypeScript strict mode - No implicit any, strict null checks
+- Prettier - Single quotes, 2-space indent, 100-char width, no trailing commas
+- ESLint - Prefer const, unused vars prefixed with `_`, no floating promises
+- Commits - Conventional format: `type(scope): description`
+- Branches - Format: `type/description` (e.g., `feature/user-auth`, `fix/login-bug`)
 
 ## Session Workflow
 
@@ -239,4 +239,4 @@ Add any additional notes, context, or information that agents should know here. 
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for branching strategy, commit guidelines, pull request process, and testing requirements.
 
-**Important:** Keep this file synchronized and updated. This is the bridge between different experts working on the same project.
+Important: Keep this file synchronized and updated. This is the bridge between different experts working on the same project.
