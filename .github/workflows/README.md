@@ -16,7 +16,7 @@ This directory contains CI/CD pipeline definitions for automated testing, lintin
 
 **What it does:**
 
-1. **Lint and Test** (Node 18.x and 20.x)
+1. **Lint and Test** (Node 20.x and 22.x)
    - Installs dependencies
    - Runs ESLint for code quality
    - Type-checks with TypeScript
@@ -111,7 +111,7 @@ Edit matrix in `ci.yml`:
 ```yaml
 strategy:
   matrix:
-    node-version: [18.x, 20.x, 22.x]
+    node-version: [20.x, 22.x, 24.x]
 ```
 
 ### Add Custom Test Commands
