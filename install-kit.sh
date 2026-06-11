@@ -135,8 +135,22 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
         !skip       { print }
       ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
     fi
+    return
+  fi
+  # no markers yet — insert the block, AFTER YAML frontmatter if the file has one
+  if head -1 "$d" | grep -qx -- '---'; then
+    act "insert AGENTS.md managed block (after frontmatter; existing content preserved)"
+    if [ "$DRY" -eq 0 ]; then
+      { printf '%s\n' "$START"; cat "$b"; printf '%s\n' "$END"; } >"$d.block.tmp"
+      awk -v bf="$d.block.tmp" '
+        BEGIN { while ((getline l < bf) > 0) blk = blk l "\n" }
+        { print }
+        /^---$/ { c++; if (c == 2 && !done) { printf "\n%s", blk; done = 1 } }
+      ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
+      rm -f "$d.block.tmp"
+    fi
   else
-    act "prepend AGENTS.md managed block (existing AGENTS.md content preserved below)"
+    act "prepend AGENTS.md managed block (existing content preserved below)"
     if [ "$DRY" -eq 0 ]; then
       { printf '%s\n' "$START"; cat "$b"; printf '%s\n\n' "$END"; cat "$d"; } >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
     fi
