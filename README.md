@@ -89,7 +89,11 @@ npm run typecheck        # TypeScript type checking without emit
 
 ## Using This Template
 
-### For New Projects
+This repo serves two missions: a **Node/TypeScript starter** and the canonical home of the
+**agent kit** (commands, labels, markdown rules, GitHub templates) that any repo — Node or not —
+can install via `install-kit.sh`.
+
+### For New Projects (Node starter)
 
 - Clone this template
 - Run `npm install`
@@ -97,9 +101,18 @@ npm run typecheck        # TypeScript type checking without emit
 - Update README.md with your project details
 - Start developing following CODE_STANDARDS.md
 
-### For Existing Projects
+### Installing the agent kit into any repo (new or existing)
 
-See [TEMPLATE_INTEGRATION.md](TEMPLATE_INTEGRATION.md) for the smart merge utility.
+`install-kit.sh` is idempotent — run it on an empty repo to scaffold, or on an existing repo to
+upgrade. It overwrites canonical tool files, merges `.gitignore`, seeds docs/issue templates
+create-if-absent, manages the AGENTS.md block, and migrates `docs/project_log.md` →
+`private/project_log.md`. Re-run anytime to pick up a newer kit version.
+
+```bash
+./install-kit.sh --dry-run /path/to/repo   # preview every change
+./install-kit.sh /path/to/repo             # apply
+/path/to/repo/utility/sync-labels.sh owner/repo   # apply the standard GitHub labels
+```
 
 ## For Teams
 
