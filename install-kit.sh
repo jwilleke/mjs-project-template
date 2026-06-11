@@ -76,13 +76,19 @@ ensure_gitignore() {       # append missing lines, never remove
   done
 }
 
-unignore_claude() {        # narrow a blanket `.claude/` ignore so kit commands are tracked
+unignore_claude() {        # un-ignore shared kit files (commands, CLAUDE.md) so they get tracked
   local gi="$TARGET/.gitignore"
   [ -f "$gi" ] || return 0
   if grep -qxE '\.claude/?' "$gi"; then
     act "gitignore -= .claude/ (blanket ignore removed; .claude/settings.local.json stays ignored)"
     if [ "$DRY" -eq 0 ]; then
       grep -vxE '\.claude/?' "$gi" >"$gi.kit.tmp" && mv "$gi.kit.tmp" "$gi"
+    fi
+  fi
+  if grep -qxE '/?CLAUDE\.md' "$gi"; then
+    act "gitignore -= CLAUDE.md (the thin pointer should be tracked, not local-only)"
+    if [ "$DRY" -eq 0 ]; then
+      grep -vxE '/?CLAUDE\.md' "$gi" >"$gi.kit.tmp" && mv "$gi.kit.tmp" "$gi"
     fi
   fi
 }
