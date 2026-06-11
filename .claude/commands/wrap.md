@@ -8,9 +8,19 @@ to close.
 
 ### Step 1: Survey everything outstanding
 
+Git state:
+
 - `git status -sb` — uncommitted changes, untracked files, branch + ahead/behind
 - `git stash list` — forgotten stashes
 - `git log --oneline @{u}..HEAD` — unpushed commits
+
+In-flight work that a shutdown would orphan (note status of each, anything of significance):
+
+- **Workflows / background agents** still running this session (e.g. `/workflows`, background tasks) — capture what each is doing and whether it finished.
+- **Running processes** started this session — dev servers, watchers, background shells, tunnels.
+- **CI in progress** — `gh run list --limit 5` (anything `in_progress`/`queued`).
+- **Open PRs awaiting action** — `gh pr list` (review/merge state).
+- **Scheduled tasks / routines** that will fire (`/schedule` list, cron).
 
 ### Step 2: Commit outstanding work
 
@@ -28,11 +38,12 @@ entries) so the next session knows exactly where to pick up:
 ## ▶ Resume here — yyyy-MM-dd
 
 - Last worked on: one-line summary
-- Branch / state: <branch>, clean | N unpushed
-- In flight / parked: half-done work, or "none"
+- Branch / state: BRANCH, clean | N unpushed | N stashes
+- Running / in-flight: workflows, background agents, dev servers, in-progress CI — or "none"
+- Parked / half-done: uncommitted experiments, partial work — or "none"
 - Next steps:
   - the next concrete action
-- Blockers: or "none"
+- Blockers / significant notes: or "none"
 <!-- RESUME:END -->
 ```
 
@@ -48,8 +59,9 @@ after the log's title. This block is always overwritten — it reflects only the
 Report one clear verdict:
 
 - ✅ **Safe to close** — working tree clean (or only intentional local files), commits pushed
-  (or explicitly held), resume pointer written.
-- ⚠️ **Attention** — list anything that would be lost or forgotten on shutdown: untracked files
+  (or explicitly held), nothing running, resume pointer written.
+- ⚠️ **Attention** — list anything a shutdown would interrupt or that would be forgotten:
+  still-running workflows / background agents / dev servers, in-progress CI, untracked files
   not committed, stashes, unpushed commits held locally by choice.
 
 ## Notes
