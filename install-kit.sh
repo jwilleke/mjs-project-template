@@ -11,6 +11,7 @@
 # Behavior per file:
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint.jsonc)
 #   merge            .gitignore — append missing lines only
+#   unignore         .gitignore — narrow a blanket `.claude/` ignore (keeps settings.local.json ignored)
 #   create-if-absent TODO.md, CLAUDE.md, private/project_log.md
 #   managed-block    AGENTS.md boilerplate between <!-- KIT:START/END --> markers
 #   migrate          docs/project_log.md → private/project_log.md (once)
@@ -68,11 +69,22 @@ seed() {                   # copy REL from kit only if absent (source at the sam
 
 ensure_gitignore() {       # append missing lines, never remove
   local gi="$TARGET/.gitignore" line
-  for line in "private/" ".claude/settings.local.json"; do
+  for line in "private/" ".claude/settings.local.json" ".claude/worktrees/"; do
     if [ -f "$gi" ] && grep -qxF -- "$line" "$gi"; then act "gitignore ok: $line"; continue; fi
     act "gitignore += $line"
     if [ "$DRY" -eq 0 ]; then printf '%s\n' "$line" >>"$gi"; fi
   done
+}
+
+unignore_claude() {        # narrow a blanket `.claude/` ignore so kit commands are tracked
+  local gi="$TARGET/.gitignore"
+  [ -f "$gi" ] || return 0
+  if grep -qxE '\.claude/?' "$gi"; then
+    act "gitignore -= .claude/ (blanket ignore removed; .claude/settings.local.json stays ignored)"
+    if [ "$DRY" -eq 0 ]; then
+      grep -vxE '\.claude/?' "$gi" >"$gi.kit.tmp" && mv "$gi.kit.tmp" "$gi"
+    fi
+  fi
 }
 
 migrate_log() {            # docs/project_log.md → private/project_log.md (once)
@@ -151,6 +163,7 @@ echo
 
 echo "Merges & migrations (run before create-if-absent so existing logs migrate):"
 ensure_gitignore
+unignore_claude
 migrate_log
 supersede_markdownlint
 echo
