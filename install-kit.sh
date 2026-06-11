@@ -58,6 +58,14 @@ create_if_absent() {       # create REL from templates/TMPL only if absent
   if [ "$DRY" -eq 0 ]; then mkdir -p "$(dirname "$d")"; cp "$s" "$d"; fi
 }
 
+seed() {                   # copy REL from kit only if absent (source at the same path)
+  local rel="$1" s="$SRC/$1" d="$TARGET/$1"
+  [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
+  if [ -e "$d" ]; then act "keep existing: $rel"; return; fi
+  act "create: $rel"
+  if [ "$DRY" -eq 0 ]; then mkdir -p "$(dirname "$d")"; cp "$s" "$d"; fi
+}
+
 ensure_gitignore() {       # append missing lines, never remove
   local gi="$TARGET/.gitignore" line
   for line in "private/" ".claude/settings.local.json"; do
@@ -69,7 +77,7 @@ ensure_gitignore() {       # append missing lines, never remove
 
 migrate_log() {            # docs/project_log.md → private/project_log.md (once)
   local old="$TARGET/docs/project_log.md" new="$TARGET/private/project_log.md"
-  [ -f "$old" ] || return
+  [ -f "$old" ] || return 0
   if [ -f "$new" ]; then act "log: private/project_log.md already exists (leaving docs/ copy alone)"; return; fi
   act "migrate: docs/project_log.md → private/project_log.md (git mv + rm --cached)"
   if [ "$DRY" -eq 0 ]; then
@@ -85,7 +93,7 @@ migrate_log() {            # docs/project_log.md → private/project_log.md (onc
 
 supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
   local old="$TARGET/.markdownlint.json"
-  [ -f "$old" ] || return
+  [ -f "$old" ] || return 0
   act "remove superseded: .markdownlint.json (replaced by .markdownlint.jsonc)"
   if [ "$DRY" -eq 0 ]; then
     if git -C "$TARGET" ls-files --error-unmatch .markdownlint.json >/dev/null 2>&1; then
@@ -151,6 +159,15 @@ ensure_agents_block
 create_if_absent "TODO.md" "TODO.md.tmpl"
 create_if_absent "CLAUDE.md" "CLAUDE.md.tmpl"
 create_if_absent "private/project_log.md" "project_log.md.tmpl"
+echo
+
+echo "GitHub templates (create-if-absent — keeps your customizations):"
+seed ".github/ISSUE_TEMPLATE/bug_report.md"
+seed ".github/ISSUE_TEMPLATE/feature_request.md"
+seed ".github/ISSUE_TEMPLATE/security.md"
+seed ".github/ISSUE_TEMPLATE/epic.md"
+seed ".github/ISSUE_TEMPLATE/config.yml"
+seed ".github/PULL_REQUEST_TEMPLATE.md"
 echo
 
 echo "Done."
