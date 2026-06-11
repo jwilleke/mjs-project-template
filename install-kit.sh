@@ -71,7 +71,7 @@ ensure_gitignore() {       # append missing lines, never remove
   for line in "private/" ".claude/settings.local.json"; do
     if [ -f "$gi" ] && grep -qxF -- "$line" "$gi"; then act "gitignore ok: $line"; continue; fi
     act "gitignore += $line"
-    [ "$DRY" -eq 0 ] && printf '%s\n' "$line" >>"$gi"
+    if [ "$DRY" -eq 0 ]; then printf '%s\n' "$line" >>"$gi"; fi
   done
 }
 
