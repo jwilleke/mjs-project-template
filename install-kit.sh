@@ -144,6 +144,7 @@ overwrite ".claude/commands/status.md"
 overwrite ".claude/commands/session-commit.md"
 overwrite ".claude/commands/context.md"
 overwrite ".claude/commands/check-todos.md"
+overwrite ".claude/commands/wrap.md"
 overwrite "utility/sync-labels.sh"
 overwrite ".markdownlint.jsonc"
 echo
