@@ -52,7 +52,7 @@
     "lint-staged": "^15.5.2",
     "markdownlint-cli": "^0.48.0",
     "prettier": "^3.0.0",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.58.2",
     "vitest": "^4.1.4"
