@@ -11,6 +11,18 @@ This document tracks ongoing work and session history for the MJS Cookbook proje
 
 ## Session Logs
 
+### 2026-06-12-01
+
+- Agent: Claude
+- Subject: Rename /status skill to /pstatus to avoid built-in command conflict
+- Current Issue: none
+- Work Done:
+  - Renamed `.claude/commands/status.md` → `pstatus.md`
+  - Updated all internal `/status` references to `/pstatus` within the file
+- Commits: f112d2b
+- Files Modified:
+  - `.claude/commands/pstatus.md` (renamed from `status.md`)
+
 ### Session Log Required Format
 
 ```
