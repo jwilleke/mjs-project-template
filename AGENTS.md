@@ -231,6 +231,7 @@ npm run typecheck        # TypeScript type checking without emit
 - Work on tasks following CODE_STANDARDS.md
 - Update `docs/project_log.md` with session log entry
 - Update this file's `last_updated` field if making significant changes
+- **Commits — always use the `/session-commit` skill.** Never run a bare `git commit` directly. `/session-commit` enforces the session log update, conventional commit format, and co-author trailer.
 
 ## Notes & Context
 
