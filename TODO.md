@@ -8,7 +8,6 @@
 - Running / in-flight: none
 - Parked / half-done: jackery-homeassistant kit applied locally but not pushed (fork of theak/jackery-homeassistant — no push access)
 - Next steps:
-  - Run `sync-labels.sh` on newly kitted repos: grow-nutrient-tank, grow-tent, jackery-homeassistant, jwilleke, mjs-ha
   - Per repo (optional): `needs-triage` backfill on unlabeled issues; first `/pstatus` to materialize Dependabot alerts
   - Repos not yet local (not cloned): mjs-cookbook, geohazardwatch, deby, fairways-* and any others not in /Volumes/jobd/code/GitHub/
 - Blockers / significant notes:
