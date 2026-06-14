@@ -11,6 +11,19 @@ This document tracks ongoing work and session history for the MJS Cookbook proje
 
 ## Session Logs
 
+### 2026-06-14-01
+
+- Agent: Claude
+- Subject: Add agent behavior rules for issue links, in-review label, and /session-commit
+- Current Issue: none
+- Work Done:
+  - Added issue/PR link rule — agents must always pair `#N` with full GitHub URL
+  - Added awaiting-approval rule — agents apply `in-review` label and leave structured comment
+  - Added `/session-commit` rule — agents must never use bare `git commit`
+- Commits: acbb401, f836b7a
+- Files Modified:
+  - `AGENTS.md`
+
 ### 2026-06-12-01
 
 - Agent: Claude
