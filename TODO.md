@@ -3,16 +3,16 @@
 <!-- RESUME:START -->
 ## ▶ Resume here — 2026-06-14
 
-- Last worked on: rolled out issue decomposition rule + kit to all local repos
-- Branch / state: master, clean, all pushed
+- Last worked on: added GitHub issue decomposition rule to kit; rolled out to all 10 local repos + sync-labels on newly kitted ones
+- Branch / state: master, clean, pushed
 - Running / in-flight: none
 - Parked / half-done: jackery-homeassistant kit applied locally but not pushed (fork of theak/jackery-homeassistant — no push access)
 - Next steps:
-  - Per repo (optional): `needs-triage` backfill on unlabeled issues; first `/pstatus` to materialize Dependabot alerts
-  - Repos not yet local (not cloned): mjs-cookbook, geohazardwatch, deby, fairways-* and any others not in /Volumes/jobd/code/GitHub/
+  - Clone and kit repos not yet local: mjs-cookbook, geohazardwatch, deby, fairways-* and any others
+  - Per repo (optional): `needs-triage` backfill on unlabeled issues; `/pstatus` to materialize Dependabot alerts
+  - Review Dependabot PR #7 (esbuild/tsx bump)
 - Blockers / significant notes:
   - Kitted so far: mjs-project-template (home), garage-car-positioning, yourphr, ngdpbase, mj-infra-flux, grow-nutrient-tank, grow-tent, jackery-homeassistant (local only), jwilleke, mjs-ha
-  - Preserve any repo's customized commands as `<name>-local.md` before applying (kit overwrites canonical names)
   - mj-infra-flux drifts via flux image-automation bot — rebase before pushing
   - yourphr is worked on concurrently from jminim4 — fetch/rebase before pushing
 <!-- RESUME:END -->
