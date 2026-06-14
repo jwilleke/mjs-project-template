@@ -184,6 +184,11 @@ See [project_log.md](docs/project_log.md) for the required format, historical wo
 - Eagerness - Do not jump into implementation or change files unless clearly instructed. When intent is ambiguous, default to research and recommendations rather than action. Only proceed with edits when the user explicitly requests them.
 - No speculation - Never speculate about code you have not opened. Read relevant files BEFORE answering questions. Never make claims about code before investigating.
 - Parallel tool calls - If calling multiple tools with no dependencies between them, make all independent calls in parallel. Never use placeholders or guess missing parameters.
+- Issue decomposition - NEVER put "Steps", "Phases", or numbered sequences inside a single GitHub issue. Break each step into its own issue and link them using GitHub relationships:
+  - `closes #N` / `fixes #N` — this issue resolves another
+  - `blocked by #N` — cannot start until N is closed
+  - `relates to #N` — context link, no hard dependency
+  - Example: a 3-phase migration = 3 issues with "blocked by" chains, not one issue with "Phase 1 / Phase 2 / Phase 3" headings.
 
 ## Commands
 

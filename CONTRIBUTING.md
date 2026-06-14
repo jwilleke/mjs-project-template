@@ -104,6 +104,16 @@ This includes:
 - Approve when satisfactory
 - All CI checks must pass before merging
 
+## GitHub Issues
+
+One concern per issue. If work has phases or steps, create one issue per phase and express the dependency with GitHub relationships:
+
+- `closes #N` / `fixes #N` — this issue resolves another
+- `blocked by #N` — cannot start until N is closed
+- `relates to #N` — context link, no hard dependency
+
+Never add "Step 1 / Step 2" or "Phase" headings inside a single issue body.
+
 ## Questions?
 
 - Check AGENTS.md for project context
