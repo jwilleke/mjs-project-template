@@ -1,20 +1,20 @@
 # TODO
 
 <!-- RESUME:START -->
-## ▶ Resume here — 2026-06-11
+## ▶ Resume here — 2026-06-14
 
-- Last worked on: built the agent kit and rolled it out to 5 repos
-- Branch / state: master, clean, all pushed (template + 4 target repos)
+- Last worked on: rolled out issue decomposition rule + kit to all local repos
+- Branch / state: master, clean, all pushed
 - Running / in-flight: none
-- Parked / half-done: none
+- Parked / half-done: jackery-homeassistant kit applied locally but not pushed (fork of theak/jackery-homeassistant — no push access)
 - Next steps:
-  - Apply the kit to the remaining ~13 active repos (e.g. mjs-ha, mjs-cookbook, geohazardwatch, deby, fairways-*)
-  - Per repo: ensure local current → `install-kit.sh <repo>` (preview with `--dry-run`) → `sync-labels.sh owner/repo` → commit/push
-  - Per repo (optional): `needs-triage` backfill on unlabeled issues; first `/status` to materialize Dependabot alerts
+  - Run `sync-labels.sh` on newly kitted repos: grow-nutrient-tank, grow-tent, jackery-homeassistant, jwilleke, mjs-ha
+  - Per repo (optional): `needs-triage` backfill on unlabeled issues; first `/pstatus` to materialize Dependabot alerts
+  - Repos not yet local (not cloned): mjs-cookbook, geohazardwatch, deby, fairways-* and any others not in /Volumes/jobd/code/GitHub/
 - Blockers / significant notes:
-  - Kitted so far: mjs-project-template (home), garage-car-positioning, yourphr, ngdpbase, mj-infra-flux
+  - Kitted so far: mjs-project-template (home), garage-car-positioning, yourphr, ngdpbase, mj-infra-flux, grow-nutrient-tank, grow-tent, jackery-homeassistant (local only), jwilleke, mjs-ha
   - Preserve any repo's customized commands as `<name>-local.md` before applying (kit overwrites canonical names)
-  - mj-infra-flux drifts via flux image-automation bot — `git pull --ff-only` before working
+  - mj-infra-flux drifts via flux image-automation bot — rebase before pushing
   - yourphr is worked on concurrently from jminim4 — fetch/rebase before pushing
 <!-- RESUME:END -->
 
