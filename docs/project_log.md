@@ -1,17 +1,18 @@
 # Project Log
 
-This document tracks ongoing work and session history for the MJS Cookbook project.
+Rules for the log entry:
 
-## Current Status
+- Newest entry at top
+- Use today's date for yyyy-MM-dd
+- Use ## as an incrementing number if there are multiple entries for the same date (start at 01)
+- For Agent, use the name of the AI agent (e.g., "Claude")
+- For Current Issue, reference any GitHub issue numbers as #123 format
+- For Commits, use the short hash(es) from git log
+- For Files Modified, list every file that was changed in this session
 
-- Phase:  (EXAMPLE) Phase 4 Complete - Web UI Live
-- Build Status: (EXAMPLE) All tests passing (11 tests)
-- Last Updated:  (EXAMPLE) 2025-12-21
-- Overall Health:  (EXAMPLE) Stable - No known blockers
+<!-- ## Entries go below here -->
 
-## Session Logs
-
-### 2026-06-16-01
+## 2026-06-16-01
 
 - Agent: Claude
 - Subject: Sync /session-commit rule and create sync-log to all kitted downstream repos
@@ -21,12 +22,12 @@ This document tracks ongoing work and session history for the MJS Cookbook proje
   - Created `docs/sync-log.md` to track downstream repo syncs by template commit
   - Added /session-commit rule to 8 local kitted repos (jackery-homeassistant excluded — fork)
   - Backfilled sync-log entries for prior 2026-06-14 syncs
-- Commits: bfe2b2c (sync-log), 0c9fe25 (deby), e0dc781, 5e92460, 4d1bdd3, 95a3caf, 5a4736d, ddcfe96, 5d37f484, 576a8069
+- Commits: bfe2b2c, 0c9fe25, e0dc781, 5e92460, 4d1bdd3, 95a3caf, 5a4736d, ddcfe96, 5d37f484, 576a8069
 - Files Modified:
   - `docs/sync-log.md`
   - `docs/project_log.md`
 
-### 2026-06-14-01
+## 2026-06-14-01
 
 - Agent: Claude
 - Subject: Add agent behavior rules for issue links, in-review label, and /session-commit
@@ -39,7 +40,7 @@ This document tracks ongoing work and session history for the MJS Cookbook proje
 - Files Modified:
   - `AGENTS.md`
 
-### 2026-06-12-01
+## 2026-06-12-01
 
 - Agent: Claude
 - Subject: Rename /status skill to /pstatus to avoid built-in command conflict
@@ -50,20 +51,3 @@ This document tracks ongoing work and session history for the MJS Cookbook proje
 - Commits: f112d2b
 - Files Modified:
   - `.claude/commands/pstatus.md` (renamed from `status.md`)
-
-### Session Log Required Format
-
-```
-### yyyy-MM-dd-##
-
-- Agent: [Claude/Gemini/Other]
-- Subject: [Brief description]
-- Current Issue: [issue]
-- Work Done: 
-  - [task 1]
-  - [task 2]
-- Commits: [hash]
-- Files Modified: 
-  - [file1.js]
-  - [file2.md]
-```
