@@ -221,8 +221,8 @@ echo
 echo "Project docs (create-if-absent / managed):"
 ensure_agents_block
 stamp_kit_version
-create_if_absent "TODO.md" "TODO.md.tmpl"
-create_if_absent "CLAUDE.md" "CLAUDE.md.tmpl"
+create_if_absent_stamped "TODO.md" "TODO.md.tmpl"
+create_if_absent_stamped "CLAUDE.md" "CLAUDE.md.tmpl"
 create_if_absent_stamped "private/project_log.md" "project_log.md.tmpl"
 echo
 

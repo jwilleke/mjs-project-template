@@ -1,3 +1,10 @@
+---
+title: TODO
+description: Priority bands and resume pointer for mjs-project-template.
+last_updated: "2026-06-16"
+kit_version: "v1.0.0-10-ge10bd0c"
+---
+
 # TODO
 
 <!-- RESUME:START -->
