@@ -19,6 +19,35 @@ Rules for the log entry:
 
 <!-- ## Entries go below here -->
 
+## 2026-06-16-02
+
+- Agent: Claude
+- Subject: Full kit sync — frontmatter, markdown-lint CI, VS Code extensions, unwrapped boilerplate; push all 8 downstream repos
+- Current Issue: none
+- Work Done:
+  - Added YAML frontmatter with `kit_version: "KIT-VERSION"` to all templates (CLAUDE.md.tmpl, TODO.md.tmpl, project_log.md.tmpl, agents-frontmatter.md.tmpl)
+  - Added richer scaffold content to CLAUDE.md.tmpl, TODO.md.tmpl, project_log.md.tmpl
+  - Added `.vscode/extensions.json` recommending `DavidAnson.vscode-markdownlint` — seeded to all repos
+  - Added canonical `.github/workflows/markdown-lint.yml` using `markdownlint-cli2-action` (no npm) — seeded to all repos
+  - Fixed ngdpbase CI (`ci.yml`, `ci-passing-tests.yml`) to check `.markdownlint.jsonc` not just `.markdownlint.json`
+  - Unwrapped all boilerplate bullets to single long lines per session feedback
+  - Committed and pushed all 8 downstream repos (version bump + extensions.json where new)
+  - Updated `docs/sync-log.md` with final installed versions
+  - Fixed MD001 heading-increment errors in `.github/workflows/README.md`
+- Commits: ae575c2, e10bd0c, 01c77cd, 1fa177f, 3083ea6, 0a27f04, dd5d8af, 50845b6
+- Files Modified:
+  - `templates/agents-boilerplate.md`
+  - `templates/agents-frontmatter.md.tmpl`
+  - `templates/CLAUDE.md.tmpl`
+  - `templates/TODO.md.tmpl`
+  - `templates/project_log.md.tmpl`
+  - `.vscode/extensions.json`
+  - `.github/workflows/markdown-lint.yml`
+  - `.github/workflows/README.md`
+  - `docs/sync-log.md`
+  - `TODO.md`
+  - `docs/project_log.md`
+
 ## 2026-06-16-01
 
 - Agent: Claude
