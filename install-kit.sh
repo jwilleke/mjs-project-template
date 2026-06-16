@@ -124,13 +124,30 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
   fi
 }
 
+stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
+  local d="$TARGET/AGENTS.md"
+  [ -f "$d" ] || return 0
+  head -1 "$d" | grep -qx -- '---' || return 0   # no frontmatter — skip
+  if grep -q '^kit_version:' "$d"; then
+    act "frontmatter: kit_version = $KIT_VERSION (update)"
+    if [ "$DRY" -eq 0 ]; then
+      awk -v v="$KIT_VERSION" '/^kit_version:/{print "kit_version: \"" v "\""} !/^kit_version:/{print}' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
+    fi
+  else
+    act "frontmatter: kit_version = $KIT_VERSION (insert)"
+    if [ "$DRY" -eq 0 ]; then
+      awk -v v="$KIT_VERSION" 'BEGIN{c=0} /^---$/{c++; if(c==2){print "kit_version: \"" v "\""}} {print}' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
+    fi
+  fi
+}
+
 ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
   if [ ! -f "$d" ]; then
     act "create: AGENTS.md (frontmatter + managed block + repo stub)"
     if [ "$DRY" -eq 0 ]; then
       local fm="$SRC/templates/agents-frontmatter.md.tmpl"
-      { sed "s/YYYY-MM-DD/$(date +%Y-%m-%d)/" "$fm"; printf '\n%s\n' "$START"; cat "$b"; printf '%s\n\n' "$END"; cat "$SRC/templates/agents-stub.md"; } >"$d"
+      { sed -e "s/YYYY-MM-DD/$(date +%Y-%m-%d)/" -e "s/KIT-VERSION/$KIT_VERSION/" "$fm"; printf '\n%s\n' "$START"; cat "$b"; printf '%s\n\n' "$END"; cat "$SRC/templates/agents-stub.md"; } >"$d"
     fi
     return
   fi
@@ -193,6 +210,7 @@ echo
 
 echo "Project docs (create-if-absent / managed):"
 ensure_agents_block
+stamp_kit_version
 create_if_absent "TODO.md" "TODO.md.tmpl"
 create_if_absent "CLAUDE.md" "CLAUDE.md.tmpl"
 create_if_absent "private/project_log.md" "project_log.md.tmpl"
