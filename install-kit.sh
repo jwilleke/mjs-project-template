@@ -34,7 +34,9 @@ done
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="$(cd "${TARGET:-$PWD}" && pwd)"
 
-START='<!-- KIT:START — managed by mjs-project-template; edit below the KIT:END marker -->'
+KIT_VERSION="$(git -C "$SRC" describe --tags --long 2>/dev/null || git -C "$SRC" rev-parse --short HEAD)"
+START="<!-- KIT:START $KIT_VERSION — managed by mjs-project-template; edit below the KIT:END marker -->"
+START_PREFIX='<!-- KIT:START'
 END='<!-- KIT:END -->'
 
 act() { if [ "$DRY" -eq 1 ]; then printf '  [dry-run] %s\n' "$*"; else printf '  %s\n'  "$*"; fi; }
@@ -131,12 +133,12 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
     fi
     return
   fi
-  if grep -qF "$START" "$d"; then
+  if grep -qF "$START_PREFIX" "$d"; then
     act "update AGENTS.md managed block (your content below KIT:END preserved)"
     if [ "$DRY" -eq 0 ]; then
-      awk -v start="$START" -v end="$END" -v bf="$b" '
+      awk -v prefix="$START_PREFIX" -v start="$START" -v end="$END" -v bf="$b" '
         BEGIN { while ((getline l < bf) > 0) blk = blk l "\n" }
-        $0 == start { print; printf "%s", blk; skip = 1; next }
+        substr($0, 1, length(prefix)) == prefix { print start; printf "%s", blk; skip = 1; next }
         $0 == end   { print; skip = 0; next }
         !skip       { print }
       ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
