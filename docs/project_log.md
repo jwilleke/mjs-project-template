@@ -2,6 +2,7 @@
 title: Project Log
 description: Session history for mjs-project-template.
 last_updated: "2026-06-16"
+kit_version: "v1.0.0-9-gae575c2"
 ---
 
 # Project Log
