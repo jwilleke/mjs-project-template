@@ -61,6 +61,16 @@ create_if_absent() {       # create REL from templates/TMPL only if absent
   if [ "$DRY" -eq 0 ]; then mkdir -p "$(dirname "$d")"; cp "$s" "$d"; fi
 }
 
+create_if_absent_stamped() { # like create_if_absent but substitutes YYYY-MM-DD and KIT-VERSION
+  local rel="$1" s="$SRC/templates/$2" d="$TARGET/$1"
+  if [ -e "$d" ]; then act "keep existing: $rel"; return; fi
+  act "create: $rel"
+  if [ "$DRY" -eq 0 ]; then
+    mkdir -p "$(dirname "$d")"
+    sed -e "s/YYYY-MM-DD/$(date +%Y-%m-%d)/" -e "s/KIT-VERSION/$KIT_VERSION/" "$s" >"$d"
+  fi
+}
+
 seed() {                   # copy REL from kit only if absent (source at the same path)
   local rel="$1" s="$SRC/$1" d="$TARGET/$1"
   [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
@@ -213,7 +223,7 @@ ensure_agents_block
 stamp_kit_version
 create_if_absent "TODO.md" "TODO.md.tmpl"
 create_if_absent "CLAUDE.md" "CLAUDE.md.tmpl"
-create_if_absent "private/project_log.md" "project_log.md.tmpl"
+create_if_absent_stamped "private/project_log.md" "project_log.md.tmpl"
 echo
 
 echo "GitHub templates (create-if-absent — keeps your customizations):"
