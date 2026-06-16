@@ -1,3 +1,9 @@
+---
+title: Project Log
+description: Session history for mjs-project-template.
+last_updated: "2026-06-16"
+---
+
 # Project Log
 
 Rules for the log entry:
