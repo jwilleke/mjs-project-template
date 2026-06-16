@@ -127,9 +127,10 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
 ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
   if [ ! -f "$d" ]; then
-    act "create: AGENTS.md (managed block + repo stub)"
+    act "create: AGENTS.md (frontmatter + managed block + repo stub)"
     if [ "$DRY" -eq 0 ]; then
-      { printf '%s\n' "$START"; cat "$b"; printf '%s\n\n' "$END"; cat "$SRC/templates/agents-stub.md"; } >"$d"
+      local fm="$SRC/templates/agents-frontmatter.md.tmpl"
+      { sed "s/YYYY-MM-DD/$(date +%Y-%m-%d)/" "$fm"; printf '\n%s\n' "$START"; cat "$b"; printf '%s\n\n' "$END"; cat "$SRC/templates/agents-stub.md"; } >"$d"
     fi
     return
   fi
