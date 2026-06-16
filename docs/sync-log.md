@@ -1,23 +1,22 @@
 # Template Sync Log
 
-Tracks which downstream repos have received updates from this template, and at which template commit.
+Current sync state for each downstream repo. The `KIT:START` comment in each repo's `AGENTS.md`
+is the authoritative per-file version record; this table tracks the repo-level picture.
 
-| Date | Repo | Template Commit | What Was Synced |
+**Excluded repos (permanent):**
+
+- `theak/jackery-homeassistant` — upstream fork, no push access; never sync.
+
+## Current State
+
+| Repo | Last Synced | Kit Version | Method |
 | --- | --- | --- | --- |
-| 2026-06-14 | [jwilleke/garage-car-positioning](https://github.com/jwilleke/garage-car-positioning) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/grow-nutrient-tank](https://github.com/jwilleke/grow-nutrient-tank) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/grow-tent](https://github.com/jwilleke/grow-tent) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/jwilleke](https://github.com/jwilleke/jwilleke) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/mj-infra-flux](https://github.com/jwilleke/mj-infra-flux) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/mjs-ha](https://github.com/jwilleke/mjs-ha) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/ngdpbase](https://github.com/jwilleke/ngdpbase) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-14 | [jwilleke/yourphr](https://github.com/jwilleke/yourphr) | [acbb401](https://github.com/jwilleke/mjs-project-template/commit/acbb401) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval rules |
-| 2026-06-16 | [jwilleke/garage-car-positioning](https://github.com/jwilleke/garage-car-positioning) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/grow-nutrient-tank](https://github.com/jwilleke/grow-nutrient-tank) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/grow-tent](https://github.com/jwilleke/grow-tent) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/jwilleke](https://github.com/jwilleke/jwilleke) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/mj-infra-flux](https://github.com/jwilleke/mj-infra-flux) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/mjs-ha](https://github.com/jwilleke/mjs-ha) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/ngdpbase](https://github.com/jwilleke/ngdpbase) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/yourphr](https://github.com/jwilleke/yourphr) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — /session-commit rule |
-| 2026-06-16 | [jwilleke/deby](https://github.com/jwilleke/deby) | [f836b7a](https://github.com/jwilleke/mjs-project-template/commit/f836b7a) | `AGENTS.md` — issue decomposition, issue/PR links, awaiting-approval, and /session-commit rules |
+| [jwilleke/garage-car-positioning](https://github.com/jwilleke/garage-car-positioning) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/grow-nutrient-tank](https://github.com/jwilleke/grow-nutrient-tank) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/grow-tent](https://github.com/jwilleke/grow-tent) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/jwilleke](https://github.com/jwilleke/jwilleke) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/mj-infra-flux](https://github.com/jwilleke/mj-infra-flux) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/mjs-ha](https://github.com/jwilleke/mjs-ha) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/ngdpbase](https://github.com/jwilleke/ngdpbase) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/yourphr](https://github.com/jwilleke/yourphr) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
+| [jwilleke/deby](https://github.com/jwilleke/deby) | 2026-06-16 | f836b7a (pre-tag) | manual SSH — custom AGENTS.md, no KIT:START block |
