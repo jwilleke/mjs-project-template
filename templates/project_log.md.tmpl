@@ -1,28 +1,25 @@
 # Project Log
 
-Personal, local session journal (gitignored — not shared, per-machine). Dated session entries,
-newest on top. The cross-session `▶ Resume here` pointer lives at the top of `TODO.md`
-(committed, so it syncs across machines).
+Rules for the log entry:
 
-## Current Status
+- Newest entry at top
+- Use today's date for yyyy-MM-dd
+- Use ## as an incrementing number if there are multiple entries for the same date (start at 01)
+- For Agent, use the name of the AI agent (e.g., "Claude")
+- For Current Issue, reference any GitHub issue numbers as #123 format
+- For Commits, use the short hash(es) from git log
+- For Files Modified, list every file that was changed in this session
 
-- Phase: initial setup
-- Last Updated: —
-- Overall Health: —
+## yyyy-MM-dd-##
 
-## Session Logs
-
-### Session Log Required Format
-
-```text
-### yyyy-MM-dd-NN
-
-- Agent: Claude
-- Subject: <brief description>
-- Current Issue: <#N or none>
+- Agent: [Claude/Gemini/Other]
+- Subject: [Brief description of the session's work]
+- Current Issue: [GitHub issue number if applicable, or "none"]
 - Work Done:
-  - <task>
-- Commits: <short hash(es)>
+  - [task 1]
+  - [task 2]
+- Commits: [commit hash(es) from this session]
 - Files Modified:
-  - <file>
-```
+  - [list each modified file]
+
+<!-- ## Entries go below here -->
