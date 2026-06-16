@@ -226,6 +226,10 @@ create_if_absent_stamped "CLAUDE.md" "CLAUDE.md.tmpl"
 create_if_absent_stamped "private/project_log.md" "project_log.md.tmpl"
 echo
 
+echo "VS Code (create-if-absent — keeps your customizations):"
+seed ".vscode/extensions.json"
+echo
+
 echo "GitHub templates (create-if-absent — keeps your customizations):"
 seed ".github/ISSUE_TEMPLATE/bug_report.md"
 seed ".github/ISSUE_TEMPLATE/feature_request.md"
