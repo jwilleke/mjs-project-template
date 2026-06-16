@@ -19,4 +19,4 @@ is the authoritative per-file version record; this table tracks the repo-level p
 | [jwilleke/mjs-ha](https://github.com/jwilleke/mjs-ha) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
 | [jwilleke/ngdpbase](https://github.com/jwilleke/ngdpbase) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
 | [jwilleke/yourphr](https://github.com/jwilleke/yourphr) | 2026-06-16 | v1.0.0-2-g0fee417 | install-kit.sh |
-| [jwilleke/deby](https://github.com/jwilleke/deby) | 2026-06-16 | f836b7a (pre-tag) | manual SSH — custom AGENTS.md, no KIT:START block |
+| [jwilleke/deby](https://github.com/jwilleke/deby) | 2026-06-16 | v1.0.0-3-g02fd112 | install-kit.sh via SSH |
