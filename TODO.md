@@ -1,18 +1,19 @@
 # TODO
 
 <!-- RESUME:START -->
-## ▶ Resume here — 2026-06-14
+## ▶ Resume here — 2026-06-16
 
-- Last worked on: added GitHub issue decomposition rule to kit; rolled out to all 10 local repos + sync-labels on newly kitted ones
-- Branch / state: master, clean, pushed
+- Last worked on: tagged v1.0.0; embedded kit_version in KIT:START via git describe; synced /session-commit rule + boilerplate to 8 local repos + deby; created docs/sync-log.md
+- Branch / state: master, clean, pushed (tag v1.0.0 NOT yet pushed to remote)
 - Running / in-flight: none
-- Parked / half-done: jackery-homeassistant kit applied locally but not pushed (fork of theak/jackery-homeassistant — no push access)
+- Parked / half-done: jackery-homeassistant excluded (fork of theak/ — no push access); 8 downstream repos have 2 unpushed commits each (session-commit rule + v1.0.0 kit stamp)
 - Next steps:
-  - Clone and kit repos not yet local: mjs-cookbook, geohazardwatch, deby, fairways-* and any others
-  - Per repo (optional): `needs-triage` backfill on unlabeled issues; `/pstatus` to materialize Dependabot alerts
-  - Review Dependabot PR #7 (esbuild/tsx bump)
+  - Push v1.0.0 tag: `git -C /Volumes/jobd/code/GitHub/mjs-project-template push origin v1.0.0`
+  - Push 8 downstream repos (garage-car-positioning, grow-nutrient-tank, grow-tent, jwilleke, mj-infra-flux, mjs-ha, ngdpbase, yourphr) — rebase mj-infra-flux and yourphr before pushing
+  - Sync deby (jwilleke/deby) with v1.0.0 kit stamp via SSH
+  - Clone and kit repos not yet local: mjs-cookbook, geohazardwatch, fairways-* and any others
+  - Review Dependabot PR [#7](https://github.com/jwilleke/mjs-project-template/pull/7) (esbuild/tsx bump)
 - Blockers / significant notes:
-  - Kitted so far: mjs-project-template (home), garage-car-positioning, yourphr, ngdpbase, mj-infra-flux, grow-nutrient-tank, grow-tent, jackery-homeassistant (local only), jwilleke, mjs-ha
   - mj-infra-flux drifts via flux image-automation bot — rebase before pushing
   - yourphr is worked on concurrently from jminim4 — fetch/rebase before pushing
 <!-- RESUME:END -->
