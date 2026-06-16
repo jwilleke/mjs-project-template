@@ -230,6 +230,10 @@ echo "VS Code (create-if-absent — keeps your customizations):"
 seed ".vscode/extensions.json"
 echo
 
+echo "GitHub workflows (create-if-absent — keeps your customizations):"
+seed ".github/workflows/markdown-lint.yml"
+echo
+
 echo "GitHub templates (create-if-absent — keeps your customizations):"
 seed ".github/ISSUE_TEMPLATE/bug_report.md"
 seed ".github/ISSUE_TEMPLATE/feature_request.md"
