@@ -2,7 +2,7 @@
 
 This directory contains CI/CD pipeline definitions for automated testing, linting, security checks, and deployments.
 
-#### Related documentation
+## Related documentation
 
 - [SECURITY.md](../../SECURITY.md) - Secret management and security best practices
 - [CODE_STANDARDS.md](../../CODE_STANDARDS.md) - Code quality standards that CI/CD enforces
@@ -74,7 +74,7 @@ Quick setup:
    - `DOCKER_REGISTRY_TOKEN`
    - `DATABASE_URL` (for migrations)
 
-#### Example usage in workflow
+### Example usage in workflow
 
 ```yaml
 - name: Deploy to Heroku
