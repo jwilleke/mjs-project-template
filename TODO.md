@@ -15,8 +15,7 @@ kit_version: "v1.0.0-10-ge10bd0c"
 - Running / in-flight: none
 - Parked / half-done: none
 - Next steps:
-  - Triage #10 (assign priority) and finish its open half — make /semver project-agnostic (master vs main, package.json/release-please/manual-tag detection, pick a kit default)
-  - Close #11 once the operator approves the In-review /pstatus changes
+  - No open issues. If wanted, open a fresh issue for the project-agnostic /semver work (master vs main, package.json/release-please/manual-tag detection, pick a kit default) — descoped out of the now-closed #10
 - Blockers / significant notes:
   - yourphr/ngdpbase bespoke `*-local` commands still reference /check-todos — deliberately left as-is per operator decision
 <!-- RESUME:END -->
@@ -38,12 +37,12 @@ kit_version: "v1.0.0-10-ge10bd0c"
 
 ## 🔵 In review
 
-- [#11](https://github.com/jwilleke/mjs-project-template/issues/11) — [FEATURE] /pstatus + TODO: one issue per line (full link); add an 'in-review' band
+- _none_
 
 ## ⏸ Deferred
 
 - _none_
 
-## ❓ Needs triage (1)
+## ❓ Needs triage (0)
 
-- [#10](https://github.com/jwilleke/mjs-project-template/issues/10) — [FEATURE] Clarify release policy + make /semver project-agnostic (release on minor/major or on request, no confirm)
+- _none_
