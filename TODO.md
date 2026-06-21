@@ -22,11 +22,14 @@ kit_version: "v1.0.0-10-ge10bd0c"
 
 - _none_
 
+## 🔵 In review
+
+- [#11](https://github.com/jwilleke/mjs-project-template/issues/11) — [FEATURE] /pstatus + TODO: one issue per line (full link); add an 'in-review' band
+
 ## ⏸ Deferred
 
 - _none_
 
-## ❓ Needs triage (2)
+## ❓ Needs triage (1)
 
-- [#11](https://github.com/jwilleke/mjs-project-template/issues/11) — [FEATURE] /pstatus + TODO: one issue per line (full link); add an 'in-review' band
 - [#10](https://github.com/jwilleke/mjs-project-template/issues/10) — [FEATURE] Clarify release policy + make /semver project-agnostic (release on minor/major or on request, no confirm)
