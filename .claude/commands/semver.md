@@ -12,6 +12,10 @@ Cut a new semver release: bump `package.json`, create an annotated git tag, push
 
 If the user did not specify a bump type, ask them which one before proceeding.
 
+**Standing authorization (see AGENTS.md → Release Policy):** cut the release on any `minor` or `major` bump, or whenever the maintainer asks — without prompting for confirmation. Do not ask "should I tag/release?" for these. The only reasons to stop are the hard safety gates below (dirty tree, behind remote) or nothing to release (zero commits since the last tag). Patch-only chains may be deferred or consolidated.
+
+**Versioning model:** between releases the live version is `git describe` output — `vX.Y.Z-N-g<sha>` (last tag, commits since it, abbreviated SHA). A formal cut graduates that to a clean annotated `vX.Y.Z` tag. A large `N` ("80 commits and no release") is expected, not a defect.
+
 ## Steps
 
 ### Step 1: Verify the working tree is clean and on master
@@ -26,7 +30,7 @@ Run in parallel:
 
 - Read `package.json` `version` field.
 - Compute the next version from the requested bump (`patch` increments the third number, `minor` increments the second and zeros the third, `major` increments the first and zeros the rest).
-- Show the user: `current → next` and confirm before continuing **only if** the bump is `major` or if there are no commits since the last tag (i.e., nothing to release). For `patch` / `minor` with new commits, proceed without prompting.
+- Show the user: `current → next`. Then proceed without asking for confirmation — `minor` and `major` bumps carry standing authorization, and `patch` does too once requested. The **only** stop condition here is no commits since the last tag (nothing to release), handled in Step 3.
 
 ### Step 3: Summarize what's in the release
 
@@ -64,6 +68,7 @@ Output to the user:
 
 ## Rules
 
+- Never re-prompt for confirmation on a `minor` or `major` bump (or any explicit request) — that authorization is standing. The hard safety gates (clean tree, on the default branch, not behind remote, commits exist to release) still apply and are the only legitimate stops.
 - Never tag if the working tree is dirty.
 - Never tag a commit that hasn't been pushed.
 - Never skip the GitHub release — auto-generated notes are the whole point of cutting a tag for this repo.
