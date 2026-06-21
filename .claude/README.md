@@ -35,25 +35,24 @@ When to use: At the start of each session to understand what's been done and wha
 /context
 ```
 
-### `/check-todos`
+### `/pstatus`
 
-File: `commands/check-todos.md`
+File: `commands/pstatus.md`
 
-Displays actionable work items organized by priority level.
+Ranked briefing that surfaces security first, ranks open work by priority, regenerates `TODO.md`, and recommends a single next step. It is read-only and does not start work.
 
 #### What it shows
 
-- High priority tasks (should start here)
-- Medium priority tasks (important but not blocking)
-- Low priority tasks (nice to have)
-- Known blockers preventing progress
+- Open security signals (Dependabot / code-scanning) bridged into tracking issues
+- Open issues grouped into bands: P0 / P1 / P2 / In review / Deferred / Needs triage
+- A single "Do this next" recommendation
 
-When to use: To decide what to work on in the current session and focus effort appropriately.
+When to use: To decide what to work on in the current session, and again right before `/session-commit`.
 
 #### Example usage
 
 ```
-/check-todos
+/pstatus
 ```
 
 ### `/update-agents`
@@ -81,7 +80,7 @@ When to use: At the end of a session to document progress for the next agent or 
 ## Typical Workflow
 
 1. Start session: Use `/context` to understand project state
-2. Check priorities: Use `/check-todos` to pick what to work on
+2. Check priorities: Use `/pstatus` to pick what to work on
 3. Work on tasks: Complete your assigned work, following CODE_STANDARDS.md
 4. End session: Use `/update-agents` to document progress in AGENTS.md
 

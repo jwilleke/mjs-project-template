@@ -134,6 +134,22 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
   fi
 }
 
+retire_deprecated() {      # remove retired command files from downstream repos
+  local rel old
+  for rel in ".claude/commands/check-todos.md" ".claude/commands/status.md"; do
+    old="$TARGET/$rel"
+    [ -f "$old" ] || continue
+    act "remove retired: $rel (use /pstatus instead)"
+    if [ "$DRY" -eq 0 ]; then
+      if git -C "$TARGET" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
+        git -C "$TARGET" rm -q "$rel"
+      else
+        rm -f "$old"
+      fi
+    fi
+  done
+}
+
 stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   local d="$TARGET/AGENTS.md"
   [ -f "$d" ] || return 0
@@ -202,10 +218,9 @@ echo "  into: $TARGET"
 echo
 
 echo "Canonical tool files (overwrite):"
-overwrite ".claude/commands/status.md"
+overwrite ".claude/commands/pstatus.md"
 overwrite ".claude/commands/session-commit.md"
 overwrite ".claude/commands/context.md"
-overwrite ".claude/commands/check-todos.md"
 overwrite ".claude/commands/wrap.md"
 overwrite "utility/sync-labels.sh"
 overwrite ".markdownlint.jsonc"
@@ -216,6 +231,7 @@ ensure_gitignore
 unignore_claude
 migrate_log
 supersede_markdownlint
+retire_deprecated
 echo
 
 echo "Project docs (create-if-absent / managed):"
@@ -246,6 +262,6 @@ echo
 echo "Done."
 echo "Next:"
 echo "  - utility/sync-labels.sh            # apply the standard GitHub labels to this repo"
-echo "  - /status                           # rank work + regenerate TODO.md"
+echo "  - /pstatus                          # rank work + regenerate TODO.md"
 if [ "$DRY" -eq 1 ]; then echo "  (re-run without --dry-run to apply the changes above)"; fi
 exit 0
