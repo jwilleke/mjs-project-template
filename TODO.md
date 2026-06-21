@@ -24,10 +24,6 @@ kit_version: "v1.0.0-10-ge10bd0c"
 
 ## 🔵 In review
 
-- [#12](https://github.com/jwilleke/mjs-project-template/issues/12) — [security] vite — server.fs.deny bypass on Windows alternate paths (high)
-- [#13](https://github.com/jwilleke/mjs-project-template/issues/13) — [security] vite — NTLMv2 hash disclosure via UNC path (launch-editor) (medium)
-- [#14](https://github.com/jwilleke/mjs-project-template/issues/14) — [security] markdown-it — quadratic-complexity DoS in smartquotes (medium)
-- [#15](https://github.com/jwilleke/mjs-project-template/issues/15) — [security] esbuild — arbitrary file read via dev server on Windows (low)
 - [#11](https://github.com/jwilleke/mjs-project-template/issues/11) — [FEATURE] /pstatus + TODO: one issue per line (full link); add an 'in-review' band
 
 ## ⏸ Deferred
