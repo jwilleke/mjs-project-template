@@ -1,6 +1,6 @@
 ---
 project_state: "template"
-last_updated: "2026-05-23"
+last_updated: "2026-06-20"
 agent_priority_level: "medium"
 blockers: []
 requires_human_review: ["major architectural changes", "security policy modifications", "deployment to production"]
@@ -223,6 +223,13 @@ npm run typecheck        # TypeScript type checking without emit
 - ESLint - Prefer const, unused vars prefixed with `_`, no floating promises
 - Commits - Conventional format: `type(scope): description`
 - Branches - Format: `type/description` (e.g., `feature/user-auth`, `fix/login-bug`)
+
+## Release Policy
+
+- **Standing authorization to cut releases.** Cut a release on ANY `minor` or `major` version bump, or whenever the maintainer says to — without asking for confirmation. This is durable authorization; do not re-prompt "should I tag/release?" for these cases. Use the `/semver` skill.
+- **Patch bumps may be deferred or consolidated.** A chain of patch-only commits does not have to ship immediately; it can be rolled into the next minor/major or cut on request.
+- **Live version between releases is `git describe`.** Between formal cuts, the working version is `vX.Y.Z-N-g<sha>` — the last tag, the number of commits since it (`N`), and the abbreviated commit SHA. This is expected and healthy: "we have 80 commits and no release" reads as *80 commits past the last tag*, not as something broken.
+- **A formal cut graduates `git describe` to a clean tag.** Cutting a release replaces the `-N-g<sha>` suffix with a clean annotated `vX.Y.Z` tag at that commit. After the cut, `git describe` reports the clean tag again (until the next commit).
 
 ## Session Workflow
 
