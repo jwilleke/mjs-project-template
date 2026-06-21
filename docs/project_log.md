@@ -19,6 +19,25 @@ Rules for the log entry:
 
 <!-- ## Entries go below here -->
 
+## 2026-06-20-01
+
+- Agent: Claude
+- Subject: Encode release policy (standing authorization + git-describe model) — partial #10
+- Current Issue: #10
+- Work Done:
+  - Added `## Release Policy` section to AGENTS.md: standing authorization to cut releases on any minor/major bump or on request without confirmation; patch chains may be deferred; live version between releases is `git describe` (`vX.Y.Z-N-g<sha>`); a formal cut graduates that to a clean `vX.Y.Z` tag
+  - Updated `/semver` command: removed the minor/major confirmation prompt, documented the standing authorization and git-describe versioning model, added a Rules entry forbidding re-prompts while keeping the hard safety gates
+  - Bumped AGENTS.md `last_updated` to 2026-06-20
+  - Linked both open issues in `TODO.md` with full GitHub URLs; refreshed bands from labels
+  - Applied `needs-triage` to #10 and #11 (no prior priority labels); created the `needs-triage` repo label
+  - Note: the broader "make /semver project-agnostic" half of #10 (master/main detection, package.json/release-please/manual-tag mechanisms, pick a default) remains open
+- Commits: c622c2a, 139b33e
+- Files Modified:
+  - `AGENTS.md`
+  - `.claude/commands/semver.md`
+  - `TODO.md`
+  - `docs/project_log.md`
+
 ## 2026-06-16-02
 
 - Agent: Claude
