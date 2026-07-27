@@ -123,9 +123,10 @@ branch, and downstream CI (`markdown-lint`) only runs on PRs — so a direct pus
 
 ```bash
 ./install-kit.sh --pr /path/to/repo           # branch, commit, push, open PR
-./install-kit.sh --auto-merge /path/to/repo   # same, and land it when CI goes green
 ./install-kit.sh --dry-run --pr /path/to/repo # preview, touching nothing
 ```
+
+The PR is left open for a human to merge — the script never lands it.
 
 Requires an authenticated `gh`, an `origin` remote, and a clean working tree — the sync must be the
 only change in the PR. It detects `master` vs `main` rather than assuming, restores the branch you
