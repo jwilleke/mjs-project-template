@@ -6,7 +6,16 @@
 #   Re-run   : safe anytime to pick up a newer kit version.
 #
 # Usage:
-#   install-kit.sh [--dry-run] [target-dir]      # target-dir defaults to the current directory
+#   install-kit.sh [--dry-run] [--pr] [target-dir]
+#                                                # target-dir defaults to the current directory
+#
+# Sync modes:
+#   (default)    apply the kit in place, leaving the changes uncommitted for you to review
+#   --pr         apply on a `chore/kit-sync-<version>` branch, then commit, push, and open a PR.
+#                Requires an authenticated `gh`, an `origin` remote, and a clean working tree.
+#                Downstream AGENTS.md mandates feature branches + PRs for the default branch,
+#                and downstream CI (markdown-lint) only runs on PRs — a direct push skips both.
+#                The PR is left for a human to merge.
 #
 # Behavior per file:
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint.jsonc)
@@ -18,14 +27,19 @@
 #   supersede        remove .markdownlint.json in favor of .markdownlint.jsonc
 #
 # Requires: bash, git, awk. (Run utility/sync-labels.sh separately for GitHub labels.)
+#           --pr additionally requires the `gh` CLI, authenticated.
+#
+# Note: macOS ships bash 3.2 — keep this script free of arrays, `mapfile`, and `${var,,}`.
 
 set -euo pipefail
 
 DRY=0
+PR=0
 TARGET=""
 for a in "$@"; do
   case "$a" in
     --dry-run) DRY=1 ;;
+    --pr)      PR=1 ;;
     -*) echo "unknown flag: $a" >&2; exit 2 ;;
     *) TARGET="$a" ;;
   esac
@@ -40,6 +54,148 @@ START_PREFIX='<!-- KIT:START'
 END='<!-- KIT:END -->'
 
 act() { if [ "$DRY" -eq 1 ]; then printf '  [dry-run] %s\n' "$*"; else printf '  %s\n'  "$*"; fi; }
+
+# --- PR mode ----------------------------------------------------------------
+
+PR_BASE=""
+PR_BRANCH=""
+PR_ORIG_BRANCH=""
+
+pr_preflight() {
+  if ! command -v gh >/dev/null 2>&1; then
+    echo "--pr requires the gh CLI, which is not on PATH." >&2
+    echo "  (repos synced over SSH without gh must be synced without --pr)" >&2
+    exit 2
+  fi
+  if ! gh auth status >/dev/null 2>&1; then
+    echo "--pr requires gh to be authenticated — run: gh auth login" >&2
+    exit 2
+  fi
+  if ! git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "--pr requires the target to be a git repo: $TARGET" >&2
+    exit 2
+  fi
+  if ! git -C "$TARGET" remote get-url origin >/dev/null 2>&1; then
+    echo "--pr requires an 'origin' remote in: $TARGET" >&2
+    exit 2
+  fi
+  if [ "$SRC" = "$TARGET" ]; then
+    echo "--pr refuses to run against the kit source repo itself: $SRC" >&2
+    exit 2
+  fi
+  # A dirty tree would sweep unrelated work into the sync commit.
+  if [ -n "$(git -C "$TARGET" status --porcelain)" ]; then
+    echo "--pr requires a clean working tree in: $TARGET" >&2
+    echo "  commit or stash first — the kit sync must be the only change in the PR" >&2
+    exit 2
+  fi
+}
+
+detect_default_branch() {  # master vs main, without assuming either
+  local b=""
+  b="$(cd "$TARGET" && gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || true)"
+  if [ -z "$b" ]; then
+    b="$(git -C "$TARGET" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true)"
+    b="${b#origin/}"
+  fi
+  [ -n "$b" ] || b="master"
+  printf '%s' "$b"
+}
+
+pr_restore() {             # always leave the target on the branch we found it on
+  if [ "$PR" -eq 0 ] || [ "$DRY" -eq 1 ] || [ -z "$PR_ORIG_BRANCH" ]; then return 0; fi
+  local cur=""
+  cur="$(git -C "$TARGET" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  if [ "$cur" != "$PR_ORIG_BRANCH" ]; then
+    git -C "$TARGET" checkout --quiet "$PR_ORIG_BRANCH" 2>/dev/null || true
+  fi
+}
+
+pr_begin() {
+  PR_BASE="$(detect_default_branch)"
+  PR_BRANCH="chore/kit-sync-$KIT_VERSION"
+  echo "PR mode:"
+  echo "  base branch : $PR_BASE"
+  echo "  sync branch : $PR_BRANCH"
+  if [ "$DRY" -eq 1 ]; then
+    echo "  [dry-run] would fetch origin, branch from origin/$PR_BASE, commit, push, and open a PR"
+    echo
+    return 0
+  fi
+  PR_ORIG_BRANCH="$(git -C "$TARGET" rev-parse --abbrev-ref HEAD)"
+  trap pr_restore EXIT
+  git -C "$TARGET" fetch --quiet origin "$PR_BASE"
+  if git -C "$TARGET" show-ref --verify --quiet "refs/heads/$PR_BRANCH"; then
+    git -C "$TARGET" checkout --quiet "$PR_BRANCH"
+    echo "  reusing existing sync branch"
+  else
+    git -C "$TARGET" checkout --quiet -b "$PR_BRANCH" "origin/$PR_BASE"
+  fi
+  echo
+}
+
+pr_finish() {
+  echo "PR mode — publishing:"
+  if [ "$DRY" -eq 1 ]; then
+    echo "  [dry-run] would commit the changes above, push $PR_BRANCH, and open a PR"
+    return 0
+  fi
+  if [ -z "$(git -C "$TARGET" status --porcelain)" ]; then
+    echo "  no changes — already at kit $KIT_VERSION"
+    git -C "$TARGET" checkout --quiet "$PR_ORIG_BRANCH"
+    git -C "$TARGET" branch -D "$PR_BRANCH" >/dev/null 2>&1 || true
+    return 0
+  fi
+
+  git -C "$TARGET" add -A
+  local files
+  files="$(git -C "$TARGET" diff --cached --name-status | sed 's/^/  /')"
+
+  git -C "$TARGET" commit --quiet -F - <<EOF
+chore(kit): sync to $KIT_VERSION
+
+Applied by install-kit.sh from mjs-project-template.
+
+Files changed:
+$files
+EOF
+
+  git -C "$TARGET" push --quiet -u origin "$PR_BRANCH"
+  echo "  pushed $PR_BRANCH"
+
+  local url=""
+  url="$(cd "$TARGET" && gh pr create \
+    --base "$PR_BASE" --head "$PR_BRANCH" \
+    --title "chore(kit): sync to $KIT_VERSION" \
+    --body "Automated kit sync from [mjs-project-template](https://github.com/jwilleke/mjs-project-template), applied by \`install-kit.sh\`.
+
+Kit version: \`$KIT_VERSION\`
+
+## Files changed
+
+\`\`\`text
+$files
+\`\`\`
+
+Canonical kit files are overwritten wholesale; your own content is untouched. \`AGENTS.md\` changes
+are confined to the managed block between the \`KIT:START\` / \`KIT:END\` markers.
+
+Merging when CI is green is the expected path. If a change here is wrong, fix it upstream in the
+template rather than in this repo — the next sync would overwrite a local fix." 2>/dev/null || true)"
+
+  if [ -z "$url" ]; then
+    # A PR for this branch may already be open from an earlier run.
+    url="$(cd "$TARGET" && gh pr view "$PR_BRANCH" --json url -q .url 2>/dev/null || true)"
+  fi
+  if [ -n "$url" ]; then
+    echo "  PR: $url"
+  else
+    echo "  warning: branch pushed but no PR URL resolved — open one manually" >&2
+  fi
+
+  git -C "$TARGET" checkout --quiet "$PR_ORIG_BRANCH"
+  echo "  restored branch: $PR_ORIG_BRANCH"
+}
 
 # --- behaviors --------------------------------------------------------------
 
@@ -217,6 +373,11 @@ echo "  into: $TARGET"
 [ "$DRY" -eq 1 ] && echo "  MODE: dry-run — no changes will be written"
 echo
 
+if [ "$PR" -eq 1 ]; then
+  pr_preflight
+  pr_begin
+fi
+
 echo "Canonical tool files (overwrite):"
 overwrite ".claude/commands/pstatus.md"
 overwrite ".claude/commands/session-commit.md"
@@ -259,9 +420,18 @@ seed ".github/ISSUE_TEMPLATE/config.yml"
 seed ".github/PULL_REQUEST_TEMPLATE.md"
 echo
 
+if [ "$PR" -eq 1 ]; then
+  pr_finish
+  echo
+fi
+
 echo "Done."
 echo "Next:"
 echo "  - utility/sync-labels.sh            # apply the standard GitHub labels to this repo"
 echo "  - /pstatus                          # rank work + regenerate TODO.md"
+if [ "$PR" -eq 0 ]; then
+  echo "  - review the changes above, then commit them on a feature branch"
+  echo "    (or re-run with --pr to branch, push, and open the PR for you)"
+fi
 if [ "$DRY" -eq 1 ]; then echo "  (re-run without --dry-run to apply the changes above)"; fi
 exit 0
