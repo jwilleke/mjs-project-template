@@ -76,7 +76,28 @@ issues, no bare `#<num>`. Each line:
 
 PRs use the same one-per-line rule with the `/pull/` path, and **must name their related issues**:
 
-`- [#<num>](https://github.com/{owner}/{repo}/pull/<num>) — <title> *(ready | draft | conflicted)* — closes [#<n>](…/issues/<n>)`
+`- [#<num>](https://github.com/{owner}/{repo}/pull/<num>) — <title> _(ready | draft | conflicted)_ — closes [#<n>](…/issues/<n>)`
+
+Use **underscore** emphasis, not asterisks. The kit's own `.markdownlint.jsonc` sets MD049 to
+`underscore`, so an asterisk-wrapped state marker makes the generated `TODO.md` fail
+`npm run lint:md` in the very repo that produced it.
+
+**No entry may appear twice in `TODO.md`.** Every issue and every PR gets exactly one line in the
+whole file. When an issue's fix is already in an open PR, it belongs to the PR's line — as a
+`closes` / `refs` / `likely` link — and is **not** also listed in its priority band. Two lines for
+one piece of work inflates the apparent backlog and makes the file read as though the fix has not
+been written yet.
+
+State the absence rather than deleting it silently: a band whose only members moved to the PR
+section says so and names the count, e.g. `_None outstanding._ 2 untriaged issues exist (#17, #19)
+but both are awaiting merge — listed under 🔀 Open PRs`. An empty band and a band whose work is
+already done are different states, and the reader needs to tell them apart.
+
+Verify before finishing — every count must be 1:
+
+```bash
+grep -oE '/(issues|pull)/[0-9]+' TODO.md | sort | uniq -c | sort -rn
+```
 
 #### Resolving a PR's related issues
 
@@ -94,9 +115,10 @@ PR in the band. In order:
 If none of the three resolve, write `no linked issue` explicitly rather than leaving the line bare.
 A silent absence is indistinguishable from "not checked".
 
-Cross-reference both ways: an issue whose fix is already sitting in an open PR is **not** actually
-open work. Annotate it in its own priority band as `— PR open: [#<pr>](…/pull/<pr>)` so the ranking
-does not recommend starting something that is already written.
+An issue whose fix is already sitting in an open PR is **not** actually open work, and the ranking
+must not recommend starting something already written. Per the no-duplicate rule above, it is
+carried by the PR's line rather than annotated in its own band — one line, in the PR section, where
+the actionable verb is "merge" rather than "start".
 
 Where a PR turns out to be redundant — the change is already on the default branch, or a tracking
 issue was resolved another way — say so on the PR line as `*(redundant — already on <branch>)*`.
