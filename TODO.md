@@ -21,7 +21,8 @@ _None._
 
 ## 🔵 In review
 
-_None._
+- [#22](https://github.com/jwilleke/mjs-project-template/issues/22) — [security] linkify-it — quadratic-complexity DoS via mailto: validator (high) — patched, awaiting close
+- [#23](https://github.com/jwilleke/mjs-project-template/issues/23) — [security] brace-expansion — exponential-time DoS via consecutive empty {} groups (high) — patched, awaiting close
 
 ## ⏸ Deferred
 
