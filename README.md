@@ -110,9 +110,28 @@ create-if-absent, manages the AGENTS.md block, and migrates `docs/project_log.md
 
 ```bash
 ./install-kit.sh --dry-run /path/to/repo   # preview every change
-./install-kit.sh /path/to/repo             # apply
+./install-kit.sh /path/to/repo             # apply in place, leaving changes uncommitted
 /path/to/repo/utility/sync-labels.sh owner/repo   # apply the standard GitHub labels
 ```
+
+#### Syncing via pull request
+
+`--pr` applies the kit on a `chore/kit-sync-<version>` branch, commits, pushes, and opens a PR
+instead of leaving changes in your working tree. This is the preferred way to sync a downstream
+repo: the `AGENTS.md` this script installs requires feature branches and PRs for the default
+branch, and downstream CI (`markdown-lint`) only runs on PRs — so a direct push skips both.
+
+```bash
+./install-kit.sh --pr /path/to/repo           # branch, commit, push, open PR
+./install-kit.sh --auto-merge /path/to/repo   # same, and land it when CI goes green
+./install-kit.sh --dry-run --pr /path/to/repo # preview, touching nothing
+```
+
+Requires an authenticated `gh`, an `origin` remote, and a clean working tree — the sync must be the
+only change in the PR. It detects `master` vs `main` rather than assuming, restores the branch you
+started on (including on failure), and reports "already at kit `<version>`" without opening an empty
+PR when there is nothing to apply. A repo synced over SSH without `gh` must be synced without
+`--pr`.
 
 ## For Teams
 
