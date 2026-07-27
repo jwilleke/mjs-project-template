@@ -1,0 +1,34 @@
+# Downstream repos for the mjs agent kit.
+#
+# One owner/repo per line. Blank lines and lines starting with # are ignored.
+# Keep this machine-readable — it is consumed by tooling that fans out kit syncs.
+#
+# Read it with:
+#   grep -vE '^\s*(#|$)' downstream-repos.txt
+#
+# Example — open a kit-sync PR against every repo listed:
+#   grep -vE '^\s*(#|$)' downstream-repos.txt | while read -r repo; do
+#     ./install-kit.sh --pr "/Volumes/hd2A/workspaces/github/${repo#*/}"
+#   done
+#
+# Default branch varies (grow-tent and yourphr are `main`, the rest `master`).
+# Do not assume it — install-kit.sh --pr detects it per repo.
+#
+# Sync state and open sync PRs: docs/sync-log.md
+
+jwilleke/deby
+jwilleke/garage-car-positioning
+jwilleke/grow-nutrient-tank
+jwilleke/grow-tent
+jwilleke/mj-infra-flux
+jwilleke/mjs-ha
+jwilleke/ngdpbase
+jwilleke/yourphr
+jwilleke/fairways-gen2-website
+
+# Excluded — uncomment to bring back into the sync set.
+#
+# jwilleke/jwilleke              profile repo, not a project; excluded by operator 2026-07-27
+# jwilleke/js-rocket             3D-printing project, not a software project; no issues to rank,
+#                                never kitted; excluded by operator 2026-07-27
+# theak/jackery-homeassistant    upstream fork, no push access; permanent exclusion
