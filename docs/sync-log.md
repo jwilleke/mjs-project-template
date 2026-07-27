@@ -3,7 +3,7 @@
 Current sync state for each downstream repo. The `KIT:START` comment in each repo's `AGENTS.md`
 is the authoritative per-file version record; this table tracks the repo-level picture.
 
-**Method:** sync with `install-kit.sh --pr` (or `--auto-merge`), which opens a PR rather than
+**Method:** sync with `install-kit.sh --pr`, which opens a PR rather than
 pushing to the default branch. Direct pushes bypass the downstream `markdown-lint` CI and violate
 the feature-branch rule the kit itself installs. Record the method actually used per repo below —
 a repo without `gh` available cannot use `--pr`.

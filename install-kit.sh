@@ -6,7 +6,7 @@
 #   Re-run   : safe anytime to pick up a newer kit version.
 #
 # Usage:
-#   install-kit.sh [--dry-run] [--pr] [--auto-merge] [target-dir]
+#   install-kit.sh [--dry-run] [--pr] [target-dir]
 #                                                # target-dir defaults to the current directory
 #
 # Sync modes:
@@ -15,8 +15,7 @@
 #                Requires an authenticated `gh`, an `origin` remote, and a clean working tree.
 #                Downstream AGENTS.md mandates feature branches + PRs for the default branch,
 #                and downstream CI (markdown-lint) only runs on PRs — a direct push skips both.
-#   --auto-merge implies --pr; also sets `gh pr merge --auto --squash` so a green sync lands
-#                unattended and only a failing one needs attention.
+#                The PR is left for a human to merge.
 #
 # Behavior per file:
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint.jsonc)
@@ -36,13 +35,11 @@ set -euo pipefail
 
 DRY=0
 PR=0
-AUTO_MERGE=0
 TARGET=""
 for a in "$@"; do
   case "$a" in
-    --dry-run)    DRY=1 ;;
-    --pr)         PR=1 ;;
-    --auto-merge) PR=1; AUTO_MERGE=1 ;;
+    --dry-run) DRY=1 ;;
+    --pr)      PR=1 ;;
     -*) echo "unknown flag: $a" >&2; exit 2 ;;
     *) TARGET="$a" ;;
   esac
@@ -194,14 +191,6 @@ template rather than in this repo — the next sync would overwrite a local fix.
     echo "  PR: $url"
   else
     echo "  warning: branch pushed but no PR URL resolved — open one manually" >&2
-  fi
-
-  if [ "$AUTO_MERGE" -eq 1 ] && [ -n "$url" ]; then
-    if (cd "$TARGET" && gh pr merge --auto --squash "$url" >/dev/null 2>&1); then
-      echo "  auto-merge set — lands when CI passes"
-    else
-      echo "  warning: auto-merge not enabled (is it allowed on this repo?)" >&2
-    fi
   fi
 
   git -C "$TARGET" checkout --quiet "$PR_ORIG_BRANCH"
