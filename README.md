@@ -118,8 +118,10 @@ create-if-absent, manages the AGENTS.md block, and migrates `docs/project_log.md
 
 `--pr` applies the kit on a `chore/kit-sync-<version>` branch, commits, pushes, and opens a PR
 instead of leaving changes in your working tree. This is the preferred way to sync a downstream
-repo: the `AGENTS.md` this script installs requires feature branches and PRs for the default
-branch, and downstream CI (`markdown-lint`) only runs on PRs — so a direct push skips both.
+repo: a sync rewrites files in a repo whose owner did not initiate the change, so it gets a review
+point and a single revertable commit rather than landing unannounced. CI runs either way — the kit's
+workflows fire on `push` as well as `pull_request` — but a PR runs it as a gate *before* the change
+lands rather than a notification after.
 
 ```bash
 ./install-kit.sh --pr /path/to/repo           # branch, commit, push, open PR

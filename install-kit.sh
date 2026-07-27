@@ -13,8 +13,10 @@
 #   (default)    apply the kit in place, leaving the changes uncommitted for you to review
 #   --pr         apply on a `chore/kit-sync-<version>` branch, then commit, push, and open a PR.
 #                Requires an authenticated `gh`, an `origin` remote, and a clean working tree.
-#                Downstream AGENTS.md mandates feature branches + PRs for the default branch,
-#                and downstream CI (markdown-lint) only runs on PRs — a direct push skips both.
+#                A kit sync rewrites files in a repo whose owner did not initiate the change, so it
+#                gets a review point and a single revertable commit rather than landing unannounced.
+#                CI runs either way — on `push` as well as `pull_request` — but a PR runs it as a
+#                gate BEFORE the change lands instead of a notification after.
 #                The PR is left for a human to merge.
 #
 # Behavior per file:
