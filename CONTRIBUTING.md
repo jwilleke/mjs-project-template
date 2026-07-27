@@ -39,7 +39,14 @@ Use the slash command:
 /context
 ```
 
-### Create a Feature Branch
+### Branch — only if the change needs one
+
+Commit directly to `master` by default. A feature branch plus a pull request is warranted only when
+someone other than you will look at the change before it lands; on a single-maintainer repo a
+self-opened, self-merged PR reviews nothing. See the Process Constraints in
+[AGENTS.md](./AGENTS.md).
+
+When a branch *is* warranted:
 
 ```bash
 git checkout -b feature/your-feature-name
@@ -81,6 +88,10 @@ This includes:
 - Pre-commit hooks that enforce linting standards
 
 ## Pull Requests
+
+Not the default — see [Branch — only if the change needs one](#branch--only-if-the-change-needs-one).
+The checks below apply to a direct commit just as much as to a PR; CI runs on `push` to `master` as
+well as on `pull_request`.
 
 ### Before Creating a PR
 
