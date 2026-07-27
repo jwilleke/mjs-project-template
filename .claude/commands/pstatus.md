@@ -45,9 +45,15 @@ For each open Dependabot / code-scanning / GitGuardian alert:
 
 ### Step 4: Rank and regenerate `TODO.md`
 
-Overwrite `TODO.md` with the open issues grouped into bands. The `▶ Resume here` pointer is owned by
-`/wrap` (written at session end) — `/pstatus` does not write or preserve it; once you've resumed it
-has served its purpose, so regenerating a bands-only `TODO.md` here is expected:
+Overwrite `TODO.md` with the open issues grouped into bands.
+
+**Remove the `▶ Resume here` block, including its `RESUME:START` / `RESUME:END` markers.** The
+pointer is written by `/wrap` at session end and read by `/context` at session open; by the time
+`/pstatus` runs you have already resumed, so it has served its purpose. The output of this step is a
+bands-only `TODO.md` — that is intended, not a loss. `/pstatus` never reads the block and never
+preserves it.
+
+The bands, in this order:
 
 - `🔴 P0 — Security & Critical` (list `security` / vulnerability issues first)
 - `🟠 P1`
