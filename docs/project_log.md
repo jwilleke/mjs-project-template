@@ -19,6 +19,26 @@ Rules for the log entry:
 
 <!-- ## Entries go below here -->
 
+## 2026-07-27-01
+
+- Agent: Claude
+- Subject: Bridge two open Dependabot alerts into issues and patch them
+- Current Issue: #22, #23
+- Work Done:
+  - Ran `/pstatus`: 2 open Dependabot alerts, no code-scanning analysis, 3 untriaged bugs
+  - Bridged alert 17 (linkify-it, GHSA-v245-v573-v5vm) into #22 and alert 16 (brace-expansion, GHSA-3jxr-9vmj-r5cp) into #23, both `security` + `P0`
+  - Applied `needs-triage` to #16 (had `bug` only, no placement label)
+  - `npm audit fix`: linkify-it 5.0.1 → 5.0.2, brace-expansion 5.0.6 → 5.0.8 and 1.1.14 → 1.1.16; js-yaml → 4.2.0 and postcss → 8.5.23 carried along
+  - Verified lint, tests (1 passed), and typecheck all green
+  - Regenerated TODO.md — P0 band cleared
+- Commits: 592a882, 064faef
+- Files Modified:
+  - `package-lock.json`
+  - `TODO.md`
+  - `docs/project_log.md`
+- Notes:
+  - Two advisories remain open in `npm audit` and are NOT covered by #22/#23 — both need a breaking upgrade or have no patch yet: brace-expansion GHSA-mh99-v99m-4gvg (OOM; 1.x line unpatched, would need eslint@10.8.0) and js-yaml GHSA-52cp-r559-cp3m (4.2.0 still in range). Not yet surfaced as Dependabot alerts.
+
 ## 2026-06-20-01
 
 - Agent: Claude
