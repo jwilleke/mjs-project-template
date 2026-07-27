@@ -24,8 +24,11 @@ jwilleke/mj-infra-flux
 jwilleke/mjs-ha
 jwilleke/ngdpbase
 jwilleke/yourphr
+jwilleke/fairways-gen2-website
 
 # Excluded — uncomment to bring back into the sync set.
 #
 # jwilleke/jwilleke              profile repo, not a project; excluded by operator 2026-07-27
+# jwilleke/js-rocket             3D-printing project, not a software project; no issues to rank,
+#                                never kitted; excluded by operator 2026-07-27
 # theak/jackery-homeassistant    upstream fork, no push access; permanent exclusion
