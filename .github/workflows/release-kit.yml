@@ -23,6 +23,9 @@ on:
 
 permissions:
   contents: read
+  # Lets npm authenticate by OIDC (trusted publishing) instead of a token.
+  # Token auth is the fallback while the trusted publisher is unconfigured.
+  id-token: write
 
 jobs:
   publish:
@@ -35,8 +38,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1.
+          node-version: 22
           registry-url: https://registry.npmjs.org
+
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@latest
 
       - name: Decide whether to publish
         id: decide
