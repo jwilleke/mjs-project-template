@@ -215,6 +215,7 @@ overwrite() {              # overwrite REL from kit (canonical tool file)
   local rel="$1" s="$SRC/$1" d="$TARGET/$1"
   [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
   if [ -f "$d" ] && cmp -s "$s" "$d"; then act "unchanged: $rel"; return; fi
+  warn_local_file_edits "$rel"
   act "overwrite: $rel"
   if [ "$DRY" -eq 0 ]; then
     mkdir -p "$(dirname "$d")"; cp "$s" "$d"
@@ -357,6 +358,51 @@ apply_group() {            # apply every kit-files.tsv row in group $1, in file 
   done <"$manifest"
 }
 
+stamped_kit_version() {    # the kit version recorded in the target's AGENTS.md marker
+  local d="$TARGET/AGENTS.md"
+  [ -f "$d" ] || return 0
+  sed -n "s/.*$START_PREFIX \([^ ]*\).*/\1/p" "$d" | head -1
+}
+
+kit_ref_of() {             # a git ref for a stamped version: v1.0.0-57-gc4b69c8 or a bare sha
+  case "$1" in
+    *-g*) printf '%s' "${1##*-g}" ;;
+    *)    printf '%s' "$1" ;;
+  esac
+}
+
+warn_local_file_edits() {  # say what overwriting an `overwrite` file is about to destroy
+  local rel="$1" s="$SRC/$1" d="$TARGET/$1"
+  local stamped ref prev lost
+  [ -f "$d" ] || return 0
+
+  stamped="$(stamped_kit_version)"
+  [ -n "$stamped" ] || return 0
+  ref="$(kit_ref_of "$stamped")"
+
+  prev="$(mktemp "${TMPDIR:-/tmp}/kitfile.XXXXXX")"
+  lost="$(mktemp "${TMPDIR:-/tmp}/kitlost.XXXXXX")"
+
+  # Same test as the managed block: differing from the version this repo was
+  # synced at is a local edit; differing from the incoming file is an upgrade.
+  if git -C "$SRC" show "$ref:$rel" >"$prev" 2>/dev/null; then
+    if cmp -s "$d" "$prev"; then rm -f "$prev" "$lost"; return 0; fi
+  else
+    rm -f "$prev" "$lost"; return 0      # cannot tell an edit from an upgrade — stay quiet
+  fi
+
+  grep -Fxv -f "$s" "$d" | grep -v '^[[:space:]]*$' >"$lost" || true
+  if [ -s "$lost" ]; then
+    echo "  WARNING: $rel was edited locally since kit $stamped, and is overwritten wholesale." >&2
+    echo "           These lines are NOT in the incoming version and will be lost:" >&2
+    sed 's/^/             /' "$lost" >&2
+    echo "           Generic rules belong upstream in the kit. Repo-specific notes belong in" >&2
+    echo "           ${rel%.md}.local.md, which the kit never touches." >&2
+  fi
+
+  rm -f "$prev" "$lost"
+}
+
 managed_block_of() {       # print the KIT-managed block of $1, markers excluded
   awk '/<!-- KIT:START/{f=1;next} /<!-- KIT:END/{f=0} f' "$1"
 }
@@ -378,13 +424,8 @@ warn_local_block_edits() { # say what a managed-block rewrite is about to destro
   # Compare against the boilerplate of the kit version this repo was stamped
   # with. Differing from THAT is a local edit; differing from the incoming
   # boilerplate is just an upgrade.
-  stamped="$(sed -n "s/.*$START_PREFIX \([^ ]*\).*/\1/p" "$d" | head -1)"
-  # `git describe` form is v1.0.0-57-gc4b69c8; a repo with no tags is stamped
-  # with a bare short sha instead, and that resolves just as well.
-  case "$stamped" in
-    *-g*) sha="${stamped##*-g}" ;;
-    *)    sha="$stamped" ;;
-  esac
+  stamped="$(stamped_kit_version)"
+  sha="$(kit_ref_of "$stamped")"
   status="unknown"
   if [ -n "$sha" ] &&
      git -C "$SRC" show "$sha:templates/agents-boilerplate.md" >"$prev" 2>/dev/null; then

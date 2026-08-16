@@ -192,3 +192,16 @@ actionable; "merge #24" alone makes the operator go look up why it matters.
 - For each repo, gather open Dependabot alerts + open issues labeled `P0` + open PRs.
 - Print a cross-repo table: `repo | open P0 | open security alerts | open PRs | top item`.
 - Recommend which repo needs attention first. Create no issues in sweep mode.
+
+## Repo-specific additions
+
+This file is **kit-managed and overwritten wholesale** on every `install-kit.sh` run — anything
+you add here is lost at the next sync, silently until the installer started warning about it.
+
+If this repo needs something extra from `/pstatus` — a package manager the kit does not name, a
+scanner only this repo has, a path only this repo uses — put it in
+`.claude/commands/pstatus.local.md`. The kit never writes, reads, or deletes that file.
+
+**Read it, if it exists, and treat its contents as part of this command.** A rule that is generic
+does not belong there: raise it upstream in
+[mjs-project-template](https://github.com/jwilleke/mjs-project-template) so every repo gets it.
