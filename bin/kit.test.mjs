@@ -1,6 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, rmSync, symlinkSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 import {
   compareKitVersions,
@@ -9,7 +12,8 @@ import {
   parseKitVersion,
   parseManifest,
   parseMarkerVersion,
-  reportDrift
+  reportDrift,
+  stampedVersion
 } from './kit.mjs';
 
 describe('parseKitVersion', () => {
@@ -106,6 +110,33 @@ describe('parseManifest', () => {
     const rows = parseManifest(readFileSync('kit-files.tsv', 'utf8'));
 
     expect(rows.filter((row) => !known.has(row.behavior))).toEqual([]);
+  });
+});
+
+describe('stampedVersion', () => {
+  // A published package has no git history, so the stamp is the only thing
+  // standing between a consumer and being told it is ahead of the kit.
+  const stub = (contents) => ({
+    read: () => contents,
+    exists: () => contents !== null
+  });
+
+  it('reads a packed kit-version.txt', () => {
+    const { read, exists } = stub('v1.0.0-58-g2b628bc\n');
+
+    expect(stampedVersion('/pkg', read, exists)).toBe('v1.0.0-58-g2b628bc');
+  });
+
+  it('returns null when the file is absent', () => {
+    const { read, exists } = stub(null);
+
+    expect(stampedVersion('/pkg', read, exists)).toBeNull();
+  });
+
+  it('rejects a stamp that is not a kit version', () => {
+    const { read, exists } = stub('not a version\n');
+
+    expect(stampedVersion('/pkg', read, exists)).toBeNull();
   });
 });
 
@@ -211,6 +242,24 @@ describe('reportDrift', () => {
     delete process.env.GITHUB_TOKEN;
 
     expect(await reportDrift(behindResult, true)).toContain('GITHUB_TOKEN');
+  });
+});
+
+describe('invoked through a bin symlink', () => {
+  // npm installs a bin as a symlink into node_modules/.bin. An entry-point
+  // guard that compares argv[1] to import.meta.url without resolving it makes
+  // the installed CLI print nothing and exit 0 — a check that silently passes.
+  const link = join(tmpdir(), `agent-kit-entry-${process.pid}`);
+
+  afterEach(() => rmSync(link, { force: true }));
+
+  it('still runs when argv[1] is a symlink to it', () => {
+    symlinkSync(resolve('bin/kit.mjs'), link);
+
+    const result = spawnSync(process.execPath, [link], { encoding: 'utf8' });
+
+    expect(result.stderr).toContain('usage:');
+    expect(result.status).toBe(2);
   });
 });
 

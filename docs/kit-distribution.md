@@ -139,6 +139,54 @@ Phases 2 and 3 of [#45](https://github.com/jwilleke/mjs-project-template/issues/
 `@jwilleke/agent-kit` so the workflow becomes a one-line `npx`, and porting the applying half out of
 bash — are deliberately deferred until this shape has proven itself.
 
+## The package
+
+`packages/agent-kit/` is the publishable form of the kit: `@jwilleke/agent-kit`, a Node package with
+a `bin` and no dependencies. It carries the commands, the templates, `kit-files.tsv`, and the
+checker.
+
+It is a **build artifact**, not a second copy. `build.mjs` assembles it from the authored sources at
+the repo root at pack time and rebuilds its directories from scratch, so a file deleted upstream
+cannot survive in the package. Nothing under `packages/agent-kit/bin`, `commands/`, or `templates/`
+is committed — those paths are gitignored, and editing them there is editing a build output.
+
+```bash
+cd packages/agent-kit && npm pack     # runs build.mjs via prepack
+npx @jwilleke/agent-kit check /path/to/repo
+```
+
+### Two version numbers, deliberately
+
+The package has a semver version of its own. `kit-version.txt` inside it separately records the
+`git describe` commit the package was cut from, and *that* is what the checker compares against a
+consumer's `KIT:START` marker.
+
+They cannot be collapsed into one. A published package needs a version that means something to npm;
+the marker needs a commit pointer that means something to `install-kit.sh`. The stamp is also load
+bearing rather than informational: an installed package has no git history, so without it the
+checker falls back to the latest release tag — which is older than any `git describe` marker — and
+reports every consumer as *ahead of* the kit while exiting 0. A silent false pass.
+
+### What a package version means
+
+Publishing forces a judgement `git describe` never did. For `@jwilleke/agent-kit`:
+
+- **major** — a change a consumer must act on: a command removed or renamed, a manifest behaviour
+  changed such that files that were preserved are now overwritten, a `check` exit code or `--json`
+  shape that existing automation reads.
+- **minor** — new commands, new templates, new managed files, new checker flags. Additive; a
+  consumer that ignores the release is no worse off.
+- **patch** — wording, fixes, and clarifications inside existing files.
+
+Rule of thumb: if a consumer who upgrades without reading the release notes could lose work or have
+a workflow break, it is major.
+
+### Releasing
+
+`.github/workflows/release-kit.yml` publishes on a `kit-v*` tag, after verifying the tag matches the
+package version and the tests pass. It needs an `NPM_TOKEN` secret with publish rights on the
+`@jwilleke` scope. `workflow_dispatch` builds and packs without publishing.
+
 ## Known gaps
 
 - **A local edit to the managed block dies silently** ([#44](https://github.com/jwilleke/mjs-project-template/issues/44)).
@@ -148,6 +196,12 @@ bash — are deliberately deferred until this shape has proven itself.
   [#42](https://github.com/jwilleke/mjs-project-template/issues/42).
 - **The check is not yet running anywhere.** The workflow exists and is seeded on install, but the
   nine consumers have not been synced since it was added, so none of them has it yet.
+- **The package is built but unpublished.** `@jwilleke/agent-kit` packs and installs correctly from
+  a local tarball; nothing is on npm, so `npx @jwilleke/agent-kit` does not resolve yet. Publishing
+  claims the name permanently and is an operator decision.
+- **The seeded workflow still checks the kit out** rather than using `npx`. Switching it is a
+  one-line change once the package is published, and it is what makes the two consumer profiles
+  (npm-managed versus not) start to matter.
 - **`docs/sync-log.md` is hand-written** and drifts from the markers it summarises.
 - **Partial command coverage** — four of the six `.claude/commands/*.md` files sync; `/semver` and
   `/update-agents` do not, so downstream agents follow different rules depending on the command.
