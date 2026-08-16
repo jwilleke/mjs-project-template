@@ -108,6 +108,11 @@ upgrade. It overwrites canonical tool files, merges `.gitignore`, seeds docs/iss
 create-if-absent, manages the AGENTS.md block, and migrates `docs/project_log.md` →
 `private/project_log.md`. Re-run anytime to pick up a newer kit version.
 
+For the contract behind those behaviours — which files are overwritten versus preserved, how the
+version is recorded, what is deliberately not distributed, and why the kit is not an npm package —
+see [docs/kit-distribution.md](docs/kit-distribution.md). Read it before changing anything under
+`templates/` or `.claude/commands/`; those files fan out to every downstream repo.
+
 ```bash
 ./install-kit.sh --dry-run /path/to/repo   # preview every change
 ./install-kit.sh /path/to/repo             # apply in place, leaving changes uncommitted
