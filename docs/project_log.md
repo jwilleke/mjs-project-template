@@ -19,6 +19,38 @@ Rules for the log entry:
 
 <!-- ## Entries go below here -->
 
+## 2026-08-16-01
+
+- Agent: Claude
+- Subject: Clear the P0 js-yaml alert and work every open issue
+- Current Issue: #43, #39, #42, #38, #40
+- Work Done:
+  - Ran `/pstatus`: bridged Dependabot alert 22 (js-yaml GHSA-5p4m-2wfm-xmqj, high) into #43 and applied `needs-triage` to #42
+  - #43 — merged Dependabot PR #41 (js-yaml 4.3.0 → 4.3.1); open Dependabot alerts now 0; closed
+  - Established that `TODO.md` carries no history at all (no merged/closed counts, no narrative, no other repos) — written into `pstatus.md`, `TODO.md.tmpl`, and the AGENTS boilerplate
+  - #39 — open PRs now share the priority bands with issues; `🔀 Open PRs` band removed from both `pstatus.md` and the drifted `TODO.md.tmpl`; PR priority = own label → highest linked issue → needs-triage
+  - #42 — added the missing "remove `in-review` when closing" half of the rule to the boilerplate; split the underlying `install-kit.sh` silent-overwrite problem into #44
+  - #38 — operator chose to keep the resume-block wipe; closed as not planned, but documented the `/wrap` → `/context` → `/pstatus` handover in the boilerplate so the behaviour stops reading as a bug
+  - #40 — operator chose the stronger route: `utility/set-version.mjs` writes the version fields only (both lockfile places, no re-resolution), with tests pinning byte-identical round-trip, untouched dependency entries, lockfileVersion 1, and an exactly-two-line diff
+  - Fixed a latent pre-commit failure: lint-staged handed eslint every staged `*.ts`, so any commit touching a root config (e.g. `vitest.config.ts`) failed with "not found by the project service"
+  - Gate green: lint, typecheck, build, 19 tests
+- Commits: 0b403df, afa118f, 092ff93, 1f1b5c3, c78dfa5, c4b69c8
+- Files Modified:
+  - `.claude/commands/pstatus.md`
+  - `.claude/commands/semver.md`
+  - `templates/agents-boilerplate.md`
+  - `templates/TODO.md.tmpl`
+  - `utility/set-version.mjs`
+  - `utility/set-version.test.mjs`
+  - `vitest.config.ts`
+  - `package.json`
+  - `package-lock.json`
+  - `TODO.md`
+  - `docs/project_log.md`
+- Notes:
+  - `npm audit` still reports 2 high findings not raised as Dependabot alerts — brace-expansion (GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895) and nanoid (GHSA-2v37-7h3g-55p8). Both say `fixAvailable: true`; not investigated this session, no tracking issue yet.
+  - `install-kit.sh` does not sync `.claude/commands/semver.md` or `utility/set-version.mjs`, so #40's fix does not reach consumers. Deliberate — adding `semver.md` to the overwrite list would clobber forks with their own bump tooling (ngdpbase).
+
 ## 2026-07-27-01
 
 - Agent: Claude
