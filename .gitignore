@@ -9,6 +9,15 @@ build/
 out/
 *.tsbuildinfo
 
+# packages/agent-kit is assembled from the kit sources by its build.mjs — the
+# authored copies live at the repo root, so these are artifacts, never edited here.
+packages/agent-kit/bin/
+packages/agent-kit/commands/
+packages/agent-kit/templates/
+packages/agent-kit/kit-files.tsv
+packages/agent-kit/kit-version.txt
+packages/agent-kit/*.tgz
+
 # IDE
 .vscode/*
 !.vscode/settings.json

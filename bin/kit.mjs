@@ -20,7 +20,7 @@
 // repos that are C++, Go, Python, and Shell. GitHub's runners already ship Node,
 // so those repos pay nothing for it.
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -119,6 +119,20 @@ function kitVersionFrom(kitDir) {
   }
 }
 
+/**
+ * The version stamped into a packed copy of the kit. A published package has no
+ * git history, so without this the checker would fall back to the latest *tag*
+ * — which is older than any `git describe` marker in a downstream repo, and
+ * every consumer would be told it is somehow ahead of the kit.
+ */
+export function stampedVersion(kitDir, read = readFileSync, exists = existsSync) {
+  const stamp = join(kitDir, 'kit-version.txt');
+  if (!exists(stamp)) return null;
+
+  const raw = read(stamp, 'utf8').trim();
+  return parseKitVersion(raw) ? raw : null;
+}
+
 async function latestKitTag() {
   const response = await fetch(`https://api.github.com/repos/${KIT_REPO}/tags?per_page=1`, {
     headers: { accept: 'application/vnd.github+json' }
@@ -186,7 +200,9 @@ async function check(argv) {
 
   const { local, missing } = inspect(target, kitDir);
 
-  let kit = kitVersionFrom(kitDir);
+  // Ordered by precision: a checkout knows exactly, a packed copy carries a
+  // stamp, and the tags API is the last resort because it only sees releases.
+  let kit = kitVersionFrom(kitDir) ?? stampedVersion(kitDir);
   if (!kit) {
     try {
       kit = await latestKitTag();
@@ -321,7 +337,24 @@ async function main(argv) {
   return usage();
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+/**
+ * True when this file is the entry point. npm installs a bin as a symlink, so
+ * `process.argv[1]` is the link in node_modules/.bin while `import.meta.url` is
+ * the resolved file — comparing them raw makes the installed CLI silently do
+ * nothing and exit 0.
+ */
+function isEntryPoint() {
+  const entry = process.argv[1];
+  if (!entry) return false;
+
+  try {
+    return import.meta.url === pathToFileURL(realpathSync(entry)).href;
+  } catch {
+    return false;
+  }
+}
+
+if (isEntryPoint()) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (error) => {
