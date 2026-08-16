@@ -66,9 +66,33 @@ file's contents, is what decides whether a local edit survives.
 The last four are not per-file lists, so they stay in `install-kit.sh`; the rest come from the
 manifest.
 
-The rule that follows from the table: **fix kit files upstream, never in the consumer.** A local fix
-to an `overwrite` file is deleted by the next sync without a word. If the kit is wrong, it is wrong
-for nine repos — change it here.
+The rule that follows from the table: **fix kit files upstream, never in the consumer.** If the kit
+is wrong, it is wrong for nine repos — change it here.
+
+An `overwrite` file is still replaced wholesale, but no longer silently: the installer compares the
+target's copy against the same file at the kit version stamped in that repo, and prints the lines
+that are about to disappear. That check exists because five rules in `jwilleke/yourphr` — each added
+after a real incident — were one merge away from being deleted without a trace.
+
+### Where repo-specific knowledge goes
+
+A command file is exactly where a repo accumulates operating knowledge, and exactly what the sync
+destroys. The answer is a sibling the kit never touches:
+
+```text
+.claude/commands/pstatus.md          kit-managed, overwritten every sync
+.claude/commands/pstatus.local.md    yours, never written / read / deleted by install-kit.sh
+```
+
+Each kit command ends with a section telling the agent to read its `.local.md` if present and treat
+the contents as part of the command. Commit the file — it is repo knowledge, and it should travel
+with the repo.
+
+The split is worth applying honestly. "Run the ecosystem's audit, because scanners that match by
+registry coordinates cannot see a git-URL dependency" is generic — it belongs upstream, and it is
+now in `pstatus.md` for everyone. "Run `cd frontend && yarn audit --groups dependencies`, whose exit
+code is a bitmask, see `docs/security/dependency-scanning.md`" is true of one repo — it belongs in
+that repo's `.local.md`.
 
 The managed block is the exception, and only because it is warned about. Before rewriting it, the
 installer compares what is on disk against the boilerplate of the kit version stamped in that repo's
