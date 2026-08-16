@@ -357,6 +357,63 @@ apply_group() {            # apply every kit-files.tsv row in group $1, in file 
   done <"$manifest"
 }
 
+managed_block_of() {       # print the KIT-managed block of $1, markers excluded
+  awk '/<!-- KIT:START/{f=1;next} /<!-- KIT:END/{f=0} f' "$1"
+}
+
+warn_local_block_edits() { # say what a managed-block rewrite is about to destroy
+  local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
+  local stamped sha cur prev lost status
+  [ -f "$d" ] || return 0
+  grep -qF "$START_PREFIX" "$d" || return 0
+
+  cur="$(mktemp "${TMPDIR:-/tmp}/kitblock.XXXXXX")"
+  prev="$(mktemp "${TMPDIR:-/tmp}/kitprev.XXXXXX")"
+  lost="$(mktemp "${TMPDIR:-/tmp}/kitlost.XXXXXX")"
+  managed_block_of "$d" >"$cur"
+
+  # Identical to what is about to be written: nothing can be lost.
+  if cmp -s "$cur" "$b"; then rm -f "$cur" "$prev" "$lost"; return 0; fi
+
+  # Compare against the boilerplate of the kit version this repo was stamped
+  # with. Differing from THAT is a local edit; differing from the incoming
+  # boilerplate is just an upgrade.
+  stamped="$(sed -n "s/.*$START_PREFIX \([^ ]*\).*/\1/p" "$d" | head -1)"
+  # `git describe` form is v1.0.0-57-gc4b69c8; a repo with no tags is stamped
+  # with a bare short sha instead, and that resolves just as well.
+  case "$stamped" in
+    *-g*) sha="${stamped##*-g}" ;;
+    *)    sha="$stamped" ;;
+  esac
+  status="unknown"
+  if [ -n "$sha" ] &&
+     git -C "$SRC" show "$sha:templates/agents-boilerplate.md" >"$prev" 2>/dev/null; then
+    if cmp -s "$cur" "$prev"; then status="clean"; else status="edited"; fi
+  fi
+
+  case "$status" in
+    clean) rm -f "$cur" "$prev" "$lost"; return 0 ;;
+    edited)
+      echo "  WARNING: AGENTS.md managed block was edited locally since kit $stamped." >&2 ;;
+    unknown)
+      echo "  WARNING: AGENTS.md managed block differs from the incoming boilerplate," >&2
+      echo "           and kit $stamped could not be resolved to compare against." >&2 ;;
+  esac
+
+  # Lines present locally but absent from the incoming boilerplate are exactly
+  # what the rewrite drops.
+  grep -Fxv -f "$b" "$cur" | grep -v '^[[:space:]]*$' >"$lost" || true
+  if [ -s "$lost" ]; then
+    echo "           These lines are NOT in the new boilerplate and will be lost:" >&2
+    sed 's/^/             /' "$lost" >&2
+  else
+    echo "           No lines are lost — the local copy only reorders or trims." >&2
+  fi
+  echo "           Re-add anything you need BELOW the KIT:END marker, or raise it upstream." >&2
+
+  rm -f "$cur" "$prev" "$lost"
+}
+
 ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
   if [ ! -f "$d" ]; then
@@ -368,6 +425,8 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
     return
   fi
   if grep -qF "$START_PREFIX" "$d"; then
+    # Warn BEFORE the rewrite, and in dry-run too — the point is to see it coming.
+    warn_local_block_edits
     act "update AGENTS.md managed block (your content below KIT:END preserved)"
     if [ "$DRY" -eq 0 ]; then
       awk -v prefix="$START_PREFIX" -v start="$START" -v end="$END" -v bf="$b" '

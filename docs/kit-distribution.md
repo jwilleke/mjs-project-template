@@ -67,8 +67,27 @@ The last four are not per-file lists, so they stay in `install-kit.sh`; the rest
 manifest.
 
 The rule that follows from the table: **fix kit files upstream, never in the consumer.** A local fix
-to an `overwrite` file or to the managed block is deleted by the next sync without a word. If the
-kit is wrong, it is wrong for nine repos — change it here.
+to an `overwrite` file is deleted by the next sync without a word. If the kit is wrong, it is wrong
+for nine repos — change it here.
+
+The managed block is the exception, and only because it is warned about. Before rewriting it, the
+installer compares what is on disk against the boilerplate of the kit version stamped in that repo's
+`KIT:START` marker. Differing from *that* is a local edit; differing from the incoming boilerplate is
+merely an upgrade. Local edits are printed line by line, in `--dry-run` too:
+
+```text
+WARNING: AGENTS.md managed block was edited locally since kit v1.0.0-49-g7e03e8d.
+         These lines are NOT in the new boilerplate and will be lost:
+           - Closing issues — Always remove the `in-review` label when closing …
+         Re-add anything you need BELOW the KIT:END marker, or raise it upstream.
+```
+
+It warns and proceeds — it never blocks the install, and it never merges. When the stamped version
+cannot be resolved (unreachable ref, shallow clone) it degrades to a generic warning rather than a
+silent pass.
+
+A rule someone keeps re-adding to a managed block is a rule the block is missing, so treat the
+warning as a feature request against the kit, not as noise.
 
 ## Versioning
 
@@ -222,11 +241,9 @@ stored as the `NPM_TOKEN` repo secret.
 
 ## Known gaps
 
-- **A local edit to the managed block dies silently** ([#44](https://github.com/jwilleke/mjs-project-template/issues/44)).
-  People edit the block precisely when the boilerplate is missing a rule they need — the most
-  valuable signal the kit gets, and it is currently destroyed rather than reported. A downstream
-  repo lost a "remove `in-review` on close" rule this way before it was adopted upstream as
-  [#42](https://github.com/jwilleke/mjs-project-template/issues/42).
+- **The overwrite warning is line-exact.** A rule adopted upstream in different wording still
+  reports as "will be lost", because the comparison is textual. Conservative in the right
+  direction — a false alarm costs a glance, a missed one costs the rule.
 - **The check is not yet running anywhere.** The workflow exists and is seeded on install, but the
   nine consumers have not been synced since it was added, so none of them has it yet.
 - **Nothing is on npm yet.** The package builds, packs, and installs from a local tarball, and the
