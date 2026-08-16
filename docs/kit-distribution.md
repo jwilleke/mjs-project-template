@@ -144,10 +144,9 @@ bash — are deliberately deferred until this shape has proven itself.
 `packages/agent-kit/` is the kit in Node package form: `@jwilleke/agent-kit`, a `bin` with no
 dependencies, carrying the commands, the templates, `kit-files.tsv`, and the checker.
 
-**It is not published, by preference, and it is marked `private: true` with a `prepublishOnly` guard
-that fails the command.** `npm publish --dry-run` on npm 11 does not honour the `private` flag on
-its own, which is why the guard is a failing script rather than a field. Removing both is what a
-future decision to publish would look like.
+It is published publicly, under the `@jwilleke` scope. Public rather than private is deliberate: a
+private package or GitHub Packages would need an auth token in every consumer's workflow, which is a
+worse trade than the credential-free checkout the kit already uses.
 
 It is a **build artifact**, not a second copy. `build.mjs` assembles it from the authored sources at
 the repo root at pack time and rebuilds its directories from scratch, so a file deleted upstream
@@ -156,23 +155,27 @@ is committed — those paths are gitignored, and editing them there is editing a
 
 ```bash
 cd packages/agent-kit && npm pack           # runs build.mjs via prepack
-npm install /path/to/jwilleke-agent-kit-1.0.0.tgz
+npx @jwilleke/agent-kit check /path/to/repo
 ```
 
-Unpublished, it still earns its place: it is the artifact phase 3 installs, it packs a
-self-contained copy of the kit for a machine with no checkout, and it keeps the packaging decisions
-(what ships, how the version is stamped) made and tested rather than deferred.
+### What ships, and why it is safe to ship
 
-### Not published is not the same as not public
+The package contains only kit content: the four commands, six templates, `kit-files.tsv`,
+`kit-version.txt`, the checker, and a README. Sixteen files.
 
-The kit repo itself is public on GitHub, so nothing here is confidential — declining to publish
-keeps the kit off a package registry, it does not make it private. Five of the nine consumers are
-public repos and four are private; the seeded workflow works for both, because checking out a public
-repo needs no credentials.
+Publishing makes those bytes permanent and world-readable, so the contents were audited rather than
+assumed before the first release, and that audit is worth repeating whenever the manifest grows:
 
-If a registry is wanted later, the constraint to weigh is auth: a private npm package or GitHub
-Packages requires a token in every consumer's workflow, which is a worse trade than the checkout the
-kit uses today, and it would buy Dependabot only for the two npm-managed repos.
+```bash
+cd packages/agent-kit && npm pack && tar xzf jwilleke-agent-kit-*.tgz
+grep -rniE "deby|grow-nutrient-tank|mjs-ha|fairways-gen2-website" package   # private consumers
+grep -rn "/Volumes/\|/Users/" package                                       # local paths
+grep -rhoE "https?://[A-Za-z0-9./_-]+" package | sort -u                    # every host
+```
+
+The first matters most and is the least obvious: four of the nine consumers are **private** repos, so
+naming one in a shipped template would disclose its existence. `downstream-repos.txt` names all nine
+and is deliberately not in the package.
 
 ### Two version numbers, deliberately
 
@@ -188,8 +191,7 @@ reports every consumer as *ahead of* the kit while exiting 0. A silent false pas
 
 ### What a package version means
 
-Kept for the day a registry is chosen — a package version would force a judgement `git describe`
-never did. For `@jwilleke/agent-kit`:
+Publishing forces a judgement `git describe` never did. For `@jwilleke/agent-kit`:
 
 - **major** — a change a consumer must act on: a command removed or renamed, a manifest behaviour
   changed such that files that were preserved are now overwritten, a `check` exit code or `--json`
@@ -203,9 +205,18 @@ a workflow break, it is major.
 
 ### Releasing
 
-There is no release workflow. One existed briefly and was removed with the decision not to publish —
-a workflow that publishes on a tag is exactly the kind of thing that fires by accident. Delivery is
-the seeded check workflow plus `install-kit.sh`, neither of which involves a registry.
+`.github/workflows/release-kit.yml` publishes on a `kit-v*` tag, after verifying the tag matches the
+package version and the tests pass. It needs an `NPM_TOKEN` secret with publish rights on the
+`@jwilleke` scope. `workflow_dispatch` builds and packs without publishing.
+
+```bash
+# bump packages/agent-kit/package.json first, then:
+git tag kit-v1.1.0 && git push origin kit-v1.1.0
+```
+
+A published version is permanent — npm allows unpublishing only within 72 hours, and the name is
+claimed for good on first release. The tag-matching gate exists so a release cannot go out under a
+version nobody chose.
 
 ## Known gaps
 
@@ -216,9 +227,13 @@ the seeded check workflow plus `install-kit.sh`, neither of which involves a reg
   [#42](https://github.com/jwilleke/mjs-project-template/issues/42).
 - **The check is not yet running anywhere.** The workflow exists and is seeded on install, but the
   nine consumers have not been synced since it was added, so none of them has it yet.
-- **No dependency-bot notification.** Without a registry there is nothing for Dependabot to watch,
-  so the seeded workflow's tracking issue is the only signal. That was true before the package
-  existed and remains true; it is a consequence of the no-registry decision, not an oversight.
+- **Nothing is on npm yet.** The package builds, packs, and installs from a local tarball, and the
+  release workflow is in place, but the first publish has not been run — so `npx @jwilleke/agent-kit`
+  does not resolve, and the seeded workflow still checks the kit out rather than using it.
+- **Dependabot reaches only the npm-managed consumers.** Once published, `ngdpbase` and
+  `fairways-gen2-website` can depend on the package and get PRs; the other seven have no
+  `package.json` and stay on the tracking issue. That asymmetry is the profile split still to be
+  decided.
 - **`docs/sync-log.md` is hand-written** and drifts from the markers it summarises.
 - **Partial command coverage** — four of the six `.claude/commands/*.md` files sync; `/semver` and
   `/update-agents` do not, so downstream agents follow different rules depending on the command.
@@ -250,23 +265,26 @@ The second — the one you actually feel — is already delivered without npm, b
 described above. That was phase 1 of
 [#45](https://github.com/jwilleke/mjs-project-template/issues/45).
 
-**The decision is now settled by preference as well as by argument: the kit is not published to any
-registry.** The package exists as a built artifact, guarded against publishing. That closes the
-first and third benefits above — pinning stays a `KIT:START` stamp, and installing still wants a
-checkout — and the second is covered by the tracking issue instead of a bot.
+**The answer is "yes, as well as" rather than "instead of".** `@jwilleke/agent-kit` is built and
+published publicly, and the seeded workflow keeps working for the seven consumers that cannot
+consume a package. The registry serves the two that can; it does not become the delivery mechanism
+for the rest.
+
+Public rather than private, because a private package needs an auth token in every consumer's
+workflow — worse than the checkout it would replace — and the kit repo is already public, so the
+contents are not confidential. What publishing adds is convenience (`npx` with no checkout step) and
+a Dependabot signal for the npm-managed repos.
 
 What remains open:
 
 1. **Phase 3 — port the applying half out of bash.** Largest piece, worst failure mode: a parity bug
    in the `KIT:START`/`KIT:END` surgery corrupts `AGENTS.md` in nine repos at once. `kit-files.tsv`
-   makes it a mechanical port rather than a re-derivation. Unaffected by the registry decision — it
-   consumes the package from the local build.
+   makes it a mechanical port rather than a re-derivation.
 2. **`install-kit.sh --from <git-ref>`** — clone the kit shallow into a temp dir when run outside a
    checkout, so "install kit `v1.0.0-55`" is a reproducible instruction rather than a description of
-   one machine's working tree. This is the no-registry answer to "no local clone needed".
-
-Revisit only if the constraint changes: a registry becomes worth its auth cost if most consumers
-become npm-managed, or if the kit ever needs to reach repos outside this account.
+   one machine's working tree.
+3. **The consumer profile split** — which repos consume the package and which stay on the checkout.
+   Only becomes concrete once the package is on npm.
 
 ## Related
 

@@ -1,0 +1,63 @@
+# Publishes @jwilleke/agent-kit when a kit-v* tag is pushed.
+#
+# Tag the PACKAGE version, not the kit's git describe version:
+#   git tag kit-v1.1.0 && git push origin kit-v1.1.0
+#
+# Requires an NPM_TOKEN secret with publish rights on the @jwilleke scope. Without
+# it the job fails loudly at the publish step rather than half-releasing.
+
+name: Release agent-kit
+
+on:
+  push:
+    tags:
+      - 'kit-v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and pack without publishing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build.mjs stamps the kit version from `git describe`, which needs history.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify the tag matches the package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF#refs/tags/kit-v}"
+          pkg="$(node -p "require('./packages/agent-kit/package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag kit-v$tag does not match package version $pkg" >&2
+            exit 1
+          fi
+
+      - name: Test
+        run: |
+          npm ci
+          npm test
+
+      - name: Pack
+        working-directory: packages/agent-kit
+        run: npm pack
+
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/')
+        working-directory: packages/agent-kit
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
