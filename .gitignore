@@ -1,3 +1,7 @@
+# Local, never committed — session logs, notes, credentials.
+# install-kit.sh adds this line to every downstream repo for the same reason.
+private/
+
 # Dependencies
 node_modules/
 yarn.lock
