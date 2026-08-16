@@ -2,7 +2,7 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-16"
-kit_version: "v1.0.0-55-gc4b69c8"
+kit_version: "v1.0.0-61-ge7434eb"
 ---
 
 # TODO
@@ -21,6 +21,7 @@ _None._
 
 ## 🔵 In review
 
+- [#45](https://github.com/jwilleke/mjs-project-template/issues/45) — [FEATURE] Kit drift notification: shared file manifest + Node check CLI + seeded workflow (phase 1)
 - [#42](https://github.com/jwilleke/mjs-project-template/issues/42) — [FEATURE] Boilerplate says how to apply in-review, never how to remove it
 - [#40](https://github.com/jwilleke/mjs-project-template/issues/40) — [FEATURE] /semver: make the package-lock.json sync explicit (and consider a narrower write than --package-lock-only)
 - [#39](https://github.com/jwilleke/mjs-project-template/issues/39) — [FEATURE] /pstatus: rank open PRs under P0/P1/P2 like issues (drop flat Open PRs band)
