@@ -19,7 +19,6 @@
   "license": "ISC",
   "author": "Jim Willeke",
   "type": "module",
-  "private": true,
   "bin": {
     "agent-kit": "./bin/kit.mjs"
   },
@@ -39,10 +38,12 @@
   ],
   "scripts": {
     "build": "node build.mjs",
-    "prepack": "node build.mjs",
-    "prepublishOnly": "node -e \"console.error('@jwilleke/agent-kit is deliberately unpublished; see docs/kit-distribution.md'); process.exit(1)\""
+    "prepack": "node build.mjs"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
