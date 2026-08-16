@@ -40,6 +40,15 @@ on failure.
 
 ## Who owns which file
 
+The list lives in [`kit-files.tsv`](../kit-files.tsv), not in any tool. Both `install-kit.sh`
+(which applies files) and `bin/kit.mjs` (which checks them) read it, so they cannot disagree about
+what the kit owns — a drift that is otherwise silent and that this repo has already suffered once,
+between `pstatus.md` and `TODO.md.tmpl`.
+
+```bash
+grep -vE '^\s*(#|$)' kit-files.tsv
+```
+
 Every path the installer touches falls into exactly one of these behaviours. The behaviour, not the
 file's contents, is what decides whether a local edit survives.
 
@@ -53,6 +62,9 @@ file's contents, is what decides whether a local edit survives.
 | `migrate` | One-time move, runs before create-if-absent | `docs/project_log.md` → `private/project_log.md` |
 | `supersede` | Deletes the file it replaces | `.markdownlint.json` → `.markdownlint.jsonc` |
 | `retire` | Deletes commands the kit no longer ships | `.claude/commands/check-todos.md`, `.claude/commands/status.md` |
+
+The last four are not per-file lists, so they stay in `install-kit.sh`; the rest come from the
+manifest.
 
 The rule that follows from the table: **fix kit files upstream, never in the consumer.** A local fix
 to an `overwrite` file or to the managed block is deleted by the next sync without a word. If the
@@ -91,14 +103,41 @@ each for its own reason:
 - `install-kit.sh` itself — the installer lives with the kit, so a consumer cannot self-update. This
   is the push model working as designed, not an oversight, but it does mean an operator with a
   stale clone pushes a stale kit.
-- `templates/`, `downstream-repos.txt`, `docs/sync-log.md` — kit-authoring material, meaningless
-  downstream.
+- `templates/`, `downstream-repos.txt`, `docs/sync-log.md`, `kit-files.tsv` — kit-authoring
+  material, meaningless downstream.
+- `bin/kit.mjs` — the checker runs *from* a kit checkout, not from a copy in the consumer. The
+  seeded workflow checks the kit out beside the repo, so the consumer always runs the current
+  checker rather than a stale copy of it.
 - `.claude/commands/semver.md` and `utility/set-version.mjs` — **an inconsistency, not a decision.**
   `/semver` is a real agent command that consumers would benefit from, but adding it to the
   overwrite list would clobber forks that built their own release tooling (`jwilleke/ngdpbase` did
   exactly that). Left out until someone decides which way it should go.
 - `.claude/commands/update-agents.md`, `.claude/README.md` — never added to the list; no considered
   reason found, probably an omission.
+
+## How a repo learns it is behind
+
+`bin/kit.mjs check` compares a repo's `KIT:START` marker against the kit's current version and
+reports drift, plus any `overwrite`-managed file missing from the repo entirely.
+
+```bash
+node bin/kit.mjs check /path/to/repo          # human-readable; exit 1 when behind
+node bin/kit.mjs check /path/to/repo --json   # for tooling
+```
+
+Consumers do not run it by hand. `install-kit.sh` seeds `.github/workflows/kit-check.yml`
+(create-if-absent), which runs weekly, checks out the kit beside the repo, and calls the checker
+with `--report-issue`. When the repo is behind, **one** tracking issue is opened and thereafter
+updated in place — never a fresh issue per run, which would train everyone to ignore it.
+
+This is why the checker is Node with no dependencies: Actions runners already ship Node, so
+`grow-tent` (C++) and `yourphr` (Go) run it without adopting a runtime or gaining a `package.json`.
+The workflow is the only file a consumer needs, and it is seeded create-if-absent, so a repo that
+edits the schedule keeps its version.
+
+Phases 2 and 3 of [#45](https://github.com/jwilleke/mjs-project-template/issues/45) — publishing
+`@jwilleke/agent-kit` so the workflow becomes a one-line `npx`, and porting the applying half out of
+bash — are deliberately deferred until this shape has proven itself.
 
 ## Known gaps
 
@@ -107,8 +146,8 @@ each for its own reason:
   valuable signal the kit gets, and it is currently destroyed rather than reported. A downstream
   repo lost a "remove `in-review` on close" rule this way before it was adopted upstream as
   [#42](https://github.com/jwilleke/mjs-project-template/issues/42).
-- **No consumer-side version check.** Nothing tells a repo it is behind. Discovery is an operator
-  remembering to run a sweep.
+- **The check is not yet running anywhere.** The workflow exists and is seeded on install, but the
+  nine consumers have not been synced since it was added, so none of them has it yet.
 - **`docs/sync-log.md` is hand-written** and drifts from the markers it summarises.
 - **Partial command coverage** — four of the six `.claude/commands/*.md` files sync; `/semver` and
   `/update-agents` do not, so downstream agents follow different rules depending on the command.
@@ -136,22 +175,26 @@ What packaging *would* genuinely fix — and these are real:
 - `npm outdated` / Dependabot would surface "you are behind" without an operator sweep;
 - no local clone of this repo needed to install.
 
-Those are worth having. They are also all obtainable without npm, which is the recommendation:
+Those are worth having, and the second — the one you actually feel — is already delivered without
+npm, by the seeded workflow described above. That was phase 1 of
+[#45](https://github.com/jwilleke/mjs-project-template/issues/45). What remains:
 
-1. **Teach `install-kit.sh` to fetch its own source at a ref** — `--from <git-ref>`, cloning shallow
-   into a temp dir when run outside a kit checkout. Removes the local-clone requirement and makes
-   "install kit `v1.0.0-55`" a reproducible instruction rather than a description of one machine's
-   working tree.
-2. **Ship the installer into consumers** (`overwrite "install-kit.sh"`), so a repo can update itself
-   from a ref instead of waiting for an operator. This is the change that converts the model from
-   push-only to pull-capable, and it is a prerequisite for the point below.
-3. **Add a version check** — a command, or a step in `/pstatus`, comparing the local `KIT:START`
-   marker against the kit's latest tag and reporting drift. That is the actual value of "being a
-   package", available without being one.
+1. **Phase 2 — publish `@jwilleke/agent-kit`.** Turns the workflow's checkout step into
+   `npx @jwilleke/agent-kit check`, and gives the two Node consumers Dependabot PRs on top of the
+   tracking issue. The name is currently unclaimed. The real cost is not the publish pipeline: a
+   registry version has to mean something, so the kit would need actual semver where today it has a
+   `git describe` commit pointer. Deciding whether dropping a `TODO.md` band is minor or breaking,
+   every release, is a new discipline.
+2. **Phase 3 — port the applying half out of bash.** Largest piece, worst failure mode: a parity bug
+   in the `KIT:START`/`KIT:END` surgery corrupts `AGENTS.md` in nine repos at once. `kit-files.tsv`
+   makes it a mechanical port rather than a re-derivation.
+3. **`install-kit.sh --from <git-ref>`** — clone the kit shallow into a temp dir when run outside a
+   checkout, so "install kit `v1.0.0-55`" is a reproducible instruction rather than a description of
+   one machine's working tree.
 
-Revisit if the consumer mix changes: if most downstream repos become Node projects, an
-`@jwilleke/agent-kit` package with a `bin` entry becomes the shorter path to the same three
-benefits. Until then it adds a runtime to seven repos to solve a problem a git ref already solves.
+Revisit the npm-versus-git question if the consumer mix changes: if most downstream repos become
+Node projects, a package with a `bin` entry becomes the shorter path. Until then it would add a
+runtime to seven repos to solve a problem a checkout already solves.
 
 ## Related
 

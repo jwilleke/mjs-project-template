@@ -19,14 +19,22 @@
 #                gate BEFORE the change lands instead of a notification after.
 #                The PR is left for a human to merge.
 #
-# Behavior per file:
+# Which files are managed, and how, is declared in kit-files.tsv — NOT in this
+# script. bin/kit.mjs reads the same file to check a repo, so the installer and
+# the checker cannot disagree about what the kit owns.
+#
+# Behavior per file (kit-files.tsv column 1):
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint.jsonc)
+#   seed             copied only when absent; source is the same path in the kit
+#   create-if-absent copied only when absent; source is templates/<template>
+#   managed-block    AGENTS.md boilerplate between <!-- KIT:START/END --> markers
+#
+# Behaviors that are not per-file lists, and so live in this script:
 #   merge            .gitignore — append missing lines only
 #   unignore         .gitignore — narrow a blanket `.claude/` ignore (keeps settings.local.json ignored)
-#   create-if-absent TODO.md, CLAUDE.md, private/project_log.md
-#   managed-block    AGENTS.md boilerplate between <!-- KIT:START/END --> markers
 #   migrate          docs/project_log.md → private/project_log.md (once)
 #   supersede        remove .markdownlint.json in favor of .markdownlint.jsonc
+#   retire           delete commands the kit no longer ships
 #
 # Requires: bash, git, awk. (Run utility/sync-labels.sh separately for GitHub labels.)
 #           --pr additionally requires the `gh` CLI, authenticated.
@@ -46,6 +54,8 @@ for a in "$@"; do
     *) TARGET="$a" ;;
   esac
 done
+
+TAB="$(printf '\t')"
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="$(cd "${TARGET:-$PWD}" && pwd)"
@@ -325,6 +335,28 @@ stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   fi
 }
 
+apply_group() {            # apply every kit-files.tsv row in group $1, in file order
+  local want="$1" manifest="$SRC/kit-files.tsv" beh path tmpl group
+  if [ ! -f "$manifest" ]; then
+    echo "kit-files.tsv missing from the kit: $manifest" >&2
+    exit 2
+  fi
+  # Tab is IFS whitespace, so consecutive tabs would collapse — every row carries
+  # all four columns, with `-` standing in for an absent template.
+  while IFS="$TAB" read -r beh path tmpl group; do
+    case "$beh" in ''|'#'*) continue ;; esac
+    [ "$group" = "$want" ] || continue
+    case "$beh" in
+      overwrite)                overwrite "$path" ;;
+      seed)                     seed "$path" ;;
+      create-if-absent)         create_if_absent "$path" "$tmpl" ;;
+      create-if-absent-stamped) create_if_absent_stamped "$path" "$tmpl" ;;
+      managed-block)            : ;;   # ensure_agents_block handles this one
+      *) echo "unknown behavior in kit-files.tsv: $beh ($path)" >&2; exit 2 ;;
+    esac
+  done <"$manifest"
+}
+
 ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
   if [ ! -f "$d" ]; then
@@ -381,12 +413,7 @@ if [ "$PR" -eq 1 ]; then
 fi
 
 echo "Canonical tool files (overwrite):"
-overwrite ".claude/commands/pstatus.md"
-overwrite ".claude/commands/session-commit.md"
-overwrite ".claude/commands/context.md"
-overwrite ".claude/commands/wrap.md"
-overwrite "utility/sync-labels.sh"
-overwrite ".markdownlint.jsonc"
+apply_group canonical
 echo
 
 echo "Merges & migrations (run before create-if-absent so existing logs migrate):"
@@ -400,26 +427,19 @@ echo
 echo "Project docs (create-if-absent / managed):"
 ensure_agents_block
 stamp_kit_version
-create_if_absent_stamped "TODO.md" "TODO.md.tmpl"
-create_if_absent_stamped "CLAUDE.md" "CLAUDE.md.tmpl"
-create_if_absent_stamped "private/project_log.md" "project_log.md.tmpl"
+apply_group docs
 echo
 
 echo "VS Code (create-if-absent — keeps your customizations):"
-seed ".vscode/extensions.json"
+apply_group vscode
 echo
 
 echo "GitHub workflows (create-if-absent — keeps your customizations):"
-seed ".github/workflows/markdown-lint.yml"
+apply_group workflows
 echo
 
 echo "GitHub templates (create-if-absent — keeps your customizations):"
-seed ".github/ISSUE_TEMPLATE/bug_report.md"
-seed ".github/ISSUE_TEMPLATE/feature_request.md"
-seed ".github/ISSUE_TEMPLATE/security.md"
-seed ".github/ISSUE_TEMPLATE/epic.md"
-seed ".github/ISSUE_TEMPLATE/config.yml"
-seed ".github/PULL_REQUEST_TEMPLATE.md"
+apply_group templates
 echo
 
 if [ "$PR" -eq 1 ]; then
