@@ -2,18 +2,19 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-16"
-kit_version: "v1.0.0-67-g9c345a5"
+kit_version: "v1.0.0-69-gba6c1f7"
 ---
 
 # TODO
 
 ## 🔴 P0 — Security & Critical
 
-- [#46](https://github.com/jwilleke/mjs-project-template/issues/46) — Kit sync deletes five command-file rules that exist because of past incidents
+- [#48](https://github.com/jwilleke/mjs-project-template/issues/48) — [security] nanoid — infinite loop in custom generators when size is zero (high)
+- [#26](https://github.com/jwilleke/mjs-project-template/issues/26) — [security] brace-expansion — OOM crash via unbounded expansion length (high, blocked on eslint major)
 
 ## 🟠 P1
 
-_None._
+- [#47](https://github.com/jwilleke/mjs-project-template/issues/47) — [FEATURE] Repo-specific operating knowledge has nowhere to live in kit command files
 
 ## 🟡 P2
 
