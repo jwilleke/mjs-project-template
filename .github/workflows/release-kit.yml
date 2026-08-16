@@ -1,23 +1,25 @@
-# Publishes @jwilleke/agent-kit when a kit-v* tag is pushed.
+# Publishes @jwilleke/agent-kit whenever its version changes on master.
 #
-# Tag the PACKAGE version, not the kit's git describe version:
-#   git tag kit-v1.1.0 && git push origin kit-v1.1.0
+# No tagging, no manual publish. Bump `version` in packages/agent-kit/package.json,
+# push, and this releases it. If that version is already on the registry the job
+# reports "already published" and stops, so ordinary pushes are no-ops.
 #
-# Requires an NPM_TOKEN secret with publish rights on the @jwilleke scope. Without
-# it the job fails loudly at the publish step rather than half-releasing.
+# One-time setup: an NPM_TOKEN secret holding an npm automation token with write
+# access to the @jwilleke scope. Without it the job skips rather than failing
+# every push.
 
 name: Release agent-kit
 
 on:
   push:
-    tags:
-      - 'kit-v*'
+    branches: [master]
+    paths:
+      - 'packages/agent-kit/**'
+      - '.claude/commands/**'
+      - 'templates/**'
+      - 'kit-files.tsv'
+      - 'bin/**'
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Build and pack without publishing'
-        type: boolean
-        default: true
 
 permissions:
   contents: read
@@ -36,28 +38,46 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - name: Verify the tag matches the package version
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Decide whether to publish
+        id: decide
         run: |
-          tag="${GITHUB_REF#refs/tags/kit-v}"
-          pkg="$(node -p "require('./packages/agent-kit/package.json').version")"
-          if [ "$tag" != "$pkg" ]; then
-            echo "tag kit-v$tag does not match package version $pkg" >&2
-            exit 1
+          name="$(node -p "require('./packages/agent-kit/package.json').name")"
+          version="$(node -p "require('./packages/agent-kit/package.json').version")"
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "NPM_TOKEN is not set — skipping the release."
+            echo "publish=false" >>"$GITHUB_OUTPUT"
+            exit 0
           fi
 
+          # `npm view` exits non-zero when the version does not exist, which is
+          # the case we want to publish in. Any other failure (network, auth)
+          # would look identical, so check the registry directly instead.
+          code="$(curl -s -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/$name/$version")"
+          case "$code" in
+            200) echo "$name@$version is already published."; echo "publish=false" >>"$GITHUB_OUTPUT" ;;
+            404) echo "$name@$version is not on the registry — releasing."; echo "publish=true" >>"$GITHUB_OUTPUT" ;;
+            *)   echo "registry returned $code for $name@$version — refusing to guess" >&2; exit 1 ;;
+          esac
+
       - name: Test
+        if: steps.decide.outputs.publish == 'true'
         run: |
           npm ci
           npm test
 
-      - name: Pack
-        working-directory: packages/agent-kit
-        run: npm pack
-
       - name: Publish
-        if: startsWith(github.ref, 'refs/tags/')
+        if: steps.decide.outputs.publish == 'true'
         working-directory: packages/agent-kit
-        run: npm publish --access public
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.decide.outputs.publish }}" = "true" ]; then
+            echo "Published @jwilleke/agent-kit@${{ steps.decide.outputs.version }}" >>"$GITHUB_STEP_SUMMARY"
+          else
+            echo "No release: @jwilleke/agent-kit@${{ steps.decide.outputs.version }} needs no publish" >>"$GITHUB_STEP_SUMMARY"
+          fi
