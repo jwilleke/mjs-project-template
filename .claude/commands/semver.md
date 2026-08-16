@@ -39,9 +39,26 @@ Run in parallel:
 
 ### Step 4: Bump the version
 
-- Edit `package.json` to the new version.
-- Run `npm install --package-lock-only` to sync `package-lock.json`.
+- Run `node utility/set-version.mjs <next>` — writes the new version into `package.json` **and**
+  `package-lock.json`, and nothing else.
+- Confirm the diff is version-only: `git diff --stat` should show 1 changed line in `package.json`
+  and 2 in `package-lock.json`.
 - Stage both files.
+
+**The lockfile requirement, stated rather than assumed.** `package-lock.json` carries the project
+version in **two** places — the top-level `version` and `packages[""].version` — and npm rewrites
+both on the next `npm install`. Bump only `package.json` and every release ships a lockfile one
+version behind, so every checkout shows a two-line lockfile diff after any build. Those get
+discarded by hand at each release, which trains a reflexive `git checkout -- package-lock.json`
+that will eventually throw away a *real* lockfile change. **If you replace this step with your own
+bump tool, that tool must write both fields.** This is how the step gets silently lost in a fork:
+it reads as boilerplate attached to the manual edit, so it leaves with it.
+
+**Why not `npm install --package-lock-only`.** That re-resolves the dependency tree against the
+registry and can bump transitive resolutions that satisfy existing ranges — unrelated to the
+release, and badly timed: the test gate in Step 1–3 already passed against the *old* resolution, so
+the lockfile that ships is not the one that was tested. Usually a no-op; when it is not, the change
+is invisible inside a large diff and lands unreviewed. `utility/set-version.mjs` never re-resolves.
 
 ### Step 5: Commit, tag, and push
 
