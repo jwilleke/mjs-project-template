@@ -205,18 +205,20 @@ a workflow break, it is major.
 
 ### Releasing
 
-`.github/workflows/release-kit.yml` publishes on a `kit-v*` tag, after verifying the tag matches the
-package version and the tests pass. It needs an `NPM_TOKEN` secret with publish rights on the
-`@jwilleke` scope. `workflow_dispatch` builds and packs without publishing.
+Bump `version` in `packages/agent-kit/package.json` and push. That is the whole procedure — no tag,
+no manual publish. `.github/workflows/release-kit.yml` asks the registry whether that exact version
+exists: `404` means release it, `200` means stop. Any other response fails the job rather than
+guessing, and a missing `NPM_TOKEN` skips the release instead of failing every push.
 
-```bash
-# bump packages/agent-kit/package.json first, then:
-git tag kit-v1.1.0 && git push origin kit-v1.1.0
-```
+The version field is therefore the only release control. Pushes that change kit content without
+touching it are no-ops, which is the intended behaviour: content moves continuously, releases are
+deliberate.
 
 A published version is permanent — npm allows unpublishing only within 72 hours, and the name is
-claimed for good on first release. The tag-matching gate exists so a release cannot go out under a
-version nobody chose.
+claimed for good on first release.
+
+One-time setup: an npm **automation** token (they bypass 2FA, which interactive publishing does not)
+stored as the `NPM_TOKEN` repo secret.
 
 ## Known gaps
 
