@@ -23,6 +23,12 @@ related GitHub issues. The personal log is **never committed**.
 - Regenerate `TODO.md` from the current GitHub issue labels (same banding as `/pstatus`:
   P0 / P1 / P2 / Deferred / Needs triage). The `▶ Resume here` pointer is owned by `/wrap`; no need
   to preserve it here. If `/pstatus` was just run, it is already current.
+- Apply `needs-triage` to any open issue with no placement label (`P0` / `P1` / `P2` / `deferred` /
+  `in-review`), exactly as `/pstatus` does. Two commands that regenerate the same file from the same
+  labels must not disagree about what an unlabeled issue means.
+- Use `_underscore_` emphasis, and wrap any bare URL appearing in a **title** in angle brackets
+  (`<https://…>`). Both are markdownlint rules — MD049 and MD034 — and both turn the lint job red on
+  a file nobody hand-edited.
 - Stage and commit `TODO.md` if it changed: `docs: refresh TODO from issue labels`.
 
 ### Step 4: Journal the session (local only — NOT committed)
@@ -52,6 +58,10 @@ For each related open issue:
 - If the work fully resolves it, say so but do **not** close it — let the operator decide
   (consider adding `in-review`).
 - Use `gh issue comment <number> --body "<comment>"`.
+- **When an issue or PR is closed, remove `in-review` as part of closing it** —
+  `gh issue edit <n> --remove-label in-review`, before or with the close. A closed item that keeps
+  the label makes it stop meaning "awaiting a decision", and the queue it drives stops being
+  trustworthy.
 
 ### Step 6: Push
 
