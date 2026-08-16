@@ -2,14 +2,14 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-16"
-kit_version: "v1.0.0-66-g3c24572"
+kit_version: "v1.0.0-67-g9c345a5"
 ---
 
 # TODO
 
 ## 🔴 P0 — Security & Critical
 
-_None._ No open Dependabot alerts; code scanning is not enabled on this repo.
+- [#46](https://github.com/jwilleke/mjs-project-template/issues/46) — Kit sync deletes five command-file rules that exist because of past incidents
 
 ## 🟠 P1
 
