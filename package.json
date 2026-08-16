@@ -9,7 +9,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
-    "lint": "npm run lint:code && npm run lint:md",
+    "lint": "npm run lint:code && npm run lint:md && npm run lint:templates",
     "lint:code": "eslint src/",
     "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
     "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix",
@@ -23,7 +23,8 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:templates": "node utility/lint-templates.mjs"
   },
   "lint-staged": {
     "src/**/*.ts": [
