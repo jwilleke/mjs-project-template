@@ -9,12 +9,28 @@ of your application.
 
 Canonical source: [jwilleke/mjs-project-template](https://github.com/jwilleke/mjs-project-template).
 
+## This package is not published
+
+It is built from the kit sources and marked `private`. There is no registry copy, so there is no
+`npx @jwilleke/agent-kit`. Install it from a locally built tarball, or run the checker straight out
+of a kit checkout:
+
+```bash
+cd packages/agent-kit && npm pack        # -> jwilleke-agent-kit-<version>.tgz
+npm install /path/to/jwilleke-agent-kit-1.0.0.tgz
+```
+
+Repos are normally kept in step by `install-kit.sh` and the seeded `kit-check.yml` workflow, neither
+of which needs this package. See `docs/kit-distribution.md` upstream.
+
 ## Check whether a repo is behind
 
 ```bash
-npx @jwilleke/agent-kit check              # this repo
-npx @jwilleke/agent-kit check /path/to/repo
-npx @jwilleke/agent-kit check --json
+agent-kit check                  # this repo, once installed
+agent-kit check /path/to/repo
+agent-kit check --json
+
+node bin/kit.mjs check /path/to/repo    # or straight from a kit checkout
 ```
 
 Reads the repo's `AGENTS.md` `KIT:START` marker, compares it against the kit version this package
@@ -24,7 +40,7 @@ behind, `0` when it is current.
 In CI, `--report-issue` opens **one** tracking issue and updates it in place on later runs:
 
 ```yaml
-- run: npx @jwilleke/agent-kit check . --report-issue
+- run: node .kit-check/bin/kit.mjs check . --kit .kit-check --report-issue
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -47,6 +63,8 @@ carries; it does not yet write.
 
 ## Versioning
 
-The package follows semver on its own contents. `kit-version.txt` separately records the upstream
-`git describe` commit it was cut from — that is what the checker compares against, and what a
-consumer's `KIT:START` marker records.
+The package carries a semver version of its own, which matters only if it is ever published.
+`kit-version.txt` separately records the upstream `git describe` commit it was cut from — that is
+what the checker compares against, and what a consumer's `KIT:START` marker records. A packed copy
+has no git history, so without that stamp the checker would fall back to the latest release tag and
+report every consumer as ahead of the kit.
