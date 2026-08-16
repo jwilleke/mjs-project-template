@@ -108,10 +108,27 @@ upgrade. It overwrites canonical tool files, merges `.gitignore`, seeds docs/iss
 create-if-absent, manages the AGENTS.md block, and migrates `docs/project_log.md` →
 `private/project_log.md`. Re-run anytime to pick up a newer kit version.
 
+Which files it manages, and how, is declared in [`kit-files.tsv`](kit-files.tsv) — the installer
+does not carry its own list.
+
 For the contract behind those behaviours — which files are overwritten versus preserved, how the
 version is recorded, what is deliberately not distributed, and why the kit is not an npm package —
 see [docs/kit-distribution.md](docs/kit-distribution.md). Read it before changing anything under
 `templates/` or `.claude/commands/`; those files fan out to every downstream repo.
+
+#### Telling a repo it is behind
+
+`install-kit.sh` seeds `.github/workflows/kit-check.yml`, which runs weekly and opens (then updates)
+a single tracking issue when the repo is behind the kit. It needs nothing from the repo but the
+workflow file — Actions runners already ship Node, so it works in the C++, Go, Python and Shell
+consumers as well as the Node ones.
+
+Run it by hand against any repo from a kit checkout:
+
+```bash
+node bin/kit.mjs check /path/to/repo          # exit 1 when behind
+node bin/kit.mjs check /path/to/repo --json   # machine-readable
+```
 
 ```bash
 ./install-kit.sh --dry-run /path/to/repo   # preview every change

@@ -1,0 +1,54 @@
+# kit-files.tsv — the single record of which files the kit manages, and how.
+#
+# Read by BOTH install-kit.sh (which applies them) and bin/kit.mjs (which checks
+# them). Neither tool holds its own copy of this list — that is the entire point.
+# An installer and a checker that each know the file list will drift apart, and
+# the drift is silent.
+#
+# Format: four TAB-separated columns, always four, in application order.
+#
+#   behavior <TAB> path <TAB> template <TAB> group
+#
+# `template` is the file under templates/ to copy from, or `-` when the source
+# lives at the same path inside the kit. `-` is required rather than an empty
+# field: tab is an IFS whitespace character, so bash collapses consecutive tabs
+# and an empty column would shift every field after it.
+#
+# Behaviors:
+#   overwrite                 copied from the kit every run; local edits are destroyed
+#   seed                      copied only when absent; source is the same path in the kit
+#   create-if-absent          copied only when absent; source is templates/<template>
+#   create-if-absent-stamped  as above, substituting YYYY-MM-DD and KIT-VERSION
+#   managed-block             rewritten between the KIT:START / KIT:END markers only
+#
+# Behaviors handled directly by install-kit.sh and listed here only so the checker
+# knows the file is kit-managed: managed-block.
+#
+# Read it with:
+#   grep -vE '^\s*(#|$)' kit-files.tsv
+#
+# See docs/kit-distribution.md for what each behavior means for a consumer.
+
+overwrite	.claude/commands/pstatus.md	-	canonical
+overwrite	.claude/commands/session-commit.md	-	canonical
+overwrite	.claude/commands/context.md	-	canonical
+overwrite	.claude/commands/wrap.md	-	canonical
+overwrite	utility/sync-labels.sh	-	canonical
+overwrite	.markdownlint.jsonc	-	canonical
+
+managed-block	AGENTS.md	agents-boilerplate.md	docs
+create-if-absent-stamped	TODO.md	TODO.md.tmpl	docs
+create-if-absent-stamped	CLAUDE.md	CLAUDE.md.tmpl	docs
+create-if-absent-stamped	private/project_log.md	project_log.md.tmpl	docs
+
+seed	.vscode/extensions.json	-	vscode
+
+seed	.github/workflows/markdown-lint.yml	-	workflows
+create-if-absent	.github/workflows/kit-check.yml	kit-check.yml.tmpl	workflows
+
+seed	.github/ISSUE_TEMPLATE/bug_report.md	-	templates
+seed	.github/ISSUE_TEMPLATE/feature_request.md	-	templates
+seed	.github/ISSUE_TEMPLATE/security.md	-	templates
+seed	.github/ISSUE_TEMPLATE/epic.md	-	templates
+seed	.github/ISSUE_TEMPLATE/config.yml	-	templates
+seed	.github/PULL_REQUEST_TEMPLATE.md	-	templates
