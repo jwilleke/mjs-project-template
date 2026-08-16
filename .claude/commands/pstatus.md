@@ -39,13 +39,15 @@ For each open Dependabot / code-scanning / GitGuardian alert:
 
 ### Step 3: Triage gate
 
-- Any open issue with **no** placement label (`P0` / `P1` / `P2` / `deferred` / `in-review`) gets
+- Any open **issue** with **no** placement label (`P0` / `P1` / `P2` / `deferred` / `in-review`) gets
   `needs-triage` so it shows up as awaiting a decision rather than being silently mis-ranked. An
   `in-review` issue is already placed (it lands in the In review band) and is never flagged.
+- Open **PRs** are not auto-labeled; their band is derived in Step 4 (see **PR priority**). Unplaced
+  PRs land in **Needs triage** the same way unplaced issues do — never a separate unranked dump.
 
 ### Step 4: Rank and regenerate `TODO.md`
 
-Overwrite `TODO.md` with the open issues grouped into bands.
+Overwrite `TODO.md` with open issues **and** open PRs grouped into the **same** priority bands.
 
 **Remove the `▶ Resume here` block, including its `RESUME:START` / `RESUME:END` markers.** The
 pointer is written by `/wrap` at session end and read by `/context` at session open; by the time
@@ -53,45 +55,72 @@ pointer is written by `/wrap` at session end and read by `/context` at session o
 bands-only `TODO.md` — that is intended, not a loss. `/pstatus` never reads the block and never
 preserves it.
 
-The bands, in this order:
+**`TODO.md` carries no history.** It is a snapshot of what is open *right now* — nothing else. No
+"merged since last run", no "4 of 7 have landed", no counts of what was closed, no narrative of what
+happened this session, no dated changelog, and no section for work in other repos. If an item is
+closed or merged, it simply stops appearing; that disappearance is the only record `TODO.md` keeps.
 
-- `🔴 P0 — Security & Critical` (list `security` / vulnerability issues first)
+Session history belongs in `docs/project_log.md` (or `private/project_log.md` where the repo keeps
+it there), written by `/session-commit` and `/wrap`. Never in `TODO.md`. Two files recording the
+same events drift apart, and the drift is silent: the ranked backlog starts reading as a status
+report and the operator has to work out which half is current.
+
+The bands, in this order (issues **and** PRs share these bands):
+
+- `🔴 P0 — Security & Critical` (list `security` / vulnerability items first)
 - `🟠 P1`
 - `🟡 P2`
-- `🔵 In review` (issues labeled `in-review` — work complete and pushed, awaiting the operator's
-  decision to close; takes precedence over an issue's priority band so it surfaces as "ready for your call")
+- `🔵 In review` (items labeled `in-review` — work complete and pushed, awaiting the operator's
+  decision to close; takes precedence over a priority label so it surfaces as "ready for your call")
 - `⏸ Deferred`
-- `❓ Needs triage` (count + titles)
-- `🔀 Open PRs` — every open pull request, newest first. Mark each `draft`, `ready`, or
-  `conflicted` from `isDraft` / `mergeStateStatus`, and flag any open more than 7 days as stale.
-  Dependency-bump PRs (Dependabot / Renovate) belong here too: they are frequently
-  security-relevant and are exactly the kind of thing that goes unnoticed, because the
-  corresponding scanner alert often looks *already tracked* by an unrelated issue.
+- `❓ Needs triage` (issues and PRs with no resolvable placement)
 
-**One issue per line — never bundle.** Each issue gets its OWN bullet, starting with a full clickable
-GitHub link. No grouping headers that pack several refs onto one bullet, no comma-separated runs of
-issues, no bare `#<num>`. Each line:
+**There is no separate `🔀 Open PRs` band.** Every open PR appears exactly once under the same
+priority band as issues. A flat PR-only section hid deps work from the ranked backlog (Dependabot
+PRs sat at the bottom while P1 coding looked "empty").
+
+**One entry per line — never bundle.** Each issue or PR gets its OWN bullet, starting with a full
+clickable GitHub link. No grouping headers that pack several refs onto one bullet, no
+comma-separated runs of numbers, no bare `#<num>`.
+
+Issue line:
 
 `- [#<num>](https://github.com/{owner}/{repo}/issues/<num>) — <title>`
 
-PRs use the same one-per-line rule with the `/pull/` path, and **must name their related issues**:
+PR line (always mark state; always name related issues when any):
 
-`- [#<num>](https://github.com/{owner}/{repo}/pull/<num>) — <title> _(ready | draft | conflicted)_ — closes [#<n>](…/issues/<n>)`
+`- [#<num>](https://github.com/{owner}/{repo}/pull/<num>) — <title> _(PR · ready | draft | conflicted)[ · stale Nd]_ — closes|refs|likely [#n](…) | no linked issue`
 
 Use **underscore** emphasis, not asterisks. The kit's own `.markdownlint.jsonc` sets MD049 to
 `underscore`, so an asterisk-wrapped state marker makes the generated `TODO.md` fail
 `npm run lint:md` in the very repo that produced it.
 
+#### PR priority (same bands as issues)
+
+Resolve related issues first (next subsection), then place the PR:
+
+1. **Explicit PR labels** — if the PR itself has `P0` / `P1` / `P2` / `deferred` / `in-review`, use
+   that (same precedence as issues: `in-review` wins over a priority label).
+2. **Inherit from linked issues** — among open issues linked via `closes` / `refs` / `likely`, take
+   the **highest** priority: `P0` > `P1` > `P2`. Prefer a linked `security` issue's grade when
+   present. If every linked open issue is only `in-review` or `deferred`, place the PR with that
+   placement (`in-review` / `deferred`).
+3. **Else Needs triage** — including Dependabot/Renovate PRs with no resolvable issue. Do **not**
+   invent a silent default priority for unlinked deps bumps; they must show up as untriaged so
+   someone grades them (or links them to a tracking issue).
+
+Within a band, list **security-related** items first, then by descending number. Interleave issues
+and PRs in that order (do not dump all PRs at the bottom of the band).
+
 **No entry may appear twice in `TODO.md`.** Every issue and every PR gets exactly one line in the
 whole file. When an issue's fix is already in an open PR, it belongs to the PR's line — as a
-`closes` / `refs` / `likely` link — and is **not** also listed in its priority band. Two lines for
-one piece of work inflates the apparent backlog and makes the file read as though the fix has not
-been written yet.
+`closes` / `refs` / `likely` link — and is **not** also listed as a standalone issue line. Two lines
+for one piece of work inflates the apparent backlog and makes the file read as though the fix has
+not been written yet.
 
-State the absence rather than deleting it silently: a band whose only members moved to the PR
-section says so and names the count, e.g. `_None outstanding._ 2 untriaged issues exist (#17, #19)
-but both are awaiting merge — listed under 🔀 Open PRs`. An empty band and a band whose work is
-already done are different states, and the reader needs to tell them apart.
+State the absence rather than deleting it silently: a band with no remaining open items says so,
+e.g. `_None._` An empty band and a band whose work is only awaiting merge of a PR listed in another
+band are different — the PR's placement is the truth; do not leave a ghost issue line.
 
 Verify before finishing — every count must be 1:
 
@@ -102,7 +131,7 @@ grep -oE '/(issues|pull)/[0-9]+' TODO.md | sort | uniq -c | sort -rn
 #### Resolving a PR's related issues
 
 A PR shown without its issue context reads as unrelated housekeeping, so resolve the link for every
-PR in the band. In order:
+PR. In order:
 
 1. **Declared** — `closingIssuesReferences` from Step 1. These are the issues GitHub will
    auto-close on merge; render them as `closes #<n>`.
@@ -117,21 +146,22 @@ A silent absence is indistinguishable from "not checked".
 
 An issue whose fix is already sitting in an open PR is **not** actually open work, and the ranking
 must not recommend starting something already written. Per the no-duplicate rule above, it is
-carried by the PR's line rather than annotated in its own band — one line, in the PR section, where
-the actionable verb is "merge" rather than "start".
+carried by the PR's line in the PR's priority band, where the actionable verb is "merge" rather
+than "start".
 
 Where a PR turns out to be redundant — the change is already on the default branch, or a tracking
-issue was resolved another way — say so on the PR line as `*(redundant — already on <branch>)*`.
-Stale dependency PRs routinely outlive the fix that superseded them.
+issue was resolved another way — say so on the PR line as `_(redundant — already on <branch>)_`.
+Stale dependency PRs routinely outlive the fix that superseded them. Flag open more than 7 days as
+`stale Nd` in the state marker.
 
 ### Step 5: Brief the user
 
 Print the ranked bands, then a single **"Do this next"** recommendation — the highest-value
 P0 (else the top P1, and so on) with one line of why. Stop. Do not begin the work.
 
-A **merge-ready PR outranks starting new work** when it carries a security fix or a dependency
-bump: it is finished work sitting one click from shipping, so leaving it open while beginning
-something else is strictly worse than merging it first.
+A **merge-ready PR outranks starting new work** when it sits in P0/P1 (or carries a security /
+dependency fix): it is finished work sitting one click from shipping, so leaving it open while
+beginning something else is strictly worse than merging it first.
 
 State the PR ↔ issue linkage in the recommendation itself. "Merge #24 — it closes P0 #25" is
 actionable; "merge #24" alone makes the operator go look up why it matters.
