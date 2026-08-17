@@ -126,7 +126,7 @@ try {
   check('the self-sync workflow is seeded', existsSync(syncWorkflow));
   check(
     'kit-sync.yml has no cron — it must not fire while nobody is looking',
-    !/^\s*schedule:/m.test(readFileSync(syncWorkflow, 'utf8')),
+    !/^[ \t]*schedule:/m.test(readFileSync(syncWorkflow, 'utf8')),
     'a schedule reappeared in the template'
   );
   check(

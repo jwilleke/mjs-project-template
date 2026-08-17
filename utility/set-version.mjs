@@ -50,7 +50,7 @@ export function serialize(value) {
 export function isValidVersion(version) {
   return (
     typeof version === 'string' &&
-    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)
+    /^\d+\.\d+\.\d+(?:-[0-9A-Z.-]+)?(?:\+[0-9A-Z.-]+)?$/i.test(version)
   );
 }
 

@@ -536,7 +536,7 @@ async function createIssue(repo, token, payload) {
         '(run utility/sync-labels.sh to define them)'
     );
 
-    const { labels, ...unlabelled } = payload;
+    const { labels: _dropped, ...unlabelled } = payload;
     return api(`/repos/${repo}/issues`, token, {
       method: 'POST',
       body: JSON.stringify(unlabelled)
