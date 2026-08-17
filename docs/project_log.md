@@ -7,6 +7,42 @@ kit_version: "v1.0.0-9-gae575c2"
 
 # Project Log
 
+## 2026-08-17-03
+
+- Agent: Claude
+- Subject: Correct a fleet report built from stale local clones; guard both tools against it
+- Current Issue: #53
+- Work Done:
+  - Synced `jwilleke/mjs-ha` via `install-kit.sh --pr` — [mjs-ha#57](https://github.com/jwilleke/mjs-ha/pull/57),
+    merged, both checks green. Marker now `v1.2.2-0-g14ec519`, `## Agent Kit Protocols` rename landed
+    with no MD024 collision, and `kit-check.yml` now exists there
+  - That PR touched one file where the dry-run predicted seven, which exposed the error: `--pr`
+    branches from `origin/<default>`, the dry-run had read the working tree, and the local `mjs-ha`
+    clone was **122 commits behind origin**
+  - Consequence: the fleet version table posted to #53 was read from local checkouts and was wrong
+    for most rows. Corrected on #53 with state read from GitHub. `garage-car-positioning` is
+    installed and current — the retired `docs/sync-log.md` was right and the retirement commit was
+    wrong. Four repos, not three, have no `kit-check.yml` (`mj-infra-flux` joins them)
+  - v1.2.2 — an unparseable `KIT:START` marker now counts as behind rather than `unknown`. Three
+    repos on pre-tag bare-SHA markers had been filing nothing at all for about a year
+  - v1.3.0 — `bin/kit.mjs check` and `install-kit.sh` both warn when the target checkout trails its
+    upstream; `--fetch` refreshes first. `install-kit.sh --pr` is exempt, it already branches from
+    the remote
+  - `docs/kit-distribution.md` carries the correction inline, and its "how to see fleet state"
+    snippet now queries the GitHub API instead of looping over local clones
+- Commits: 14ec519, d1793eb
+- Files Modified:
+  - `bin/kit.mjs`, `bin/kit.test.mjs`
+  - `install-kit.sh`
+  - `docs/kit-distribution.md`
+  - `package.json`, `packages/agent-kit/package.json`
+- Notes:
+  - The frontmatter-fossil evidence in #53 for `deby` / `grow-tent` / `mjs-ha` came from
+    `private/project_log.md`, which is gitignored and cannot be checked from a remote at all. Re-derive
+    it from a fresh clone before relying on it.
+  - Still silent, no `kit-check.yml`: `mj-infra-flux`, `geohazardwatch`, `mjs-media-handling`,
+    `fairways-gen2-website`. One `install-kit.sh --pr` each fixes it permanently.
+
 ## 2026-08-17-02
 
 - Agent: Claude
