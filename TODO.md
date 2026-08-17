@@ -2,7 +2,7 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-17"
-kit_version: "v1.2.1-1-gb87e855"
+kit_version: "v1.3.1-0-g1433abd"
 ---
 
 # TODO
@@ -13,18 +13,15 @@ kit_version: "v1.2.1-1-gb87e855"
 
 ## 🟠 P1
 
-_None._
+- [#54](https://github.com/jwilleke/mjs-project-template/issues/54) — [FEATURE] Repos should sync themselves — the workflow applies the kit, not the operator
 
 ## 🟡 P2
 
-_None._
+- [#55](https://github.com/jwilleke/mjs-project-template/issues/55) — [BUG] /pstatus and /session-commit tell agents to use underscore emphasis, but the kit's own .markdownlint.jsonc does not set MD049
 
 ## 🔵 In review
 
-- [#52](https://github.com/jwilleke/mjs-project-template/issues/52) — kit.mjs --report-issue files the drift issue with no labels, so the kit's own /pstatus marks it needs-triage
-- [#51](https://github.com/jwilleke/mjs-project-template/issues/51) — Kit Check should exit 0 on drift — the tracking issue is the notification, the red X is noise
-- [#50](https://github.com/jwilleke/mjs-project-template/issues/50) — install-kit.sh can leave AGENTS.md failing MD024 — the v1.1.0 heading demotion collides with repo content below KIT:END
-- [#49](https://github.com/jwilleke/mjs-project-template/issues/49) — A fresh sync leaves the repo red: synced files break the lint rules the same sync adds
+_None._
 
 ## ⏸ Deferred
 
