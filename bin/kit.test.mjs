@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -480,7 +480,7 @@ describe('exit codes', () => {
     });
   }
 
-  const unmarked = join(tmpdir(), `agent-kit-unmarked-${process.pid}`);
+  const unmarked = join(mkdtempSync(join(tmpdir(), 'agent-kit-')), 'unmarked');
 
   afterEach(() => rmSync(unmarked, { recursive: true, force: true }));
 
@@ -523,7 +523,7 @@ describe('invoked through a bin symlink', () => {
   // npm installs a bin as a symlink into node_modules/.bin. An entry-point
   // guard that compares argv[1] to import.meta.url without resolving it makes
   // the installed CLI print nothing and exit 0 — a check that silently passes.
-  const link = join(tmpdir(), `agent-kit-entry-${process.pid}`);
+  const link = join(mkdtempSync(join(tmpdir(), 'agent-kit-')), 'entry');
 
   afterEach(() => rmSync(link, { force: true }));
 
