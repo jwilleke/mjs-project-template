@@ -7,6 +7,27 @@ kit_version: "v1.0.0-9-gae575c2"
 
 # Project Log
 
+## 2026-08-17-02
+
+- Agent: Claude
+- Subject: Drop the `kit` label — grade the drift issue `P2` alone
+- Current Issue: #52
+- Work Done:
+  - `DEFAULT_ISSUE_LABELS` is now `['P2']`. The `kit` label was meant to let a repo filter the chore
+    out of a ranked backlog, but the `kit-check:drift` marker guarantees one drift issue per repo
+    forever — a label filters a class, not a set of size one — and a new label is defined in no repo
+    until someone sweeps `sync-labels.sh --all`, so it was a fleet-wide chore added to remove a chore
+  - Removed from `utility/sync-labels.sh`; deleted the label from this repo
+  - Reasoning recorded in `docs/kit-distribution.md` under _Why there is no `kit` label_ so it does
+    not get re-proposed. `--label kit` still available for anyone who wants it
+  - Released 1.2.1 (npm + tag); the fleet-wide label sweep is no longer needed at all
+- Commits: 5897a1d
+- Files Modified:
+  - `bin/kit.mjs`, `utility/sync-labels.sh`
+  - `templates/kit-check.yml.tmpl`
+  - `README.md`, `docs/kit-distribution.md`, `packages/agent-kit/README.md`
+  - `package.json`, `packages/agent-kit/package.json`
+
 ## 2026-08-17-01
 
 - Agent: Claude
