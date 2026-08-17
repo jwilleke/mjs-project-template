@@ -39,7 +39,7 @@ In CI, `--report-issue` opens **one** tracking issue and updates it in place on 
 That needs `permissions: issues: write`. A check that opened a fresh issue per run would teach
 everyone to ignore it.
 
-The issue is created labelled `P2` + `kit` (override with `--label`, suppress with `--no-labels`) so
+The issue is created graded `P2` (override with `--label`, suppress with `--no-labels`) so
 `/pstatus` bands it instead of flagging it `needs-triage`. Labels are applied on create only, so a
 human regrade sticks.
 
