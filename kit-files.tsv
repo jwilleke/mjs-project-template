@@ -19,6 +19,8 @@
 #   seed                      copied only when absent; source is the same path in the kit
 #   create-if-absent          copied only when absent; source is templates/<template>
 #   create-if-absent-stamped  as above, substituting YYYY-MM-DD and KIT-VERSION
+#   overwrite-or-suffix       as overwrite, but yields the filename to a repo that already owns
+#                             it, installing the kit copy as <name>-kit.<ext> instead
 #   managed-block             rewritten between the KIT:START / KIT:END markers only
 #
 # Behaviors handled directly by install-kit.sh and listed here only so the checker
@@ -34,7 +36,15 @@ overwrite	.claude/commands/session-commit.md	-	canonical
 overwrite	.claude/commands/context.md	-	canonical
 overwrite	.claude/commands/wrap.md	-	canonical
 overwrite	utility/sync-labels.sh	-	canonical
+overwrite	.claude/commands/update-agents.md	-	canonical
 overwrite	.markdownlint-cli2.jsonc	-	canonical
+overwrite	utility/set-version.mjs	-	canonical
+
+# /semver is a real command consumers benefit from, but the name is already
+# taken in repos that built their own release tooling (jwilleke/ngdpbase bumps
+# src/utils/version.ts; jwilleke/mjs-ha tags date-stamped snapshots). Those
+# repos keep their command and receive the kit's as semver-kit.md.
+overwrite-or-suffix	.claude/commands/semver.md	-	canonical
 
 managed-block	AGENTS.md	agents-boilerplate.md	docs
 create-if-absent-stamped	TODO.md	TODO.md.tmpl	docs

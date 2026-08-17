@@ -11,8 +11,9 @@
 //
 //     --kit <dir>       kit checkout to compare against (default: this script's repo)
 //     --repo <o/n>      owner/name for --report-issue (default: $GITHUB_REPOSITORY)
-//     --report-issue    open or update ONE tracking issue when behind (needs $GITHUB_TOKEN)
-//     --label <name>    label to apply when the issue is CREATED (repeatable; default: P2, kit)
+//     --report-issue    open or update ONE tracking issue when behind, and file ONE issue per
+//                       command-name collision on first occurrence (needs $GITHUB_TOKEN)
+//     --label <name>    label to apply when an issue is CREATED (repeatable; default: P2)
 //     --no-labels       create the issue with no labels
 //     --fail-on-drift   exit 1 when behind, for repos that want drift to gate CI
 //     --fetch           fetch the target's remote first, so the staleness warning is current
@@ -95,6 +96,12 @@ export function parseMarkerVersion(agentsMd) {
   return match ? match[1] : null;
 }
 
+/** `.claude/commands/semver.md` -> `.claude/commands/semver-kit.md`. */
+export function suffixedPath(path) {
+  const dot = path.lastIndexOf('.');
+  return dot < 0 ? `${path}-kit` : `${path.slice(0, dot)}-kit${path.slice(dot)}`;
+}
+
 /** Parse kit-files.tsv into { behavior, path, template, group } rows. */
 export function parseManifest(text) {
   return text
@@ -129,7 +136,7 @@ export function formatStaleness({ upstream, behind }) {
 }
 
 /** The human-readable report. Kept pure so its wording is testable. */
-export function formatReport({ status, local, kit, missing, target }) {
+export function formatReport({ status, local, kit, missing, collisions, target }) {
   const lines = [];
 
   if (status === 'behind') {
@@ -153,6 +160,10 @@ export function formatReport({ status, local, kit, missing, target }) {
   if (missing.length) {
     lines.push('', 'Kit-managed files missing from this repo:');
     for (const path of missing) lines.push(`  - ${path}`);
+  }
+
+  for (const collision of collisions ?? []) {
+    lines.push('', `${collision.path} is the repo's own — the kit's copy lives at ${collision.installed}`);
   }
 
   return lines.join('\n');
@@ -239,12 +250,23 @@ function inspect(targetDir, kitDir) {
   // Only files the kit would have written unprompted count as missing. A repo
   // that deleted a seeded issue template made a choice; one with no pstatus.md
   // never got the kit.
+  //
+  // `overwrite-or-suffix` rows are excluded: the kit may legitimately have
+  // installed the suffixed name instead, so an absent plain name is not a gap.
   const missing = manifest
     .filter((row) => row.behavior === 'overwrite')
     .map((row) => row.path)
     .filter((path) => !existsSync(join(targetDir, path)));
 
-  return { local, missing };
+  // A collision is durable evidence, not a guess: install-kit.sh only ever
+  // writes <name>-kit.<ext> when the repo already owned <name>.<ext> with its
+  // own content, so the suffixed file existing IS the collision record.
+  const collisions = manifest
+    .filter((row) => row.behavior === 'overwrite-or-suffix')
+    .map((row) => ({ path: row.path, installed: suffixedPath(row.path) }))
+    .filter((row) => existsSync(join(targetDir, row.installed)));
+
+  return { local, missing, collisions };
 }
 
 async function check(argv) {
@@ -287,7 +309,7 @@ async function check(argv) {
     return 0;
   }
 
-  const { local, missing } = inspect(target, kitDir);
+  const { local, missing, collisions } = inspect(target, kitDir);
 
   // Ordered by precision: a checkout knows exactly, a packed copy carries a
   // stamp, and the tags API is the last resort because it only sees releases.
@@ -316,7 +338,7 @@ async function check(argv) {
   }
 
   const position = localPosition(target, fetch);
-  const result = { status, local, kit, missing, target, repo, position };
+  const result = { status, local, kit, missing, collisions, target, repo, position };
 
   // `unknown` counts. It means the marker could not be parsed, so the repo
   // cannot be shown to be current — and a check that stays silent when it does
@@ -335,6 +357,11 @@ async function check(argv) {
     // is the only notification, silently failing to open it is the real breakage.
     const outcome = await reportDrift(result, behind, { labels: labels ?? DEFAULT_ISSUE_LABELS });
     if (outcome) console.log(outcome);
+
+    // Independent of drift: a repo can be perfectly current and still have a
+    // collision worth recording once.
+    const collided = await reportCollisions(result, { labels: labels ?? DEFAULT_ISSUE_LABELS });
+    if (collided) console.log(collided);
   }
 
   // Green on drift, on purpose — see the exit-code note at the top of this file.
@@ -342,6 +369,32 @@ async function check(argv) {
 }
 
 // --- issue reporting ---------------------------------------------------------
+
+export function collisionMarker(path) {
+  return `kit-check:collision:${path}`;
+}
+
+export function collisionBody({ path, installed }) {
+  return [
+    `This repo already had \`${path}\` with its own content when the kit was synced, so the kit's`,
+    `version was installed as \`${installed}\` instead. **Nothing of yours was overwritten.**`,
+    '',
+    'Both commands are available. Nothing is broken, and no action is required — this issue exists so',
+    'the split is recorded somewhere other than a line of installer output that scrolled past.',
+    '',
+    'Worth deciding once:',
+    '',
+    `- keep both — your \`${path}\` is genuinely a different command, and the kit's is useful too;`,
+    `- drop \`${installed}\` — you do not want the kit's version;`,
+    `- rename **yours** to something outside the kit's namespace and delete \`${installed}\`, and the`,
+    `  next sync will install the kit's copy at \`${path}\` normally.`,
+    '',
+    'Whichever you pick, the installer will not revisit it: once the suffixed file exists it stays the',
+    "kit's file in this repo, because reverting to the plain name would clobber your command.",
+    '',
+    `<!-- ${collisionMarker(path)} -->`
+  ].join('\n');
+}
 
 export function issueBody(result) {
   const lines = [
@@ -462,6 +515,43 @@ export async function reportDrift(result, behind, options = {}) {
   const created = await createIssue(result.repo, token, payload);
 
   return `opened #${created.number}`;
+}
+
+/**
+ * File ONE issue per command-name collision, on first occurrence only.
+ *
+ * Deliberately never updated afterwards. A drift issue restates a changing
+ * fact — which version you are behind — so refreshing it is useful. A collision
+ * is a single historical event with a decision attached, and rewriting it every
+ * week would stamp on whatever the operator wrote underneath.
+ */
+export async function reportCollisions(result, options = {}) {
+  const labels = options.labels ?? DEFAULT_ISSUE_LABELS;
+  const collisions = result.collisions ?? [];
+  if (!collisions.length) return null;
+
+  const token = process.env.GITHUB_TOKEN;
+  if (!token || !result.repo) {
+    return `note: ${collisions.length} command-name collision(s) found but not reportable without GITHUB_TOKEN and a repo`;
+  }
+
+  const open = await api(`/repos/${result.repo}/issues?state=all&per_page=100`, token);
+  const notes = [];
+
+  for (const collision of collisions) {
+    const marker = collisionMarker(collision.path);
+    // `state=all`: a closed collision issue means the operator decided. Opening
+    // a second one would re-ask a question they already answered.
+    if (open.some((issue) => (issue.body ?? '').includes(marker))) continue;
+
+    const title = `[kit] ${collision.path} already exists here — kit copy installed as ${collision.installed}`;
+    const body = collisionBody(collision);
+    const payload = labels.length ? { title, body, labels } : { title, body };
+    const created = await createIssue(result.repo, token, payload);
+    notes.push(`opened #${created.number} for ${collision.path}`);
+  }
+
+  return notes.length ? notes.join('\n') : null;
 }
 
 // --- entry point -------------------------------------------------------------

@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 import {
+  collisionBody,
   compareKitVersions,
   DEFAULT_ISSUE_LABELS,
   formatReport,
@@ -14,8 +15,10 @@ import {
   parseKitVersion,
   parseManifest,
   parseMarkerVersion,
+  reportCollisions,
   reportDrift,
-  stampedVersion
+  stampedVersion,
+  suffixedPath
 } from './kit.mjs';
 
 describe('parseKitVersion', () => {
@@ -104,6 +107,7 @@ describe('parseManifest', () => {
   it('gives every row in the real manifest a known behaviour', () => {
     const known = new Set([
       'overwrite',
+      'overwrite-or-suffix',
       'seed',
       'create-if-absent',
       'create-if-absent-stamped',
@@ -175,6 +179,28 @@ describe('formatReport', () => {
 
     expect(report).toContain('Kit-managed files missing');
     expect(report).toContain('- .claude/commands/wrap.md');
+  });
+});
+
+describe('suffixedPath', () => {
+  it('inserts the suffix before the extension', () => {
+    expect(suffixedPath('.claude/commands/semver.md')).toBe('.claude/commands/semver-kit.md');
+  });
+
+  it('appends when there is no extension', () => {
+    expect(suffixedPath('Makefile')).toBe('Makefile-kit');
+  });
+});
+
+describe('collisionBody', () => {
+  const collision = { path: '.claude/commands/semver.md', installed: '.claude/commands/semver-kit.md' };
+
+  it('carries a marker scoped to the colliding path', () => {
+    expect(collisionBody(collision)).toContain('kit-check:collision:.claude/commands/semver.md');
+  });
+
+  it('leads with the reassurance, since nothing is broken', () => {
+    expect(collisionBody(collision)).toContain('Nothing of yours was overwritten');
   });
 });
 
@@ -325,6 +351,85 @@ describe('reportDrift', () => {
     delete process.env.GITHUB_TOKEN;
 
     expect(await reportDrift({ ...behindResult, status: 'current' }, false)).toContain('GITHUB_TOKEN');
+  });
+});
+
+describe('reportCollisions', () => {
+  const collided = {
+    repo: 'owner/name',
+    collisions: [{ path: '.claude/commands/semver.md', installed: '.claude/commands/semver-kit.md' }]
+  };
+
+  let server;
+  let calls;
+
+  async function stubApi(existingIssues) {
+    calls = [];
+    server = createServer((req, res) => {
+      let body = '';
+      req.on('data', (chunk) => (body += chunk));
+      req.on('end', () => {
+        calls.push({ method: req.method, url: req.url, body: body ? JSON.parse(body) : null });
+        res.setHeader('content-type', 'application/json');
+        if (req.method === 'GET') return res.end(JSON.stringify(existingIssues));
+        res.end(JSON.stringify({ number: 91 }));
+      });
+    });
+    await new Promise((done) => server.listen(0, '127.0.0.1', done));
+    process.env.GITHUB_API_URL = `http://127.0.0.1:${server.address().port}`;
+    process.env.GITHUB_TOKEN = 'stub-token';
+  }
+
+  afterEach(async () => {
+    delete process.env.GITHUB_API_URL;
+    delete process.env.GITHUB_TOKEN;
+    if (server) await new Promise((done) => server.close(done));
+    server = undefined;
+  });
+
+  it('files one issue on the first occurrence', async () => {
+    await stubApi([]);
+
+    expect(await reportCollisions(collided)).toContain('opened #91');
+
+    const post = calls.find((call) => call.method === 'POST');
+    expect(post.body.title).toContain('semver-kit.md');
+    expect(post.body.labels).toEqual(DEFAULT_ISSUE_LABELS);
+  });
+
+  it('never files a second one for the same path', async () => {
+    await stubApi([{ number: 5, body: 'x\n<!-- kit-check:collision:.claude/commands/semver.md -->' }]);
+
+    expect(await reportCollisions(collided)).toBeNull();
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
+  });
+
+  // A closed collision issue means the operator decided. Re-opening the question
+  // every week would be worse than never asking it.
+  it('respects a closed issue as a decision already made', async () => {
+    await stubApi([
+      { number: 5, state: 'closed', body: '<!-- kit-check:collision:.claude/commands/semver.md -->' }
+    ]);
+
+    expect(await reportCollisions(collided)).toBeNull();
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
+  });
+
+  // Unlike drift, the issue is never PATCHed: the operator writes decisions
+  // underneath it, and a weekly rewrite would stamp on them.
+  it('never updates an existing collision issue', async () => {
+    await stubApi([{ number: 5, body: '<!-- kit-check:collision:.claude/commands/semver.md -->' }]);
+
+    await reportCollisions(collided);
+
+    expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(0);
+  });
+
+  it('says nothing when there are no collisions', async () => {
+    await stubApi([]);
+
+    expect(await reportCollisions({ repo: 'owner/name', collisions: [] })).toBeNull();
+    expect(calls).toHaveLength(0);
   });
 });
 

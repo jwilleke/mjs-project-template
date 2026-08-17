@@ -15,7 +15,7 @@
 //
 // Usage: node utility/lint-fresh-install.mjs
 
-import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -119,6 +119,37 @@ try {
     'the collision warning fires in --dry-run too',
     /WARNING/.test(dry.stderr) && dry.stderr.includes(managedHeading),
     dry.stderr
+  );
+  // #56: a repo that already owns a command name keeps it. The kit yields and
+  // installs alongside — clobbering someone's release tooling to deliver a
+  // command they did not ask for is the worst outcome available here.
+  const own = join(repo, '.claude/commands/semver.md');
+  writeFileSync(own, '# Semver\n\nThis repo has its own release command.\n');
+  const yielding = run(join(root, 'install-kit.sh'), [repo]);
+
+  check(
+    'a repo-owned command name is not clobbered',
+    readFileSync(own, 'utf8').includes('This repo has its own release command'),
+    yielding.stderr
+  );
+  check(
+    "the kit's copy is installed alongside as -kit",
+    existsSync(join(repo, '.claude/commands/semver-kit.md')),
+    yielding.stdout
+  );
+  check(
+    'the collision is announced, not silent',
+    /NOTE:.*semver\.md/.test(yielding.stderr),
+    yielding.stderr
+  );
+
+  // Once suffixed, always suffixed: reverting to the plain name on a later sync
+  // would clobber the very file this behaviour exists to protect.
+  const again = run(join(root, 'install-kit.sh'), [repo]);
+  check(
+    'a later sync keeps yielding rather than reclaiming the name',
+    readFileSync(own, 'utf8').includes('This repo has its own release command'),
+    again.stdout
   );
 } finally {
   rmSync(repo, { recursive: true, force: true });
