@@ -116,7 +116,13 @@ export function formatReport({ status, local, kit, missing, target }) {
   } else if (status === 'unmarked') {
     lines.push(`${target} has no KIT:START marker — the kit has never been installed here`);
   } else {
-    lines.push(`${target}: cannot compare versions (local ${local}, kit ${kit})`);
+    // Not a shrug. A marker predating the first tag is a bare SHA, so this is
+    // the oldest class of install there is — and reading it as "no idea, carry
+    // on" is how three consumers went a year without a single notification.
+    lines.push(
+      `${target} has an UNPARSEABLE KIT:START marker (${local}), so it cannot be proven current — treating it as behind the kit (${kit})`
+    );
+    lines.push('A bare commit SHA means the kit was installed before it was ever tagged. Re-sync to replace it.');
   }
 
   if (missing.length) {
@@ -253,7 +259,12 @@ async function check(argv) {
   }
 
   const result = { status, local, kit, missing, target, repo };
-  const behind = status === 'behind' || status === 'unmarked' || missing.length > 0;
+
+  // `unknown` counts. It means the marker could not be parsed, so the repo
+  // cannot be shown to be current — and a check that stays silent when it does
+  // not know is worse than no check, because it reads as a pass.
+  const behind =
+    status === 'behind' || status === 'unmarked' || status === 'unknown' || missing.length > 0;
 
   console.log(json ? JSON.stringify(result, null, 2) : formatReport(result));
 

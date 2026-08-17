@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdirSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -156,6 +156,17 @@ describe('formatReport', () => {
 
   it('distinguishes a repo the kit was never installed into', () => {
     expect(formatReport({ ...base, local: null, status: 'unmarked' })).toContain('never been installed');
+  });
+
+  it('treats an unparseable marker as behind rather than shrugging', () => {
+    // A marker predating the first tag is a bare SHA. Reporting "cannot
+    // compare" and exiting quietly is how geohazardwatch, mjs-media-handling
+    // and fairways-gen2-website went a year with no notification at all.
+    const report = formatReport({ ...base, local: '3aa1bb4', status: 'unknown' });
+
+    expect(report).toContain('UNPARSEABLE');
+    expect(report).toContain('treating it as behind');
+    expect(report).toContain('installed before it was ever tagged');
   });
 
   it('lists missing managed files', () => {
@@ -328,6 +339,21 @@ describe('exit codes', () => {
 
   it('exits 2 on an unknown option — bad usage is a real failure', () => {
     expect(check(['--nonsense']).status).toBe(2);
+  });
+
+  // The pre-tag installs. Silence here read as a pass for a year.
+  it('reports a bare-SHA marker as behind instead of passing silently', () => {
+    mkdirSync(unmarked, { recursive: true });
+    writeFileSync(
+      join(unmarked, 'AGENTS.md'),
+      '<!-- KIT:START 3aa1bb4 — managed by mjs-project-template -->\n<!-- KIT:END -->\n'
+    );
+
+    const result = check([unmarked, '--kit', kit]);
+
+    expect(result.stdout).toContain('UNPARSEABLE');
+    expect(result.status).toBe(0);
+    expect(check([unmarked, '--kit', kit, '--fail-on-drift']).status).toBe(1);
   });
 });
 
