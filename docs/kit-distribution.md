@@ -164,7 +164,7 @@ each for its own reason:
 reports drift, plus any `overwrite`-managed file missing from the repo entirely.
 
 ```bash
-node bin/kit.mjs check /path/to/repo          # human-readable; exit 1 when behind
+node bin/kit.mjs check /path/to/repo          # human-readable
 node bin/kit.mjs check /path/to/repo --json   # for tooling
 ```
 
@@ -172,6 +172,34 @@ Consumers do not run it by hand. `install-kit.sh` seeds `.github/workflows/kit-c
 (create-if-absent), which runs weekly, checks out the kit beside the repo, and calls the checker
 with `--report-issue`. When the repo is behind, **one** tracking issue is opened and thereafter
 updated in place — never a fresh issue per run, which would train everyone to ignore it.
+
+### Why drift exits 0
+
+Being behind is not a failure, it is the steady state: every consumer goes stale the moment the kit
+is tagged. Exiting 1 on drift put a red X and a failure email on a weekly cron in repos where the
+build was fine, the tests passed and the release was good — competing with red X's that mean
+something, which the kit's own `/pstatus` text says is how a check gets ignored.
+
+So the exit codes read:
+
+| Code | Meaning |
+|---|---|
+| `0` | the check ran and said its piece, **including** when the repo is behind |
+| `1` | behind, and `--fail-on-drift` was passed (opt-in gating) |
+| `2` | the check could not do its job: bad usage, no kit to compare against, or `--report-issue` could not file the issue |
+
+The last row is the one that matters: once the issue is the only notification, failing to open it is
+the real breakage, so a missing `GITHUB_TOKEN` on a repo that IS behind exits 2 rather than shrugging.
+
+The issue is created with the labels `P2` and `kit`, because the kit's own `/pstatus` labels any
+unplaced issue `needs-triage` — an unlabelled drift issue would arrive in every consumer already
+flagged as awaiting a decision nobody needs to make. Labels are set on **create only**: re-asserting
+them on update would overrule a human who deliberately regraded the issue `deferred` during a freeze.
+If a repo has never run `utility/sync-labels.sh`, GitHub rejects the whole create over the unknown
+label, so the checker retries unlabelled — the notification outranks the grade.
+
+Both behaviours live in `bin/kit.mjs`, and the seeded workflow runs the checker from a **fresh kit
+checkout**. Consumers pick this up on their next scheduled run with no re-sync.
 
 This is why the checker is Node with no dependencies: Actions runners already ship Node, so
 `grow-tent` (C++) and `yourphr` (Go) run it without adopting a runtime or gaining a `package.json`.

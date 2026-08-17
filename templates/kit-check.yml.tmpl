@@ -1,6 +1,15 @@
 # Seeded by mjs-project-template's install-kit.sh. Reports when this repo is behind
 # the kit; never changes a file. Delete it if you do not want the notification.
 # Seeded create-if-absent, so local edits here survive the next kit sync.
+#
+# This job is GREEN when the repo is behind. Drift is expected — every repo goes
+# stale the moment the kit is tagged — so a red X here would be permanent, weekly,
+# and on a repo where nothing is actually broken. The tracking issue it opens is
+# the notification: one issue, reused forever, labelled P2 + kit.
+#
+# Red here means the check could not run at all (no kit checkout, no token, so no
+# issue could be filed). Add --fail-on-drift to the command below if you do want
+# being behind to gate CI.
 
 name: Kit Check
 
