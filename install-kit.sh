@@ -319,6 +319,33 @@ retire_deprecated() {      # remove retired command files from downstream repos
   done
 }
 
+warn_duplicate_headings() { # a heading in the managed block repeated below KIT:END fails MD024
+  local d="$TARGET/AGENTS.md"
+  [ -f "$d" ] || return 0
+  grep -qF "$END" "$d" || return 0
+
+  # The installer cannot know what headings live below KIT:END, but it has just
+  # read the whole file to splice the block, so it CAN know it created a
+  # collision. Learning this from the tool that caused it beats learning it from
+  # a red CI run after the change landed.
+  local dupes
+  dupes="$(awk '
+    /<!-- KIT:START/ { in_block = 1; next }
+    /<!-- KIT:END/   { in_block = 0; below = 1; next }
+    /^#+[ \t]/ {
+      if (in_block) { managed[$0] = 1; next }
+      if (below && ($0 in managed)) printf "             line %d: %s\n", NR, $0
+    }
+  ' "$d")"
+  [ -n "$dupes" ] || return 0
+
+  echo "  WARNING: AGENTS.md has headings that appear BOTH in the kit-managed block and in your" >&2
+  echo "           own content below KIT:END. markdownlint MD024 fails on this:" >&2
+  printf '%s\n' "$dupes" >&2
+  echo "           Rename YOUR heading — the managed block is rewritten on every sync, so a" >&2
+  echo "           rename there does not survive." >&2
+}
+
 stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   local d="$TARGET/AGENTS.md"
   [ -f "$d" ] || return 0
@@ -527,6 +554,7 @@ echo
 echo "Project docs (create-if-absent / managed):"
 ensure_agents_block
 stamp_kit_version
+warn_duplicate_headings
 apply_group docs
 echo
 

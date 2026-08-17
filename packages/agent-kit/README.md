@@ -22,8 +22,11 @@ npx @jwilleke/agent-kit check --json
 ```
 
 Reads the repo's `AGENTS.md` `KIT:START` marker, compares it against the kit version this package
-was built from, and lists any kit-managed file missing from the repo. Exits `1` when the repo is
-behind, `0` when it is current.
+was built from, and lists any kit-managed file missing from the repo.
+
+Exits `0` even when the repo is behind — drift is the expected steady state, so gating on it makes a
+weekly cron permanently red on a repo where nothing is broken. `2` means the check could not run.
+Pass `--fail-on-drift` to opt in to `1` on drift.
 
 In CI, `--report-issue` opens **one** tracking issue and updates it in place on later runs:
 
@@ -35,6 +38,10 @@ In CI, `--report-issue` opens **one** tracking issue and updates it in place on 
 
 That needs `permissions: issues: write`. A check that opened a fresh issue per run would teach
 everyone to ignore it.
+
+The issue is created labelled `P2` + `kit` (override with `--label`, suppress with `--no-labels`) so
+`/pstatus` bands it instead of flagging it `needs-triage`. Labels are applied on create only, so a
+human regrade sticks.
 
 ## What is in the package
 

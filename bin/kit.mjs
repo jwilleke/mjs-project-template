@@ -12,9 +12,19 @@
 //     --kit <dir>       kit checkout to compare against (default: this script's repo)
 //     --repo <o/n>      owner/name for --report-issue (default: $GITHUB_REPOSITORY)
 //     --report-issue    open or update ONE tracking issue when behind (needs $GITHUB_TOKEN)
+//     --label <name>    label to apply when the issue is CREATED (repeatable; default: P2, kit)
+//     --no-labels       create the issue with no labels
+//     --fail-on-drift   exit 1 when behind, for repos that want drift to gate CI
 //     --json            machine-readable output
 //
-// Exit codes: 0 up to date, 1 behind or missing managed files, 2 usage/error.
+// Exit codes:
+//   0  the check ran and said its piece — INCLUDING when the repo is behind.
+//      Drift is expected: every repo goes stale the moment the kit is tagged, so a
+//      red X here would be permanent, weekly, and on a repo where nothing is broken.
+//      The tracking issue is the notification; red is reserved for real breakage.
+//   1  behind, and --fail-on-drift was asked for.
+//   2  the check could NOT do its job — bad usage, no kit to compare against, or
+//      --report-issue was unable to file the issue that is supposed to carry the news.
 //
 // No dependencies, and none are wanted: this runs via `actions/checkout` in
 // repos that are C++, Go, Python, and Shell. GitHub's runners already ship Node,
@@ -27,6 +37,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ISSUE_MARKER = 'kit-check:drift';
 const KIT_REPO = 'jwilleke/mjs-project-template';
+
+// The kit's own /pstatus labels any issue with no placement label `needs-triage`,
+// so an unlabelled drift issue would arrive in every consumer already flagged as
+// awaiting a human decision. It is not: it is a known, recurring chore of a known
+// shape. `P2` is the kit's own grade for "real work, not urgent, nothing broken";
+// `kit` lets a repo filter the chore out of a ranked backlog entirely.
+export const DEFAULT_ISSUE_LABELS = ['P2', 'kit'];
 
 // --- pure helpers (unit-tested) ---------------------------------------------
 
@@ -171,6 +188,8 @@ async function check(argv) {
   let repo = process.env.GITHUB_REPOSITORY ?? null;
   let json = false;
   let reportIssue = false;
+  let failOnDrift = false;
+  let labels = null;   // null = "not asked for", so the default set still applies
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -178,6 +197,9 @@ async function check(argv) {
     else if (arg === '--repo') repo = argv[++i];
     else if (arg === '--json') json = true;
     else if (arg === '--report-issue') reportIssue = true;
+    else if (arg === '--fail-on-drift') failOnDrift = true;
+    else if (arg === '--no-labels') labels = [];
+    else if (arg === '--label') (labels ??= []).push(argv[++i]);
     else if (arg.startsWith('-')) {
       console.error(`unknown option: ${arg}`);
       return 2;
@@ -232,11 +254,14 @@ async function check(argv) {
   console.log(json ? JSON.stringify(result, null, 2) : formatReport(result));
 
   if (reportIssue) {
-    const outcome = await reportDrift(result, behind);
+    // A failure to file THROWS, and main() turns that into exit 2. Once the issue
+    // is the only notification, silently failing to open it is the real breakage.
+    const outcome = await reportDrift(result, behind, { labels: labels ?? DEFAULT_ISSUE_LABELS });
     if (outcome) console.log(outcome);
   }
 
-  return behind ? 1 : 0;
+  // Green on drift, on purpose — see the exit-code note at the top of this file.
+  return behind && failOnDrift ? 1 : 0;
 }
 
 // --- issue reporting ---------------------------------------------------------
@@ -254,7 +279,8 @@ export function issueBody(result) {
     `./install-kit.sh --pr ${result.target ? '/path/to/this/repo' : '.'}`,
     '```',
     '',
-    'Closing this issue is fine — the check reopens it on the next run if the repo is still behind.',
+    'Nothing is broken: `Kit Check` passes green on drift, and this issue is the whole notification.',
+    'Closing it is fine — the check reopens it on the next run if the repo is still behind.',
     '',
     `<!-- ${ISSUE_MARKER} -->`
   ];
@@ -278,16 +304,55 @@ async function api(path, token, init = {}) {
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub API ${init.method ?? 'GET'} ${path}: ${response.status}`);
+    const error = new Error(`GitHub API ${init.method ?? 'GET'} ${path}: ${response.status}`);
+    error.status = response.status;   // callers need 422 to tell a bad label from a real failure
+    throw error;
   }
 
   return response.json();
 }
 
-export async function reportDrift(result, behind) {
+/**
+ * POST the issue, retrying without labels if the repo has not defined them.
+ *
+ * GitHub rejects the WHOLE create when a label does not exist, so a repo that
+ * never ran utility/sync-labels.sh would lose its notification over a grade.
+ * The notification is the point; the grade is a convenience.
+ */
+async function createIssue(repo, token, payload) {
+  try {
+    return await api(`/repos/${repo}/issues`, token, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    if (error.status !== 422 || !payload.labels?.length) throw error;
+
+    console.log(
+      `note: ${repo} does not define all of [${payload.labels.join(', ')}] — filing unlabelled ` +
+        '(run utility/sync-labels.sh to define them)'
+    );
+
+    const { labels, ...unlabelled } = payload;
+    return api(`/repos/${repo}/issues`, token, {
+      method: 'POST',
+      body: JSON.stringify(unlabelled)
+    });
+  }
+}
+
+export async function reportDrift(result, behind, options = {}) {
+  const labels = options.labels ?? DEFAULT_ISSUE_LABELS;
+
+  // Being unable to file is only a failure when there is something to file.
+  const cannot = (what) => {
+    if (!behind) return `note: --report-issue needs ${what}; nothing to report anyway`;
+    throw new Error(`--report-issue needs ${what}, and this repo is behind — the drift went unreported`);
+  };
+
   const token = process.env.GITHUB_TOKEN;
-  if (!token) return 'note: --report-issue needs GITHUB_TOKEN; skipped';
-  if (!result.repo) return 'note: --report-issue needs --repo or $GITHUB_REPOSITORY; skipped';
+  if (!token) return cannot('GITHUB_TOKEN');
+  if (!result.repo) return cannot('--repo or $GITHUB_REPOSITORY');
 
   const open = await api(`/repos/${result.repo}/issues?state=open&per_page=100`, token);
   // One issue, forever. A check that opens a fresh issue per run trains people
@@ -306,6 +371,9 @@ export async function reportDrift(result, behind) {
   const body = issueBody(result);
 
   if (existing) {
+    // Labels are set on CREATE only. Re-asserting them here would fight a human
+    // who deliberately regraded the issue — someone who marked a drift `deferred`
+    // during a freeze must stay deferred.
     await api(`/repos/${result.repo}/issues/${existing.number}`, token, {
       method: 'PATCH',
       body: JSON.stringify({ title, body })
@@ -313,10 +381,8 @@ export async function reportDrift(result, behind) {
     return `updated #${existing.number}`;
   }
 
-  const created = await api(`/repos/${result.repo}/issues`, token, {
-    method: 'POST',
-    body: JSON.stringify({ title, body })
-  });
+  const payload = labels.length ? { title, body, labels } : { title, body };
+  const created = await createIssue(result.repo, token, payload);
 
   return `opened #${created.number}`;
 }
@@ -324,7 +390,11 @@ export async function reportDrift(result, behind) {
 // --- entry point -------------------------------------------------------------
 
 function usage() {
-  console.error('usage: kit.mjs check [target-dir] [--kit <dir>] [--repo <owner/name>] [--report-issue] [--json]');
+  console.error(
+    'usage: kit.mjs check [target-dir] [--kit <dir>] [--repo <owner/name>]\n' +
+      '                    [--report-issue] [--label <name>]... [--no-labels]\n' +
+      '                    [--fail-on-drift] [--json]'
+  );
   return 2;
 }
 

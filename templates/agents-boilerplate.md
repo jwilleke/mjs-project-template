@@ -1,6 +1,11 @@
-## Agent Context & Protocols
+## Agent Kit Protocols
 
 This section is **managed by the kit** (`install-kit.sh`) — it is identical across repos. Put repo-specific context **below the `KIT:END` marker**; do not edit here.
+
+The heading above names the kit on purpose. It used to read `Agent Context & Protocols`, which is the
+same wording a repo naturally picks for its own agent section below `KIT:END` — two identical `##`
+headings in one file, and `markdownlint` MD024 fails on it. The kit owns one heading string in every
+repo that installs it, so that string says whose it is.
 
 ### Session continuity
 

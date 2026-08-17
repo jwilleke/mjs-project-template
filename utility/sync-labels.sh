@@ -30,6 +30,7 @@ LABELS=(
   "in-review|0075ca|Shipped; awaiting operator verification"
   "blocked|000000|Blocked on an external dependency or decision"
   "dependencies|0366d6|Dependency updates (Dependabot)"
+  "kit|5319e7|Agent kit sync chore, filed by the Kit Check workflow"
 )
 
 apply_to() {

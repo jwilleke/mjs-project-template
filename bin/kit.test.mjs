@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 
 import {
   compareKitVersions,
+  DEFAULT_ISSUE_LABELS,
   formatReport,
   issueBody,
   parseKitVersion,
@@ -178,16 +179,25 @@ describe('reportDrift', () => {
   let server;
   let calls;
 
-  /** Stand up a stub GitHub API returning `openIssues` from the list endpoint. */
-  async function stubApi(openIssues) {
+  /**
+   * Stand up a stub GitHub API returning `openIssues` from the list endpoint.
+   * `rejectLabels` makes POSTs carrying labels fail 422, the way GitHub does when
+   * a repo has not defined them.
+   */
+  async function stubApi(openIssues, { rejectLabels = false } = {}) {
     calls = [];
     server = createServer((req, res) => {
       let body = '';
       req.on('data', (chunk) => (body += chunk));
       req.on('end', () => {
-        calls.push({ method: req.method, url: req.url, body: body ? JSON.parse(body) : null });
+        const parsed = body ? JSON.parse(body) : null;
+        calls.push({ method: req.method, url: req.url, body: parsed });
         res.setHeader('content-type', 'application/json');
         if (req.method === 'GET') return res.end(JSON.stringify(openIssues));
+        if (rejectLabels && parsed?.labels?.length) {
+          res.statusCode = 422;
+          return res.end(JSON.stringify({ message: 'Validation Failed' }));
+        }
         res.end(JSON.stringify({ number: 77 }));
       });
     });
@@ -238,10 +248,86 @@ describe('reportDrift', () => {
     expect(calls.every((call) => call.method === 'GET')).toBe(true);
   });
 
-  it('skips rather than throwing when no token is present', async () => {
+  it('grades the issue on creation so /pstatus does not call it untriaged', async () => {
+    await stubApi([]);
+
+    await reportDrift(behindResult, true);
+
+    const post = calls.find((call) => call.method === 'POST');
+    expect(post.body.labels).toEqual(DEFAULT_ISSUE_LABELS);
+  });
+
+  it('never re-asserts labels on update — a human regrade must stick', async () => {
+    await stubApi([{ number: 12, body: '<!-- kit-check:drift -->', labels: [{ name: 'deferred' }] }]);
+
+    await reportDrift(behindResult, true);
+
+    expect(calls.find((call) => call.method === 'PATCH').body.labels).toBeUndefined();
+  });
+
+  it('honours an explicit label set', async () => {
+    await stubApi([]);
+
+    await reportDrift(behindResult, true, { labels: ['chore'] });
+
+    expect(calls.find((call) => call.method === 'POST').body.labels).toEqual(['chore']);
+  });
+
+  it('files unlabelled rather than losing the notification to an undefined label', async () => {
+    await stubApi([], { rejectLabels: true });
+
+    expect(await reportDrift(behindResult, true)).toBe('opened #77');
+
+    const posts = calls.filter((call) => call.method === 'POST');
+    expect(posts).toHaveLength(2);
+    expect(posts[1].body.labels).toBeUndefined();
+  });
+
+  it('throws when it is behind and cannot file — the issue IS the notification', async () => {
     delete process.env.GITHUB_TOKEN;
 
-    expect(await reportDrift(behindResult, true)).toContain('GITHUB_TOKEN');
+    await expect(reportDrift(behindResult, true)).rejects.toThrow('GITHUB_TOKEN');
+  });
+
+  it('does not throw for a missing token when there is nothing to report', async () => {
+    delete process.env.GITHUB_TOKEN;
+
+    expect(await reportDrift({ ...behindResult, status: 'current' }, false)).toContain('GITHUB_TOKEN');
+  });
+});
+
+describe('exit codes', () => {
+  // Drift is expected — every repo goes stale the moment the kit is tagged — so a
+  // red X here would be permanent, weekly, and on a repo where nothing is broken.
+  const kit = resolve('.');
+
+  function check(args) {
+    return spawnSync(process.execPath, [resolve('bin/kit.mjs'), 'check', ...args], {
+      encoding: 'utf8'
+    });
+  }
+
+  const unmarked = join(tmpdir(), `agent-kit-unmarked-${process.pid}`);
+
+  afterEach(() => rmSync(unmarked, { recursive: true, force: true }));
+
+  it('exits 0 on drift', () => {
+    mkdirSync(unmarked, { recursive: true });
+
+    const result = check([unmarked, '--kit', kit]);
+
+    expect(result.stdout).toContain('never been installed');
+    expect(result.status).toBe(0);
+  });
+
+  it('exits 1 on drift when --fail-on-drift is asked for', () => {
+    mkdirSync(unmarked, { recursive: true });
+
+    expect(check([unmarked, '--kit', kit, '--fail-on-drift']).status).toBe(1);
+  });
+
+  it('exits 2 on an unknown option — bad usage is a real failure', () => {
+    expect(check(['--nonsense']).status).toBe(2);
   });
 });
 
