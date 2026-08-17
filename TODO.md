@@ -21,12 +21,12 @@ kit_version: "v1.3.1-0-g1433abd"
 
 ## 🔵 In review
 
-_None._
+*None.*
 
 ## ⏸ Deferred
 
-_None._
+*None.*
 
 ## ❓ Needs triage
 
-_None._
+*None.*

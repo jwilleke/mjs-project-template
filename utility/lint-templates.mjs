@@ -8,7 +8,7 @@
 // workflow the kit ALSO seeds red on a consumer's first commit.
 //
 // This renders each template the way install-kit.sh does and lints the result
-// with the kit's own .markdownlint.jsonc.
+// with the kit's own .markdownlint-cli2.jsonc.
 //
 // Usage: node utility/lint-templates.mjs
 
@@ -49,13 +49,13 @@ try {
     ].join('\n')
   );
 
-  cpSync(join(root, '.markdownlint.jsonc'), join(out, '.markdownlint.jsonc'));
+  cpSync(join(root, '.markdownlint-cli2.jsonc'), join(out, '.markdownlint-cli2.jsonc'));
 
   // The kit's own binary, by path: the temp dir has no node_modules, so `npx`
   // there resolves nothing and fails in a way that looks like a lint failure.
   const result = spawnSync(
-    join(root, 'node_modules', '.bin', 'markdownlint'),
-    ['*.md', '--config', '.markdownlint.jsonc'],
+    join(root, 'node_modules', '.bin', 'markdownlint-cli2'),
+    ['*.md'],
     { cwd: out, encoding: 'utf8', stdio: ['ignore', 'inherit', 'inherit'] }
   );
 

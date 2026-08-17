@@ -96,7 +96,7 @@ npm run lint:code:fix # ESLint only
 
 We use Markdownlint to ensure consistent and well-formatted documentation.
 
-Configuration: `.markdownlint.json`
+Configuration: `.markdownlint-cli2.jsonc`
 
 Key rules:
 
@@ -214,7 +214,7 @@ Closes #123
 
 ## Pre-commit Hooks
 
-Husky + lint-staged runs linting on **changed files only** before each commit. Commits with linting errors will be rejected.
+Husky + lint-staged runs linting on __changed files only__ before each commit. Commits with linting errors will be rejected.
 
 The pre-commit hook runs via lint-staged:
 

@@ -1,6 +1,6 @@
 {
   "name": "project-template",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "A comprehensive Node.js/TypeScript project template with production-ready tooling",
   "type": "module",
   "main": "dist/index.js",
@@ -11,8 +11,8 @@
     "start": "node dist/index.js",
     "lint": "npm run lint:code && npm run lint:md && npm run lint:templates && npm run lint:install",
     "lint:code": "eslint src/",
-    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
-    "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix",
+    "lint:md": "markdownlint-cli2",
+    "lint:md:fix": "markdownlint-cli2 --fix",
     "lint:fix": "npm run lint:code:fix && npm run lint:md:fix",
     "lint:code:fix": "eslint src/ --fix",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -33,7 +33,7 @@
       "prettier --write"
     ],
     "*.md": [
-      "markdownlint --fix"
+      "markdownlint-cli2 --fix --no-globs"
     ]
   },
   "keywords": [
@@ -52,7 +52,7 @@
     "eslint": "^9.39.4",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
-    "markdownlint-cli": "^0.49.0",
+    "markdownlint-cli2": "^0.23.2",
     "prettier": "^3.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",

@@ -18,7 +18,7 @@ kit_version: "v1.0.0-9-gae575c2"
     with no MD024 collision, and `kit-check.yml` now exists there
   - That PR touched one file where the dry-run predicted seven, which exposed the error: `--pr`
     branches from `origin/<default>`, the dry-run had read the working tree, and the local `mjs-ha`
-    clone was **122 commits behind origin**
+    clone was __122 commits behind origin__
   - Consequence: the fleet version table posted to #53 was read from local checkouts and was wrong
     for most rows. Corrected on #53 with state read from GitHub. `garage-car-positioning` is
     installed and current — the retired `docs/sync-log.md` was right and the retirement commit was
@@ -54,7 +54,7 @@ kit_version: "v1.0.0-9-gae575c2"
     forever — a label filters a class, not a set of size one — and a new label is defined in no repo
     until someone sweeps `sync-labels.sh --all`, so it was a fleet-wide chore added to remove a chore
   - Removed from `utility/sync-labels.sh`; deleted the label from this repo
-  - Reasoning recorded in `docs/kit-distribution.md` under _Why there is no `kit` label_ so it does
+  - Reasoning recorded in `docs/kit-distribution.md` under *Why there is no `kit` label* so it does
     not get re-proposed. `--label kit` still available for anyone who wants it
   - Released 1.2.1 (npm + tag); the fleet-wide label sweep is no longer needed at all
 - Commits: 5897a1d

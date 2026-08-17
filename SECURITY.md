@@ -1,6 +1,6 @@
 # Security Guidelines
 
-This document outlines security best practices and policies for this project. All contributors must follow these guidelines. **Core rule: NEVER put unencrypted secrets in Git** (see [CODE_STANDARDS.md](./CODE_STANDARDS.md#guiding-principles)).
+This document outlines security best practices and policies for this project. All contributors must follow these guidelines. __Core rule: NEVER put unencrypted secrets in Git__ (see [CODE_STANDARDS.md](./CODE_STANDARDS.md#guiding-principles)).
 
 ## Table of Contents
 
@@ -49,7 +49,7 @@ Critical Rule: Never commit passwords, API keys, tokens, or other secrets to ver
 #### Production Deployment
 
 1. Use GitHub repository secrets:
-   - Go to **Settings → Secrets and variables → Actions**
+   - Go to __Settings → Secrets and variables → Actions__
    - Add secrets needed for deployment
 
 2. Use environment-specific secrets:
@@ -437,4 +437,4 @@ If you have security questions or concerns:
 3. Consult with team security lead
 4. For critical issues: use private disclosure channel
 
-Remember: **Security is everyone's responsibility.**
+Remember: __Security is everyone's responsibility.__

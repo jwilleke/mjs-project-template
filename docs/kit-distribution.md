@@ -14,13 +14,13 @@ where the model currently leaks. Read this before changing anything under `templ
 
 ## The model in one line
 
-The kit is **pushed**, not pulled: an operator runs `install-kit.sh` from a local clone of this repo
+The kit is __pushed__, not pulled: an operator runs `install-kit.sh` from a local clone of this repo
 against a local clone of the target repo. Nothing in a downstream repo reaches back here, and no
 downstream repo can update itself.
 
-That has one consequence worth stating plainly, because every gap below descends from it: **a
+That has one consequence worth stating plainly, because every gap below descends from it: __a
 downstream repo is at whatever kit version was last pushed to it, and it has no way to find out that
-a newer one exists.** The `kit_version` stamp records what happened, not what was intended.
+a newer one exists.__ The `kit_version` stamp records what happened, not what was intended.
 
 ## Two entry points
 
@@ -54,19 +54,19 @@ file's contents, is what decides whether a local edit survives.
 
 | Behaviour | What happens to local changes | Paths |
 | --- | --- | --- |
-| `overwrite` | **Destroyed.** Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `utility/sync-labels.sh`, `.markdownlint.jsonc` |
-| `managed-block` | **Destroyed inside the markers**, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
-| `create-if-absent` | **Preserved.** Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
-| `merge` | **Preserved.** Missing lines appended, nothing removed. | `.gitignore` (adds `private/`, `.claude/settings.local.json`, `.claude/worktrees/`) |
+| `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc` |
+| `managed-block` | __Destroyed inside the markers__, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
+| `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
+| `merge` | __Preserved.__ Missing lines appended, nothing removed. | `.gitignore` (adds `private/`, `.claude/settings.local.json`, `.claude/worktrees/`) |
 | `unignore` | Removes a blanket `.claude/` or `CLAUDE.md` ignore so kit files get tracked; `.claude/settings.local.json` stays ignored | `.gitignore` |
 | `migrate` | One-time move, runs before create-if-absent | `docs/project_log.md` → `private/project_log.md` |
-| `supersede` | Deletes the file it replaces | `.markdownlint.json` → `.markdownlint.jsonc` |
+| `supersede` | Deletes the file it replaces | `.markdownlint.json` → `.markdownlint.jsonc` → `.markdownlint-cli2.jsonc` |
 | `retire` | Deletes commands the kit no longer ships | `.claude/commands/check-todos.md`, `.claude/commands/status.md` |
 
 The last four are not per-file lists, so they stay in `install-kit.sh`; the rest come from the
 manifest.
 
-The rule that follows from the table: **fix kit files upstream, never in the consumer.** If the kit
+The rule that follows from the table: __fix kit files upstream, never in the consumer.__ If the kit
 is wrong, it is wrong for twelve repos — change it here.
 
 An `overwrite` file is still replaced wholesale, but no longer silently: the installer compares the
@@ -120,21 +120,21 @@ The kit version is `git describe --tags --long` of the kit checkout at install t
 
 It is recorded in two places in every downstream repo:
 
-- the `KIT:START` marker in `AGENTS.md` — this is the **authoritative** record;
+- the `KIT:START` marker in `AGENTS.md` — this is the __authoritative__ record;
 - `kit_version` in the `AGENTS.md` frontmatter, written by `stamp_kit_version`.
 
-There is deliberately **no hand-maintained table of who is on which version.** `docs/sync-log.md`
+There is deliberately __no hand-maintained table of who is on which version.__ `docs/sync-log.md`
 was that table, and it was retired: it declared itself non-authoritative in its own first paragraph,
 listed seven sync PRs as open when four had merged and one was closed, and had no rows at all for
 three consumers. A cache that must be checked against the truth before use is not worth keeping.
 
-> **Correction (2026-08-17).** The commit that retired it also claimed the table recorded
+> __Correction (2026-08-17).__ The commit that retired it also claimed the table recorded
 > `garage-car-positioning` as synced when it had never been installed. That was wrong, and the table
 > was right: the repo is installed and current. The error came from reading `AGENTS.md` out of a
 > local clone that was far behind its remote — the same mistake described below. Recorded here rather
 > than quietly dropped, because a correction that leaves no trace is how the original claim survived.
 
-Ask **the remote**, never a checkout on somebody's disk:
+Ask __the remote__, never a checkout on somebody's disk:
 
 ```bash
 jq -r '.repos[]' downstream-repos.json | while read -r repo; do
@@ -161,7 +161,7 @@ jq -r '.repos[]' downstream-repos.json
 ```
 
 `excluded[]` carries the repos deliberately kept out, each with its reason, so an absence is never
-mistaken for an oversight. The default branch is **not** recorded — it varies, and
+mistaken for an oversight. The default branch is __not__ recorded — it varies, and
 `install-kit.sh --pr` detects it per repo; storing it would be one more hand-kept fact to drift.
 
 Example — open a kit-sync PR against every repo listed:
@@ -187,7 +187,7 @@ each for its own reason:
 - `bin/kit.mjs` — the checker runs *from* a kit checkout, not from a copy in the consumer. The
   seeded workflow checks the kit out beside the repo, so the consumer always runs the current
   checker rather than a stale copy of it.
-- `.claude/commands/semver.md` and `utility/set-version.mjs` — **an inconsistency, not a decision.**
+- `.claude/commands/semver.md` and `utility/set-version.mjs` — __an inconsistency, not a decision.__
   `/semver` is a real agent command that consumers would benefit from, but adding it to the
   overwrite list would clobber forks that built their own release tooling (`jwilleke/ngdpbase` did
   exactly that). Left out until someone decides which way it should go.
@@ -206,7 +206,7 @@ node bin/kit.mjs check /path/to/repo --json   # for tooling
 
 Consumers do not run it by hand. `install-kit.sh` seeds `.github/workflows/kit-check.yml`
 (create-if-absent), which runs weekly, checks out the kit beside the repo, and calls the checker
-with `--report-issue`. When the repo is behind, **one** tracking issue is opened and thereafter
+with `--report-issue`. When the repo is behind, __one__ tracking issue is opened and thereafter
 updated in place — never a fresh issue per run, which would train everyone to ignore it.
 
 ### Why drift exits 0
@@ -220,7 +220,7 @@ So the exit codes read:
 
 | Code | Meaning |
 |---|---|
-| `0` | the check ran and said its piece, **including** when the repo is behind |
+| `0` | the check ran and said its piece, __including__ when the repo is behind |
 | `1` | behind, and `--fail-on-drift` was passed (opt-in gating) |
 | `2` | the check could not do its job: bad usage, no kit to compare against, or `--report-issue` could not file the issue |
 
@@ -229,7 +229,7 @@ the real breakage, so a missing `GITHUB_TOKEN` on a repo that IS behind exits 2 
 
 The issue is created graded `P2`, because the kit's own `/pstatus` labels any unplaced issue
 `needs-triage` — an unlabelled drift issue would arrive in every consumer already flagged as
-awaiting a decision nobody needs to make. Labels are set on **create only**: re-asserting them on
+awaiting a decision nobody needs to make. Labels are set on __create only__: re-asserting them on
 update would overrule a human who deliberately regraded the issue `deferred` during a freeze. If a
 repo has never run `utility/sync-labels.sh`, GitHub rejects the whole create over the unknown label,
 so the checker retries unlabelled — the notification outranks the grade.
@@ -237,14 +237,14 @@ so the checker retries unlabelled — the notification outranks the grade.
 ### Why there is no `kit` label
 
 There was one, briefly, so a repo could filter the chore out of a ranked backlog. It does not earn
-its place. The `kit-check:drift` marker guarantees **one** drift issue per repo forever, and a label
+its place. The `kit-check:drift` marker guarantees __one__ drift issue per repo forever, and a label
 exists to filter a class, not a set of size one — and that one issue is already identifiable by its
 `[kit]` title prefix and by the marker itself. A new label is also defined in no repo until someone
 sweeps `utility/sync-labels.sh --all`, so its first effect would have been a chore added in order to
 remove a chore. `--label kit` still works for anyone who wants it.
 
-Both behaviours live in `bin/kit.mjs`, and the seeded workflow runs the checker from a **fresh kit
-checkout**. Consumers pick this up on their next scheduled run with no re-sync.
+Both behaviours live in `bin/kit.mjs`, and the seeded workflow runs the checker from a __fresh kit
+checkout__. Consumers pick this up on their next scheduled run with no re-sync.
 
 This is why the checker is Node with no dependencies: Actions runners already ship Node, so
 `grow-tent` (C++) and `yourphr` (Go) run it without adopting a runtime or gaining a `package.json`.
@@ -264,7 +264,7 @@ It is published publicly, under the `@jwilleke` scope. Public rather than privat
 private package or GitHub Packages would need an auth token in every consumer's workflow, which is a
 worse trade than the credential-free checkout the kit already uses.
 
-It is a **build artifact**, not a second copy. `build.mjs` assembles it from the authored sources at
+It is a __build artifact__, not a second copy. `build.mjs` assembles it from the authored sources at
 the repo root at pack time and rebuilds its directories from scratch, so a file deleted upstream
 cannot survive in the package. Nothing under `packages/agent-kit/bin`, `commands/`, or `templates/`
 is committed — those paths are gitignored, and editing them there is editing a build output.
@@ -289,7 +289,7 @@ grep -rn "/Volumes/\|/Users/" package                                       # lo
 grep -rhoE "https?://[A-Za-z0-9./_-]+" package | sort -u                    # every host
 ```
 
-The first matters most and is the least obvious: six of the twelve consumers are **private** repos, so
+The first matters most and is the least obvious: six of the twelve consumers are __private__ repos, so
 naming one in a shipped template would disclose its existence. `downstream-repos.json` names all twelve
 and is deliberately not in the package.
 
@@ -309,12 +309,12 @@ reports every consumer as *ahead of* the kit while exiting 0. A silent false pas
 
 Publishing forces a judgement `git describe` never did. For `@jwilleke/agent-kit`:
 
-- **major** — a change a consumer must act on: a command removed or renamed, a manifest behaviour
+- __major__ — a change a consumer must act on: a command removed or renamed, a manifest behaviour
   changed such that files that were preserved are now overwritten, a `check` exit code or `--json`
   shape that existing automation reads.
-- **minor** — new commands, new templates, new managed files, new checker flags. Additive; a
+- __minor__ — new commands, new templates, new managed files, new checker flags. Additive; a
   consumer that ignores the release is no worse off.
-- **patch** — wording, fixes, and clarifications inside existing files.
+- __patch__ — wording, fixes, and clarifications inside existing files.
 
 Rule of thumb: if a consumer who upgrades without reading the release notes could lose work or have
 a workflow break, it is major.
@@ -333,31 +333,31 @@ deliberate.
 A published version is permanent — npm allows unpublishing only within 72 hours, and the name is
 claimed for good on first release.
 
-One-time setup: an npm **automation** token (they bypass 2FA, which interactive publishing does not)
+One-time setup: an npm __automation__ token (they bypass 2FA, which interactive publishing does not)
 stored as the `NPM_TOKEN` repo secret.
 
 ## Known gaps
 
-- **The overwrite warning is line-exact.** A rule adopted upstream in different wording still
+- __The overwrite warning is line-exact.__ A rule adopted upstream in different wording still
   reports as "will be lost", because the comparison is textual. Conservative in the right
   direction — a false alarm costs a glance, a missed one costs the rule.
-- **The check is not yet running anywhere.** The workflow exists and is seeded on install, but the
+- __The check is not yet running anywhere.__ The workflow exists and is seeded on install, but the
   nine consumers have not been synced since it was added, so none of them has it yet.
-- **Nothing is on npm yet.** The package builds, packs, and installs from a local tarball, and the
+- __Nothing is on npm yet.__ The package builds, packs, and installs from a local tarball, and the
   release workflow is in place, but the first publish has not been run — so `npx @jwilleke/agent-kit`
   does not resolve, and the seeded workflow still checks the kit out rather than using it.
-- **Dependabot reaches only the npm-managed consumers.** Once published, `ngdpbase` and
+- __Dependabot reaches only the npm-managed consumers.__ Once published, `ngdpbase` and
   `fairways-gen2-website` can depend on the package and get PRs; the other seven have no
   `package.json` and stay on the tracking issue. That asymmetry is the profile split still to be
   decided.
-- **Partial command coverage** — four of the six `.claude/commands/*.md` files sync; `/semver` and
+- __Partial command coverage__ — four of the six `.claude/commands/*.md` files sync; `/semver` and
   `/update-agents` do not, so downstream agents follow different rules depending on the command.
 
 ## Should this be an npm package?
 
 No — and the reason is in the consumer list, not in the tooling.
 
-Of the twelve repos in `downstream-repos.json`, **six have a `package.json`** and six do not — the
+Of the twelve repos in `downstream-repos.json`, __six have a `package.json`__ and six do not — the
 rest are Shell, C++, Python, Go, and a Flux/Kubernetes config repo. Distributing an agent kit through
 npm would require half the fleet to adopt Node and a `package.json` they otherwise have no use for,
 purely as a delivery mechanism. The kit is bash and markdown; its dependency footprint is `bash`,
@@ -367,7 +367,7 @@ That split was 2:7 when this section was written and is 6:6 now, so the argument
 was — but it is an argument about the *six*, and it does not improve as the fleet grows.
 
 The second reason is that packaging solves the part that is already easy. The hard part of this
-system is the **merge semantics** — which files are overwritten, which are seeded once, which are
+system is the __merge semantics__ — which files are overwritten, which are seeded once, which are
 managed between markers. An npm package would still need `install-kit.sh` to apply those rules to a
 repo. Registry distribution moves the bytes; it does not decide what happens when a consumer edited
 line 40 of a managed block.
@@ -383,7 +383,7 @@ The second — the one you actually feel — is already delivered without npm, b
 described above. That was phase 1 of
 [#45](https://github.com/jwilleke/mjs-project-template/issues/45).
 
-**The answer is "yes, as well as" rather than "instead of".** `@jwilleke/agent-kit` is built and
+__The answer is "yes, as well as" rather than "instead of".__ `@jwilleke/agent-kit` is built and
 published publicly, and the seeded workflow keeps working for the seven consumers that cannot
 consume a package. The registry serves the two that can; it does not become the delivery mechanism
 for the rest.
@@ -395,13 +395,13 @@ a Dependabot signal for the npm-managed repos.
 
 What remains open:
 
-1. **Phase 3 — port the applying half out of bash.** Largest piece, worst failure mode: a parity bug
+1. __Phase 3 — port the applying half out of bash.__ Largest piece, worst failure mode: a parity bug
    in the `KIT:START`/`KIT:END` surgery corrupts `AGENTS.md` in nine repos at once. `kit-files.tsv`
    makes it a mechanical port rather than a re-derivation.
-2. **`install-kit.sh --from <git-ref>`** — clone the kit shallow into a temp dir when run outside a
+2. __`install-kit.sh --from <git-ref>`__ — clone the kit shallow into a temp dir when run outside a
    checkout, so "install kit `v1.0.0-55`" is a reproducible instruction rather than a description of
    one machine's working tree.
-3. **The consumer profile split** — which repos consume the package and which stay on the checkout.
+3. __The consumer profile split__ — which repos consume the package and which stay on the checkout.
    Only becomes concrete once the package is on npm.
 
 ## Related
