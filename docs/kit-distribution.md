@@ -250,6 +250,19 @@ Three deliberate choices:
 The one thing `GITHUB_TOKEN` cannot do is modify a file under `.github/workflows/`. Seeded workflows
 are `create-if-absent`, so this only bites when a repo is missing one — the push then fails loudly.
 
+### The self-sync cannot deliver its own workflow
+
+`GITHUB_TOKEN` may not push a file under `.github/workflows/`. The push is rejected outright —
+*"refusing to allow a GitHub App to create or update workflow … without `workflows` permission"* —
+which would fail the entire sync over a file the job could never deliver.
+
+So the job excludes `.github/workflows` from its commit, and if that leaves nothing staged it says
+so and exits 0. Workflow changes reach a repo through a local `install-kit.sh --pr`, run by a human
+whose push may touch workflows. Everything else the self-sync handles.
+
+This is why `kit-sync.yml` is `overwrite-template` rather than `create-if-absent`: seeded once, a bug
+in it was permanent in every consumer, since the kit that wrote it could never replace it.
+
 ### One repo setting is required, and no workflow can grant it
 
 __Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve

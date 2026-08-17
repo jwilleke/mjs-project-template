@@ -26,6 +26,11 @@
 # pull requests". This job does not treat that as a failure: the branch is already
 # pushed by then, so it files an issue carrying the compare link and exits 0.
 #
+# One thing this job structurally cannot deliver: changes to files under
+# .github/workflows/, including this one. GITHUB_TOKEN may not push them, so they
+# are excluded from the commit and a local `install-kit.sh --pr` — run by a human,
+# whose push may touch workflows — is what updates them.
+#
 # Green means checked. Red means the sync could not be produced or did not lint.
 
 name: Kit Sync
@@ -111,12 +116,28 @@ jobs:
           fi
 
           git checkout -b "$branch"
-          # Exclude the kit checkout: it lives inside this work tree, and a blank
-          # `git add -A` stages it as an embedded git repository, putting a
-          # gitlink to the kit in every sync commit. install-kit.sh also adds
-          # .kit-sync/ to .gitignore; this is the belt to that braces, and it
-          # protects anyone running these steps by hand.
-          git add -A -- ':!.kit-sync'
+
+          # Two exclusions, for different reasons.
+          #
+          # .kit-sync — the kit checkout lives inside this work tree, and a blank
+          # `git add -A` stages it as an embedded git repository, putting a gitlink
+          # to the kit in every sync commit.
+          #
+          # .github/workflows — GITHUB_TOKEN may not push changes to a workflow
+          # file. The push is rejected outright ("refusing to allow a GitHub App to
+          # create or update workflow ... without `workflows` permission"), which
+          # would fail the whole sync over a file the job cannot deliver anyway.
+          # The kit owns this workflow, so a local `install-kit.sh --pr` run by a
+          # human updates it; the self-sync delivers everything else.
+          git add -A -- ':!.kit-sync' ':!.github/workflows'
+
+          if git diff --cached --quiet; then
+            echo "::notice::The only pending kit change is under .github/workflows/, which"
+            echo "::notice::GITHUB_TOKEN may not push. Run install-kit.sh --pr locally to deliver it."
+            git checkout -q "${GITHUB_REF_NAME}"
+            exit 0
+          fi
+
           git commit -q -m "chore(kit): sync to $version"
           git push -q -f -u origin "$branch"
 
