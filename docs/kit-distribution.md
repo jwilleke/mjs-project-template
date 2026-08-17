@@ -249,6 +249,18 @@ Three deliberate choices:
 The one thing `GITHUB_TOKEN` cannot do is modify a file under `.github/workflows/`. Seeded workflows
 are `create-if-absent`, so this only bites when a repo is missing one — the push then fails loudly.
 
+### One repo setting is required, and no workflow can grant it
+
+__Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve
+pull requests.__ It is off by default in many repos and organisations, and a `permissions:` block
+cannot override it.
+
+Without it `gh pr create` fails with *"GitHub Actions is not permitted to create or approve pull
+requests"*. The workflow does not treat that as a failure: the branch is pushed before the PR call,
+so nothing is lost. It prints the compare link and files one issue — reused, not repeated — saying
+which setting to tick. Red stays reserved for a sync that could not be produced or did not lint,
+because a job that goes red on every push forever is one people stop reading.
+
 ## How a repo learns it is behind
 
 `bin/kit.mjs check` compares a repo's `KIT:START` marker against the kit's current version and

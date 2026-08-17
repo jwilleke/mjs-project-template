@@ -129,6 +129,28 @@ try {
     !/^[ \t]*schedule:/m.test(readFileSync(syncWorkflow, 'utf8')),
     'a schedule reappeared in the template'
   );
+  // #61: the kit checkout lives inside the work tree, so a blank `git add -A`
+  // stages it as an embedded git repository and every sync commit carries a
+  // gitlink to the kit.
+  check(
+    ".gitignore excludes the workflow's own kit checkout",
+    readFileSync(join(repo, '.gitignore'), 'utf8').includes('.kit-sync/'),
+    readFileSync(join(repo, '.gitignore'), 'utf8')
+  );
+  check(
+    'kit-sync.yml never stages the kit checkout',
+    /git add -A -- ':!\.kit-sync'/.test(readFileSync(syncWorkflow, 'utf8')),
+    'a blank `git add -A` reappeared'
+  );
+  // A repo that has not ticked "Allow GitHub Actions to create and approve pull
+  // requests" would otherwise go red on every push, for a reason that means
+  // neither "checked" nor "could not run".
+  check(
+    'kit-sync.yml degrades rather than failing when it may not open a PR',
+    /not permitted to create or approve pull requests/.test(readFileSync(syncWorkflow, 'utf8')),
+    'the permission failure is no longer handled'
+  );
+
   check(
     'kit-sync.yml asks for no secret beyond GITHUB_TOKEN',
     !/secrets\.(?!GITHUB_TOKEN)/.test(readFileSync(syncWorkflow, 'utf8')),
