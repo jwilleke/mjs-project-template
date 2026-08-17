@@ -12,11 +12,11 @@ last_updated: "2026-08-17"
 
 ## 🟠 P1
 
-- [#54](https://github.com/jwilleke/mjs-project-template/issues/54) — [FEATURE] Repos should sync themselves — the workflow applies the kit, not the operator
+*None.*
 
 ## 🟡 P2
 
-- [#57](https://github.com/jwilleke/mjs-project-template/issues/57) — [BUG] Nothing enforces the TODO.md band rules, so generated files drift into status reports
+*None.*
 
 ## 🔵 In review
 
