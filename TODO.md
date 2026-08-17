@@ -9,7 +9,7 @@ kit_version: "v1.2.1-1-gb87e855"
 
 ## 🔴 P0 — Security & Critical
 
-_None._
+- [#53](https://github.com/jwilleke/mjs-project-template/issues/53) — [EPIC] .agent-kit.json — one machine-readable manifest for kit state
 
 ## 🟠 P1
 
@@ -32,4 +32,4 @@ _None._
 
 ## ❓ Needs triage
 
-- [#53](https://github.com/jwilleke/mjs-project-template/issues/53) — [EPIC] .agent-kit.json — one machine-readable manifest for kit state
+_None._
