@@ -120,6 +120,12 @@ try {
     /WARNING/.test(dry.stderr) && dry.stderr.includes(managedHeading),
     dry.stderr
   );
+  // #58: a licence is text the repo holds, not text it wrote. Renumbering a GPL
+  // copy's sections to satisfy MD029 edits a legal instrument.
+  writeFileSync(join(repo, 'LICENSE.md'), '# License\n\n14. a\n15. b\n\nSee `show w\' for details.\n');
+  const withLicence = run(join(root, 'node_modules', '.bin', 'markdownlint-cli2'), []);
+  check('a LICENSE.md is not linted', withLicence.status === 0, withLicence.stdout + withLicence.stderr);
+
   // #56: a repo that already owns a command name keeps it. The kit yields and
   // installs alongside — clobbering someone's release tooling to deliver a
   // command they did not ask for is the worst outcome available here.
