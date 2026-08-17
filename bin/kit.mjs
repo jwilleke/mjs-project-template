@@ -307,7 +307,7 @@ function inspect(targetDir, kitDir) {
   // `overwrite-or-suffix` rows are excluded: the kit may legitimately have
   // installed the suffixed name instead, so an absent plain name is not a gap.
   const missing = manifest
-    .filter((row) => row.behavior === 'overwrite')
+    .filter((row) => row.behavior === 'overwrite' || row.behavior === 'overwrite-template')
     .map((row) => row.path)
     .filter((path) => !existsSync(join(targetDir, path)));
 

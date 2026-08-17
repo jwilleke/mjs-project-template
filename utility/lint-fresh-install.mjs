@@ -157,6 +157,16 @@ try {
     'the workflow now requires a PAT'
   );
 
+  // #61: as create-if-absent, a bug in this workflow was permanent downstream —
+  // the kit that wrote it could never replace it.
+  writeFileSync(syncWorkflow, '# a stale copy with the bug in it\n');
+  run(join(root, 'install-kit.sh'), [repo]);
+  check(
+    'a stale kit-sync.yml is replaced, not preserved',
+    !readFileSync(syncWorkflow, 'utf8').startsWith('# a stale copy'),
+    readFileSync(syncWorkflow, 'utf8').slice(0, 60)
+  );
+
   // #53: the manifest is the record of what landed. A stamp says what a file
   // claims to be; a hash says what it is.
   const manifest = JSON.parse(readFileSync(join(repo, '.agent-kit.json'), 'utf8'));
