@@ -125,17 +125,30 @@ It is recorded in two places in every downstream repo:
 
 There is deliberately **no hand-maintained table of who is on which version.** `docs/sync-log.md`
 was that table, and it was retired: it declared itself non-authoritative in its own first paragraph,
-and by the time it was removed it recorded a repo as synced that had never been installed, listed
-seven sync PRs as open when four had merged and one was closed, and had no rows for three consumers
-at all. A cache that must be checked against the truth before use is not worth keeping.
+listed seven sync PRs as open when four had merged and one was closed, and had no rows at all for
+three consumers. A cache that must be checked against the truth before use is not worth keeping.
 
-Ask the repos instead:
+> **Correction (2026-08-17).** The commit that retired it also claimed the table recorded
+> `garage-car-positioning` as synced when it had never been installed. That was wrong, and the table
+> was right: the repo is installed and current. The error came from reading `AGENTS.md` out of a
+> local clone that was far behind its remote — the same mistake described below. Recorded here rather
+> than quietly dropped, because a correction that leaves no trace is how the original claim survived.
+
+Ask **the remote**, never a checkout on somebody's disk:
 
 ```bash
 jq -r '.repos[]' downstream-repos.json | while read -r repo; do
-  node bin/kit.mjs check "/Volumes/hd2A/workspaces/github/${repo#*/}" --kit . --json
+  marker=$(gh api -H "Accept: application/vnd.github.raw" \
+    "/repos/$repo/contents/AGENTS.md" 2>/dev/null | grep -o 'KIT:START [^ ]*' | head -1)
+  printf '%-34s %s\n' "$repo" "${marker:-no marker}"
 done
 ```
+
+A local clone is not evidence of what a repo contains. `jwilleke/mjs-ha` was 122 commits behind
+origin on the machine this was written from, and a fleet-wide version table built by grepping local
+checkouts was wrong for most rows. `bin/kit.mjs check` and `install-kit.sh` both read the working
+tree, so both now warn when the target trails its upstream — but the warning is a guard, not a
+substitute for asking the remote.
 
 Narrative about a sync — what broke, what was skipped and why — is session history and belongs in
 `docs/project_log.md`, not in a state file. Two files recording the same events drift apart, and the
