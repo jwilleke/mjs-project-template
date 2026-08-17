@@ -23,6 +23,19 @@
   "globs": ["**/*.md", ".claude/**/*.md"],
   "gitignore": true,
 
+  // Tracked is not the same as authored. `gitignore: true` catches what is
+  // generated or vendored, but a repo also commits text it holds without having
+  // written — and a licence is the case where owning the file does not grant the
+  // right to reformat it. The MD029 hits in a GPL copy are the licence's own
+  // section numbering and its `show w' shell examples: correct as written, and
+  // legally load-bearing.
+  //
+  // Deliberately only the licence. CHANGELOG.md and CODE_OF_CONDUCT.md were
+  // considered and rejected — those are ours, so they get fixed, not exempted.
+  // COPYING and NOTICE are not here because no consumer has one; a pattern that
+  // matches nothing is a rule someone has to understand later for no benefit.
+  "ignores": ["**/LICENSE*.md", "**/LICENCE*.md"],
+
   "config": {
     "default": true,
     "MD003": { "style": "atx" },           // headings use # / ## (atx) style
