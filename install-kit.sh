@@ -320,22 +320,20 @@ retire_deprecated() {      # remove retired command files from downstream repos
 }
 
 warn_duplicate_headings() { # a heading in the managed block repeated below KIT:END fails MD024
-  local d="$TARGET/AGENTS.md"
+  local d="$TARGET/AGENTS.md" b="$SRC/templates/agents-boilerplate.md"
   [ -f "$d" ] || return 0
+  [ -f "$b" ] || return 0
   grep -qF "$END" "$d" || return 0
 
-  # The installer cannot know what headings live below KIT:END, but it has just
-  # read the whole file to splice the block, so it CAN know it created a
-  # collision. Learning this from the tool that caused it beats learning it from
-  # a red CI run after the change landed.
+  # Headings come from the INCOMING boilerplate, not from the block on disk.
+  # Reading the target's own block would compare the outgoing headings in
+  # --dry-run (where nothing has been spliced yet) and so miss exactly the
+  # collision a heading rename introduces — which is the case this exists for.
   local dupes
-  dupes="$(awk '
-    /<!-- KIT:START/ { in_block = 1; next }
-    /<!-- KIT:END/   { in_block = 0; below = 1; next }
-    /^#+[ \t]/ {
-      if (in_block) { managed[$0] = 1; next }
-      if (below && ($0 in managed)) printf "             line %d: %s\n", NR, $0
-    }
+  dupes="$(awk -v bf="$b" '
+    BEGIN { while ((getline l < bf) > 0) if (l ~ /^#+[ \t]/) incoming[l] = 1 }
+    /<!-- KIT:END/ { below = 1; next }
+    below && /^#+[ \t]/ && ($0 in incoming) { printf "             line %d: %s\n", NR, $0 }
   ' "$d")"
   [ -n "$dupes" ] || return 0
 
