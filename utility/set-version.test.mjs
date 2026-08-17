@@ -113,7 +113,29 @@ describe('isValidVersion', () => {
     expect(isValidVersion(v)).toBe(true);
   });
 
-  it.each(['v1.0.0', '1.0', '', 'patch', undefined])('rejects %s', (v) => {
-    expect(isValidVersion(v)).toBe(false);
+  it.each(['v1.0.0', '1.0', '', 'patch', undefined, '1.0.0-', '1.0.0+', '1.0.0.0'])(
+    'rejects %s',
+    (v) => {
+      expect(isValidVersion(v)).toBe(false);
+    }
+  );
+
+  it('accepts a prerelease containing dashes, and a build after it', () => {
+    expect(isValidVersion('1.2.3-rc.1+exp.sha.5114f85')).toBe(true);
+    expect(isValidVersion('1.2.3-a-b')).toBe(true);
+  });
+
+  // CodeQL js/redos, reported against a consumer that received this file in
+  // v1.5.0. The old pattern starred a group whose `-` separator also appeared
+  // inside its own character class, so a run of dashes could be partitioned
+  // exponentially many ways: 40 dashes took 2.6s, 50 took 70s.
+  it('rejects a long run of dashes in linear time', () => {
+    const attack = `1.0.0${'-'.repeat(50_000)}!`;
+
+    const started = process.hrtime.bigint();
+    expect(isValidVersion(attack)).toBe(false);
+    const ms = Number(process.hrtime.bigint() - started) / 1e6;
+
+    expect(ms).toBeLessThan(1000);
   });
 });
