@@ -121,6 +121,21 @@ pr_restore() {             # always leave the target on the branch we found it o
   if [ "$PR" -eq 0 ] || [ "$DRY" -eq 1 ] || [ -z "$PR_ORIG_BRANCH" ]; then return 0; fi
   local cur=""
   cur="$(git -C "$TARGET" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+
+  # Discard an unfinished sync BEFORE switching back. `git checkout` carries
+  # staged changes across branches, so a commit that failed — a repo's own
+  # pre-commit hook rejecting it, say — used to deposit the entire sync, staged,
+  # on the base branch and then leave. The operator is handed a dirty master and
+  # no PR, which is the worst of both.
+  #
+  # Safe because --pr refuses to start unless the tree is clean: everything here
+  # was written by this run.
+  if [ "$cur" = "$PR_BRANCH" ] && [ -n "$(git -C "$TARGET" status --porcelain)" ]; then
+    echo "  sync did not complete — discarding the working copy and leaving $PR_ORIG_BRANCH untouched" >&2
+    git -C "$TARGET" reset --quiet --hard HEAD 2>/dev/null || true
+    git -C "$TARGET" clean --quiet -fd 2>/dev/null || true
+  fi
+
   if [ "$cur" != "$PR_ORIG_BRANCH" ]; then
     git -C "$TARGET" checkout --quiet "$PR_ORIG_BRANCH" 2>/dev/null || true
   fi
@@ -346,6 +361,19 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
   fi
 }
 
+uses_markdownlint_v1() {   # does anything here still call the v1 `markdownlint` binary?
+  # `markdownlint` as a word, not `markdownlint-cli2`. Checked in the places a
+  # repo actually invokes it from; the kit manages none of them.
+  grep -rlE '(^|[^-[:alnum:]])markdownlint([^-]|$)' \
+    "$TARGET/package.json" "$TARGET/.lintstagedrc" "$TARGET/.lintstagedrc.json" \
+    "$TARGET/.husky" "$TARGET/.github/workflows" 2>/dev/null |
+    xargs -r grep -lvE 'markdownlint-cli2' >/dev/null 2>&1 && return 0
+
+  grep -rqE '(^|[^-[:alnum:]])markdownlint([^-2]|$)' \
+    "$TARGET/package.json" "$TARGET/.lintstagedrc" "$TARGET/.lintstagedrc.json" \
+    "$TARGET/.husky" "$TARGET/.github/workflows" 2>/dev/null
+}
+
 retire_deprecated() {      # remove files the kit no longer ships
   # .markdownlint.jsonc is superseded by .markdownlint-cli2.jsonc, which holds
   # the rules AND the globs AND the ignores. Leaving both would put two rulebooks
@@ -353,8 +381,21 @@ retire_deprecated() {      # remove files the kit no longer ships
   local rel old
   # kit-check.yml goes only once kit-sync.yml is in place, so a repo is never
   # left with neither — a repo with no workflow is one that reports nothing.
-  local retire_list=".claude/commands/check-todos.md .claude/commands/status.md .markdownlint.jsonc"
+  local retire_list=".claude/commands/check-todos.md .claude/commands/status.md"
   [ -f "$TARGET/.github/workflows/kit-sync.yml" ] && retire_list="$retire_list .github/workflows/kit-check.yml"
+
+  # .markdownlint.jsonc is superseded by .markdownlint-cli2.jsonc — but only
+  # markdownlint-cli2 reads the new name. A repo whose hooks or CI still call the
+  # v1 `markdownlint` binary would be left with no config at all and silently
+  # fall back to stock defaults (MD013 at 80 columns, MD040 on), which is how a
+  # sync into jwilleke/ngdpbase produced 100+ errors and blocked its own commit.
+  if uses_markdownlint_v1; then
+    echo "  NOTE: keeping .markdownlint.jsonc — this repo still calls the v1 \`markdownlint\` binary," >&2
+    echo "        which cannot read .markdownlint-cli2.jsonc. Move those callers to" >&2
+    echo "        \`markdownlint-cli2\`, then delete .markdownlint.jsonc." >&2
+  else
+    retire_list="$retire_list .markdownlint.jsonc"
+  fi
 
   for rel in $retire_list; do
     old="$TARGET/$rel"
