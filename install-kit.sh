@@ -457,6 +457,61 @@ stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   fi
 }
 
+fix_markdown() {           # bring the repo's markdown to the rules the sync just installed
+  # The rule and the conformance have to arrive together. Pinning MD049/MD050 in
+  # v1.4.0 without this left any repo with existing `**bold**` unable to commit
+  # the sync at all — its own pre-commit hook rejected prose the sync never
+  # touched. jwilleke/fairways-gen2-website hit exactly that.
+  #
+  # This edits files the kit does not own. That is deliberate and operator-
+  # approved: it is confined to what markdownlint can fix automatically, and it
+  # lands in the sync PR where it can be read before it is merged.
+  local bin=""
+  for candidate in \
+    "$TARGET/node_modules/.bin/markdownlint-cli2" \
+    "$SRC/node_modules/.bin/markdownlint-cli2"; do
+    [ -x "$candidate" ] && { bin="$candidate"; break; }
+  done
+  if [ -z "$bin" ] && command -v npx >/dev/null 2>&1; then bin="npx --yes markdownlint-cli2"; fi
+  if [ -z "$bin" ]; then
+    act "markdown: no markdownlint-cli2 available — skipping the auto-fix"
+    return 0
+  fi
+
+  act "markdown: applying markdownlint --fix under the newly installed rules"
+  [ "$DRY" -eq 1 ] && return 0
+
+  # cli2 discovers the config from the target, which is the one just installed.
+  ( cd "$TARGET" && $bin --fix >/dev/null 2>&1 ) || true
+
+  # Whatever survives --fix is structural: multiple H1s, missing image alt text,
+  # duplicate headings. Those cannot be rewritten automatically, and in a repo
+  # whose pages are markdown they are usually not documentation at all — they are
+  # content, and linting content as prose is the mistake.
+  #
+  # Say so here rather than letting the operator meet it as a wall of errors from
+  # their own pre-commit hook, which is how fairways-gen2-website failed: 108
+  # violations across converted CMS pages, none of them about the sync.
+  local residue dirs
+  residue="$( cd "$TARGET" && $bin 2>&1 | grep -cE ' error ' || true )"
+  [ "${residue:-0}" -gt 0 ] 2>/dev/null || return 0
+
+  # `|| true` is load-bearing: pipefail makes the whole substitution fail because
+  # markdownlint-cli2 exits non-zero when it finds violations — which is exactly
+  # the case this branch handles.
+  dirs="$( cd "$TARGET" && $bin 2>&1 | grep -oE '^[^:]+\.md' |
+    sed 's#/[^/]*$##' | sort | uniq -c | sort -rn | head -3 |
+    awk '{ printf "             %s (%s)\n", $2, $1 }' || true )"
+
+  echo "  NOTE: $residue markdown violation(s) remain that --fix cannot repair." >&2
+  echo "        Mostly in:" >&2
+  printf '%s\n' "$dirs" >&2
+  echo "        If those files are page content rather than documentation, exempt the" >&2
+  echo "        directory instead of rewriting it — drop a .markdownlint-cli2.jsonc beside" >&2
+  echo "        the content with the offending rules set to false. The kit never writes" >&2
+  echo "        into subdirectories, so that survives every future sync." >&2
+}
+
 write_manifest() {         # .agent-kit.json — the machine-readable record of this install
   # One fact, one home. Before this, "which kit version is this repo on?" lived in
   # the KIT:START marker, in AGENTS.md frontmatter, and frozen at birth in TODO.md,
@@ -732,6 +787,10 @@ echo
 
 echo "GitHub templates (create-if-absent — keeps your customizations):"
 apply_group templates
+echo
+
+echo "Markdown (conform the repo to the rules this sync installs):"
+fix_markdown
 echo
 
 echo "Manifest (written last, so it records what actually landed):"
