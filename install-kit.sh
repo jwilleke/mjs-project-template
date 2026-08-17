@@ -351,10 +351,19 @@ retire_deprecated() {      # remove files the kit no longer ships
   # the rules AND the globs AND the ignores. Leaving both would put two rulebooks
   # in the repo, and markdownlint-cli2 reads both — the exact split this replaced.
   local rel old
-  for rel in ".claude/commands/check-todos.md" ".claude/commands/status.md" ".markdownlint.jsonc"; do
+  # kit-check.yml goes only once kit-sync.yml is in place, so a repo is never
+  # left with neither — a repo with no workflow is one that reports nothing.
+  local retire_list=".claude/commands/check-todos.md .claude/commands/status.md .markdownlint.jsonc"
+  [ -f "$TARGET/.github/workflows/kit-sync.yml" ] && retire_list="$retire_list .github/workflows/kit-check.yml"
+
+  for rel in $retire_list; do
     old="$TARGET/$rel"
     [ -f "$old" ] || continue
-    act "remove retired: $rel (use /pstatus instead)"
+    case "$rel" in
+      .github/workflows/kit-check.yml) act "remove retired: $rel (superseded by kit-sync.yml)" ;;
+      .markdownlint.jsonc)             act "remove retired: $rel (superseded by .markdownlint-cli2.jsonc)" ;;
+      *)                               act "remove retired: $rel (use /pstatus instead)" ;;
+    esac
     if [ "$DRY" -eq 0 ]; then
       if git -C "$TARGET" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
         git -C "$TARGET" rm -q "$rel"
@@ -677,6 +686,7 @@ echo
 
 echo "GitHub workflows (create-if-absent — keeps your customizations):"
 apply_group workflows
+retire_deprecated
 echo
 
 echo "GitHub templates (create-if-absent — keeps your customizations):"

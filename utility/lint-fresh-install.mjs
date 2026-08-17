@@ -120,6 +120,21 @@ try {
     /WARNING/.test(dry.stderr) && dry.stderr.includes(managedHeading),
     dry.stderr
   );
+  // #54: the repo must be able to sync itself, so the workflow that does it has
+  // to arrive — and it has to be valid YAML, which nothing else here checks.
+  const syncWorkflow = join(repo, '.github/workflows/kit-sync.yml');
+  check('the self-sync workflow is seeded', existsSync(syncWorkflow));
+  check(
+    'kit-sync.yml has no cron — it must not fire while nobody is looking',
+    !/^\s*schedule:/m.test(readFileSync(syncWorkflow, 'utf8')),
+    'a schedule reappeared in the template'
+  );
+  check(
+    'kit-sync.yml asks for no secret beyond GITHUB_TOKEN',
+    !/secrets\.(?!GITHUB_TOKEN)/.test(readFileSync(syncWorkflow, 'utf8')),
+    'the workflow now requires a PAT'
+  );
+
   // #53: the manifest is the record of what landed. A stamp says what a file
   // claims to be; a hash says what it is.
   const manifest = JSON.parse(readFileSync(join(repo, '.agent-kit.json'), 'utf8'));

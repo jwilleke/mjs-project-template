@@ -223,6 +223,32 @@ held back because shipping it would clobber forks that built their own release t
 That was a real objection to `overwrite`, not to distribution, so it ships as
 `overwrite-or-suffix`: repos that own the name keep it and receive `semver-kit.md` alongside.
 
+## How a repo keeps itself up to date
+
+`install-kit.sh` seeds `.github/workflows/kit-sync.yml`. On a push to the default branch, or on
+demand, the repo checks itself out, checks the kit out beside it, and — if it is behind — __runs the
+installer and opens a pull request__ labelled `P2`. Merging it is the only manual step.
+
+It replaces `kit-check.yml`, which filed an issue asking someone to go and run the installer. That
+issue existed because nothing could act; once the workflow acts, the issue is noise. `install-kit.sh`
+retires the old workflow, but only once the new one is in place, so a repo is never left with
+neither.
+
+Three deliberate choices:
+
+- __No cron.__ A schedule fires while nobody is looking, and GitHub disables scheduled workflows
+  after 60 days of repository inactivity — so it stops firing in exactly the dormant repos that drift
+  furthest. Pushing to the repo is the trigger, which is when someone is already there.
+- __No PAT and no GitHub App.__ The built-in `GITHUB_TOKEN` is scoped to the repo and expires with
+  the job.
+- __The sync validates itself in-job.__ GitHub does not start workflow runs for events raised by
+  `GITHUB_TOKEN`, so a PR it opens gets no checks. Rather than wait for checks that will never
+  arrive, the job runs the kit's own markdown lint against the change it just made and refuses to
+  open the PR if it fails. An issue is filed only in that case.
+
+The one thing `GITHUB_TOKEN` cannot do is modify a file under `.github/workflows/`. Seeded workflows
+are `create-if-absent`, so this only bites when a repo is missing one — the push then fails loudly.
+
 ## How a repo learns it is behind
 
 `bin/kit.mjs check` compares a repo's `KIT:START` marker against the kit's current version and
