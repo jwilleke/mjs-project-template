@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 
 import {
   collisionBody,
+  compareKitTags,
   compareKitVersions,
   DEFAULT_ISSUE_LABELS,
   formatReport,
@@ -14,6 +15,7 @@ import {
   issueBody,
   parseKitVersion,
   parseManifest,
+  parseManifestFile,
   parseMarkerVersion,
   reportCollisions,
   reportDrift,
@@ -57,6 +59,40 @@ describe('compareKitVersions', () => {
   it('returns null when either side is unparseable', () => {
     expect(compareKitVersions('nonsense', 'v1.0.0')).toBeNull();
     expect(compareKitVersions('v1.0.0', 'nonsense')).toBeNull();
+  });
+});
+
+describe('compareKitTags', () => {
+  // `git describe` moves on every kit commit, so under the old comparison every
+  // consumer went behind within minutes of any push — a README typo included.
+  it('ignores commits since the tag', () => {
+    expect(compareKitTags('v1.6.0', 'v1.6.0-40-gabc1234')).toBe(0);
+  });
+
+  it('still reports a release behind', () => {
+    expect(compareKitTags('v1.5.0', 'v1.6.0-0-gabc1234')).toBe(-1);
+  });
+
+  it('still reports ahead', () => {
+    expect(compareKitTags('v1.7.0', 'v1.6.0-2-gabc1234')).toBe(1);
+  });
+
+  it('returns null when either side is unparseable', () => {
+    expect(compareKitTags('3aa1bb4', 'v1.6.0')).toBeNull();
+  });
+});
+
+describe('parseManifestFile', () => {
+  it('reads a manifest', () => {
+    expect(parseManifestFile('{"schema":1,"installed":"v1.6.0"}').installed).toBe('v1.6.0');
+  });
+
+  it('rejects one with no installed version, rather than half-trusting it', () => {
+    expect(parseManifestFile('{"schema":1}')).toBeNull();
+  });
+
+  it('rejects malformed JSON instead of throwing', () => {
+    expect(parseManifestFile('{oops')).toBeNull();
   });
 });
 

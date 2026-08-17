@@ -120,6 +120,23 @@ try {
     /WARNING/.test(dry.stderr) && dry.stderr.includes(managedHeading),
     dry.stderr
   );
+  // #53: the manifest is the record of what landed. A stamp says what a file
+  // claims to be; a hash says what it is.
+  const manifest = JSON.parse(readFileSync(join(repo, '.agent-kit.json'), 'utf8'));
+  check('a manifest is written', manifest.schema === 1 && Boolean(manifest.installed));
+  check(
+    'the manifest records a tag, not a git describe ref',
+    /^v\d+\.\d+\.\d+$/.test(manifest.installed),
+    manifest.installed
+  );
+  check('the manifest hashes every managed file it installed', Object.keys(manifest.files).length > 5);
+
+  const target = Object.keys(manifest.files)[0];
+  appendFileSync(join(repo, target), '\nlocal edit\n');
+  const tampered = run(process.execPath, [join(root, 'bin/kit.mjs'), 'check', repo, '--kit', root]);
+  check('a locally edited managed file is reported', /modified: /.test(tampered.stdout), tampered.stdout);
+  run('git', ['checkout', '--', target]);
+
   // #58: a licence is text the repo holds, not text it wrote. Renumbering a GPL
   // copy's sections to satisfy MD029 edits a legal instrument.
   writeFileSync(join(repo, 'LICENSE.md'), '# License\n\n14. a\n15. b\n\nSee `show w\' for details.\n');
