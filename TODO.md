@@ -12,7 +12,7 @@ last_updated: "2026-08-17"
 
 ## 🟠 P1
 
-*None.*
+- [#61](https://github.com/jwilleke/mjs-project-template/issues/61) — [BUG] Kit Sync goes red on every push where Actions cannot open PRs, and git add -A swallows its own .kit-sync checkout
 
 ## 🟡 P2
 
