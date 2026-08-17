@@ -96,6 +96,37 @@ Rules for the log entry:
   - `npm audit` still reports 2 high findings not raised as Dependabot alerts — brace-expansion (GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895) and nanoid (GHSA-2v37-7h3g-55p8). Both say `fixAvailable: true`; not investigated this session, no tracking issue yet.
   - `install-kit.sh` does not sync `.claude/commands/semver.md` or `utility/set-version.mjs`, so #40's fix does not reach consumers. Deliberate — adding `semver.md` to the overwrite list would clobber forks with their own bump tooling (ngdpbase).
 
+## 2026-07-27-02
+
+- Agent: Claude
+- Subject: First PR-based kit sync across the fleet (v1.0.0-43-g7cf371c)
+- Current Issue: none
+- Work Done:
+  - Seven PRs opened with `install-kit.sh --pr`, the first use of PR mode against real remotes. All
+    seven were `MERGEABLE`. `ngdpbase` ran first as a watched pilot before the rest followed
+  - Two repos not synced: `jwilleke` (excluded by the operator) and `mj-infra-flux`, whose working
+    tree held two untracked files — `--pr` refuses a dirty tree, correctly, since it stages with
+    `git add -A` and would otherwise sweep unrelated files into the sync commit
+- Notes:
+  - `markdown-lint` failed on five of the seven PRs, and none of it was caused by the sync. The
+    failures were pre-existing violations in each repo's own documentation, in files no sync PR
+    touches:
+
+    | repo | total lint errors | errors in synced files |
+    | --- | --- | --- |
+    | grow-tent | 6 | 0 |
+    | grow-nutrient-tank | 276 | 0 |
+    | mjs-ha | 202 | 0 |
+    | deby | 61 | 0 |
+    | garage-car-positioning | 99 | 0 |
+
+  - `markdown-lint.yml` runs only on pull requests. These repos had not opened a PR since the
+    workflow was seeded, so the violations were never surfaced; the sync PR was simply the first
+    thing to run it. Expect this on any repo's first PR-based sync — triage it as that repo's own
+    backlog, not as sync breakage. Errors under `.claude/commands/` in `deby` and
+    `garage-car-positioning` are in repo-specific commands (`check-k8s.md`, `check-net.md`,
+    `update-docs.md`) that the kit does not ship
+
 ## 2026-07-27-01
 
 - Agent: Claude

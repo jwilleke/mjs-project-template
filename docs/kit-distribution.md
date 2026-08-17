@@ -123,12 +123,23 @@ It is recorded in two places in every downstream repo:
 - the `KIT:START` marker in `AGENTS.md` — this is the **authoritative** record;
 - `kit_version` in the `AGENTS.md` frontmatter, written by `stamp_kit_version`.
 
-`docs/sync-log.md` tracks the repo-level picture but is maintained by hand and drifts. Verify
-against the marker before relying on it:
+There is deliberately **no hand-maintained table of who is on which version.** `docs/sync-log.md`
+was that table, and it was retired: it declared itself non-authoritative in its own first paragraph,
+and by the time it was removed it recorded a repo as synced that had never been installed, listed
+seven sync PRs as open when four had merged and one was closed, and had no rows for three consumers
+at all. A cache that must be checked against the truth before use is not worth keeping.
+
+Ask the repos instead:
 
 ```bash
-grep -o "KIT:START [^ ]*" /path/to/repo/AGENTS.md
+jq -r '.repos[]' downstream-repos.json | while read -r repo; do
+  node bin/kit.mjs check "/Volumes/hd2A/workspaces/github/${repo#*/}" --kit . --json
+done
 ```
+
+Narrative about a sync — what broke, what was skipped and why — is session history and belongs in
+`docs/project_log.md`, not in a state file. Two files recording the same events drift apart, and the
+drift is silent.
 
 The set of consumers is `downstream-repos.json`:
 
@@ -158,7 +169,7 @@ each for its own reason:
 - `install-kit.sh` itself — the installer lives with the kit, so a consumer cannot self-update. This
   is the push model working as designed, not an oversight, but it does mean an operator with a
   stale clone pushes a stale kit.
-- `templates/`, `downstream-repos.json`, `docs/sync-log.md`, `kit-files.tsv` — kit-authoring
+- `templates/`, `downstream-repos.json`, `kit-files.tsv` — kit-authoring
   material, meaningless downstream.
 - `bin/kit.mjs` — the checker runs *from* a kit checkout, not from a copy in the consumer. The
   seeded workflow checks the kit out beside the repo, so the consumer always runs the current
@@ -326,7 +337,6 @@ stored as the `NPM_TOKEN` repo secret.
   `fairways-gen2-website` can depend on the package and get PRs; the other seven have no
   `package.json` and stay on the tracking issue. That asymmetry is the profile split still to be
   decided.
-- **`docs/sync-log.md` is hand-written** and drifts from the markers it summarises.
 - **Partial command coverage** — four of the six `.claude/commands/*.md` files sync; `/semver` and
   `/update-agents` do not, so downstream agents follow different rules depending on the command.
 
@@ -384,6 +394,5 @@ What remains open:
 ## Related
 
 - `README.md` — how to run the installer, flags, and modes
-- `docs/sync-log.md` — per-repo sync state (hint; the `KIT:START` marker is the truth)
 - `downstream-repos.json` — the consumer list
 - `AGENTS.md` — when a kit sync must go through a PR
