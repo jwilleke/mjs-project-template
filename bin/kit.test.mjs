@@ -9,6 +9,7 @@ import {
   compareKitVersions,
   DEFAULT_ISSUE_LABELS,
   formatReport,
+  formatStaleness,
   issueBody,
   parseKitVersion,
   parseManifest,
@@ -174,6 +175,26 @@ describe('formatReport', () => {
 
     expect(report).toContain('Kit-managed files missing');
     expect(report).toContain('- .claude/commands/wrap.md');
+  });
+});
+
+describe('formatStaleness', () => {
+  // A local mjs-ha 122 commits behind origin produced a whole fleet report that
+  // was wrong, and nothing in the output hinted at it.
+  it('warns that the report describes disk, not the remote', () => {
+    const warning = formatStaleness({ upstream: 'origin/master', behind: 122 });
+
+    expect(warning).toContain('122 commits behind origin/master');
+    expect(warning).toContain('NOT what is on the remote');
+  });
+
+  it('gets the singular right', () => {
+    expect(formatStaleness({ upstream: 'origin/main', behind: 1 })).toContain('1 commit behind');
+  });
+
+  it('says nothing when the checkout is current or has no upstream', () => {
+    expect(formatStaleness({ upstream: 'origin/master', behind: 0 })).toBeNull();
+    expect(formatStaleness({ upstream: null, behind: 0 })).toBeNull();
   });
 });
 

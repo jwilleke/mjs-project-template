@@ -15,7 +15,12 @@
 //     --label <name>    label to apply when the issue is CREATED (repeatable; default: P2, kit)
 //     --no-labels       create the issue with no labels
 //     --fail-on-drift   exit 1 when behind, for repos that want drift to gate CI
+//     --fetch           fetch the target's remote first, so the staleness warning is current
 //     --json            machine-readable output
+//
+// It reads the files ON DISK. Run against a clone nobody has pulled in weeks, it
+// describes that clone and not the repo — so it warns when the target's branch
+// trails its upstream. Never assume a local clone is current.
 //
 // Exit codes:
 //   0  the check ran and said its piece — INCLUDING when the repo is behind.
@@ -103,6 +108,26 @@ export function parseManifest(text) {
     .filter((row) => row.path);
 }
 
+/**
+ * The warning for a target whose working tree is behind its own remote.
+ *
+ * `check` reads files on disk. In CI that is a fresh checkout and the two are
+ * the same thing; run by hand against a clone someone has not pulled in weeks,
+ * it silently describes the wrong repo. A local `mjs-ha` 122 commits behind
+ * origin once produced a whole fleet report that was wrong, and the report gave
+ * no hint of it. Never assume a local clone is current — say so instead.
+ */
+export function formatStaleness({ upstream, behind }) {
+  if (!upstream || !behind) return null;
+
+  return [
+    `WARNING: this working copy is ${behind} commit${behind === 1 ? '' : 's'} behind ${upstream}.`,
+    '         The report below describes the files on disk, NOT what is on the remote.',
+    '         Pull first, or read the marker from the remote:',
+    '           gh api -H "Accept: application/vnd.github.raw" /repos/<owner>/<repo>/contents/AGENTS.md'
+  ].join('\n');
+}
+
 /** The human-readable report. Kept pure so its wording is testable. */
 export function formatReport({ status, local, kit, missing, target }) {
   const lines = [];
@@ -134,6 +159,36 @@ export function formatReport({ status, local, kit, missing, target }) {
 }
 
 // --- side-effecting bits -----------------------------------------------------
+
+/**
+ * How far the target's checked-out branch trails its upstream.
+ *
+ * Deliberately does not fetch — a checker should not mutate the repo it is
+ * inspecting. That means the answer is only as fresh as the last fetch, which
+ * is itself worth saying, so `--fetch` is offered for when it matters.
+ */
+function localPosition(targetDir, fetch = false) {
+  const git = (args) =>
+    execFileSync('git', ['-C', targetDir, ...args], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+
+  try {
+    const upstream = git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}']);
+    if (fetch) {
+      const remote = upstream.split('/')[0];
+      try {
+        git(['fetch', '--quiet', remote]);
+      } catch {
+        // Offline, or no permission. The counts below are then simply older.
+      }
+    }
+    return { upstream, behind: Number(git(['rev-list', '--count', `HEAD..${upstream}`])) || 0 };
+  } catch {
+    return { upstream: null, behind: 0 };   // no upstream, or not a git repo
+  }
+}
 
 function kitVersionFrom(kitDir) {
   try {
@@ -199,6 +254,7 @@ async function check(argv) {
   let json = false;
   let reportIssue = false;
   let failOnDrift = false;
+  let fetch = false;
   let labels = null;   // null = "not asked for", so the default set still applies
 
   for (let i = 0; i < argv.length; i++) {
@@ -208,6 +264,7 @@ async function check(argv) {
     else if (arg === '--json') json = true;
     else if (arg === '--report-issue') reportIssue = true;
     else if (arg === '--fail-on-drift') failOnDrift = true;
+    else if (arg === '--fetch') fetch = true;
     else if (arg === '--no-labels') labels = [];
     else if (arg === '--label') (labels ??= []).push(argv[++i]);
     else if (arg.startsWith('-')) {
@@ -258,13 +315,18 @@ async function check(argv) {
     else status = 'current';
   }
 
-  const result = { status, local, kit, missing, target, repo };
+  const position = localPosition(target, fetch);
+  const result = { status, local, kit, missing, target, repo, position };
 
   // `unknown` counts. It means the marker could not be parsed, so the repo
   // cannot be shown to be current — and a check that stays silent when it does
   // not know is worse than no check, because it reads as a pass.
   const behind =
     status === 'behind' || status === 'unmarked' || status === 'unknown' || missing.length > 0;
+
+  // Before the report, not after — a stale checkout invalidates everything below it.
+  const staleness = formatStaleness(position);
+  if (staleness && !json) console.error(staleness);
 
   console.log(json ? JSON.stringify(result, null, 2) : formatReport(result));
 
@@ -408,7 +470,7 @@ function usage() {
   console.error(
     'usage: kit.mjs check [target-dir] [--kit <dir>] [--repo <owner/name>]\n' +
       '                    [--report-issue] [--label <name>]... [--no-labels]\n' +
-      '                    [--fail-on-drift] [--json]'
+      '                    [--fail-on-drift] [--fetch] [--json]'
   );
   return 2;
 }

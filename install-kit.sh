@@ -528,11 +528,33 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
 
 # --- run --------------------------------------------------------------------
 
+warn_target_behind_remote() {  # never assume the target checkout is current
+  # --pr branches from origin/<default> and is unaffected. Plain mode writes
+  # into whatever is on disk, so a stale clone gets a sync applied on top of an
+  # old tree and committed as though it were current. A local mjs-ha 122 commits
+  # behind origin is what prompted this.
+  [ "$PR" -eq 1 ] && return 0
+  git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1 || return 0
+
+  local upstream behind
+  upstream="$(git -C "$TARGET" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
+  [ -n "$upstream" ] || return 0
+  behind="$(git -C "$TARGET" rev-list --count "HEAD..$upstream" 2>/dev/null || echo 0)"
+  [ "$behind" -gt 0 ] 2>/dev/null || return 0
+
+  echo "  WARNING: this checkout is $behind commit(s) behind $upstream." >&2
+  echo "           The kit would be applied on top of a stale tree and committed as if current." >&2
+  echo "           Pull first, or use --pr, which branches from the remote instead." >&2
+  echo >&2
+}
+
 echo "Installing agent kit"
 echo "  from: $SRC"
 echo "  into: $TARGET"
 [ "$DRY" -eq 1 ] && echo "  MODE: dry-run — no changes will be written"
 echo
+
+warn_target_behind_remote
 
 if [ "$PR" -eq 1 ]; then
   pr_preflight
