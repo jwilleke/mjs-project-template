@@ -113,6 +113,17 @@ try {
     /WARNING/.test(colliding.stderr) && colliding.stderr.includes(managedHeading),
     colliding.stderr
   );
+
+  // The warning has to fire BEFORE anything is written, or it only tells you
+  // about a file you have already changed. It compares the incoming boilerplate
+  // against the target, so --dry-run sees exactly what a real run would.
+  const dry = run(join(root, 'install-kit.sh'), ['--dry-run', repo]);
+
+  check(
+    'the collision warning fires in --dry-run too',
+    /WARNING/.test(dry.stderr) && dry.stderr.includes(managedHeading),
+    dry.stderr
+  );
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }
