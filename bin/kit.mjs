@@ -41,9 +41,13 @@ const KIT_REPO = 'jwilleke/mjs-project-template';
 // The kit's own /pstatus labels any issue with no placement label `needs-triage`,
 // so an unlabelled drift issue would arrive in every consumer already flagged as
 // awaiting a human decision. It is not: it is a known, recurring chore of a known
-// shape. `P2` is the kit's own grade for "real work, not urgent, nothing broken";
-// `kit` lets a repo filter the chore out of a ranked backlog entirely.
-export const DEFAULT_ISSUE_LABELS = ['P2', 'kit'];
+// shape. `P2` is the kit's own grade for "real work, not urgent, nothing broken".
+//
+// Deliberately just the grade. A dedicated `kit` label was tried and dropped: the
+// marker below guarantees ONE drift issue per repo forever, and a label exists to
+// filter a class, not a set of size one. It would also have to be defined in every
+// consumer before it did anything, which is a chore to remove a chore.
+export const DEFAULT_ISSUE_LABELS = ['P2'];
 
 // --- pure helpers (unit-tested) ---------------------------------------------
 

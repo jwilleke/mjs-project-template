@@ -191,12 +191,21 @@ So the exit codes read:
 The last row is the one that matters: once the issue is the only notification, failing to open it is
 the real breakage, so a missing `GITHUB_TOKEN` on a repo that IS behind exits 2 rather than shrugging.
 
-The issue is created with the labels `P2` and `kit`, because the kit's own `/pstatus` labels any
-unplaced issue `needs-triage` — an unlabelled drift issue would arrive in every consumer already
-flagged as awaiting a decision nobody needs to make. Labels are set on **create only**: re-asserting
-them on update would overrule a human who deliberately regraded the issue `deferred` during a freeze.
-If a repo has never run `utility/sync-labels.sh`, GitHub rejects the whole create over the unknown
-label, so the checker retries unlabelled — the notification outranks the grade.
+The issue is created graded `P2`, because the kit's own `/pstatus` labels any unplaced issue
+`needs-triage` — an unlabelled drift issue would arrive in every consumer already flagged as
+awaiting a decision nobody needs to make. Labels are set on **create only**: re-asserting them on
+update would overrule a human who deliberately regraded the issue `deferred` during a freeze. If a
+repo has never run `utility/sync-labels.sh`, GitHub rejects the whole create over the unknown label,
+so the checker retries unlabelled — the notification outranks the grade.
+
+### Why there is no `kit` label
+
+There was one, briefly, so a repo could filter the chore out of a ranked backlog. It does not earn
+its place. The `kit-check:drift` marker guarantees **one** drift issue per repo forever, and a label
+exists to filter a class, not a set of size one — and that one issue is already identifiable by its
+`[kit]` title prefix and by the marker itself. A new label is also defined in no repo until someone
+sweeps `utility/sync-labels.sh --all`, so its first effect would have been a chore added in order to
+remove a chore. `--label kit` still works for anyone who wants it.
 
 Both behaviours live in `bin/kit.mjs`, and the seeded workflow runs the checker from a **fresh kit
 checkout**. Consumers pick this up on their next scheduled run with no re-sync.

@@ -123,7 +123,7 @@ a single tracking issue when the repo is behind the kit. It needs nothing from t
 workflow file — Actions runners already ship Node, so it works in the C++, Go, Python and Shell
 consumers as well as the Node ones.
 
-The workflow is **green when the repo is behind**, and the issue it files is graded `P2` + `kit`.
+The workflow is **green when the repo is behind**, and the issue it files is graded `P2`.
 Drift is the expected steady state, so a red X would be permanent, weekly, and on a repo where
 nothing is broken; red is reserved for the check failing to run at all.
 
