@@ -66,7 +66,7 @@ describe('lintTodo', () => {
   });
 
   it('notices a missing band', () => {
-    const short = todo().replace(`## ⏸ Deferred\n\n*None.*\n`, '');
+    const short = todo().replace('## ⏸ Deferred\n\n*None.*\n', '');
 
     expect(lintTodo(short).join('\n')).toContain('missing band');
   });
