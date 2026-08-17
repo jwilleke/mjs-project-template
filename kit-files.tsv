@@ -34,7 +34,7 @@ overwrite	.claude/commands/session-commit.md	-	canonical
 overwrite	.claude/commands/context.md	-	canonical
 overwrite	.claude/commands/wrap.md	-	canonical
 overwrite	utility/sync-labels.sh	-	canonical
-overwrite	.markdownlint.jsonc	-	canonical
+overwrite	.markdownlint-cli2.jsonc	-	canonical
 
 managed-block	AGENTS.md	agents-boilerplate.md	docs
 create-if-absent-stamped	TODO.md	TODO.md.tmpl	docs

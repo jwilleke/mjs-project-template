@@ -24,7 +24,7 @@
 # the checker cannot disagree about what the kit owns.
 #
 # Behavior per file (kit-files.tsv column 1):
-#   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint.jsonc)
+#   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint-cli2.jsonc)
 #   seed             copied only when absent; source is the same path in the kit
 #   create-if-absent copied only when absent; source is templates/<template>
 #   managed-block    AGENTS.md boilerplate between <!-- KIT:START/END --> markers
@@ -34,7 +34,7 @@
 #   unignore         .gitignore — narrow a blanket `.claude/` ignore (keeps settings.local.json ignored)
 #   migrate          docs/project_log.md → private/project_log.md (once)
 #   supersede        remove .markdownlint.json in favor of .markdownlint.jsonc
-#   retire           delete commands the kit no longer ships
+#   retire           delete files the kit no longer ships (old commands, .markdownlint.jsonc)
 #
 # Requires: bash, git, awk. (Run utility/sync-labels.sh separately for GitHub labels.)
 #           --pr additionally requires the `gh` CLI, authenticated.
@@ -303,9 +303,12 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
   fi
 }
 
-retire_deprecated() {      # remove retired command files from downstream repos
+retire_deprecated() {      # remove files the kit no longer ships
+  # .markdownlint.jsonc is superseded by .markdownlint-cli2.jsonc, which holds
+  # the rules AND the globs AND the ignores. Leaving both would put two rulebooks
+  # in the repo, and markdownlint-cli2 reads both — the exact split this replaced.
   local rel old
-  for rel in ".claude/commands/check-todos.md" ".claude/commands/status.md"; do
+  for rel in ".claude/commands/check-todos.md" ".claude/commands/status.md" ".markdownlint.jsonc"; do
     old="$TARGET/$rel"
     [ -f "$old" ] || continue
     act "remove retired: $rel (use /pstatus instead)"

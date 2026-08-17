@@ -63,11 +63,7 @@ try {
 
   // The kit's own binary by path: the temp repo has no node_modules, so `npx`
   // there resolves nothing and fails in a way that reads as a lint failure.
-  const lint = run(join(root, 'node_modules', '.bin', 'markdownlint'), [
-    '**/*.md',
-    '--config',
-    join(root, '.markdownlint.jsonc')
-  ]);
+  const lint = run(join(root, 'node_modules', '.bin', 'markdownlint-cli2'), []);
   check('every installed markdown file lints clean', lint.status === 0, lint.stdout + lint.stderr);
 
   check('private/project_log.md was created', existsSync(join(repo, 'private/project_log.md')));

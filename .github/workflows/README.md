@@ -66,8 +66,8 @@ For deployment workflows, configure GitHub repository secrets. See [SECURITY.md]
 
 Quick setup:
 
-1. Go to **Settings → Secrets and variables → Actions**
-2. Click **New repository secret**
+1. Go to __Settings → Secrets and variables → Actions__
+2. Click __New repository secret__
 3. Add secrets like:
    - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
    - `HEROKU_API_KEY`
@@ -89,8 +89,8 @@ Quick setup:
 
 Protect your `master` branch:
 
-1. Go to **Settings → Branches**
-2. Click **Add rule** for `master` branch
+1. Go to __Settings → Branches__
+2. Click __Add rule__ for `master` branch
 3. Require:
    - ✅ Pull request reviews before merging
    - ✅ Status checks to pass before merging (select CI workflow)
@@ -98,7 +98,7 @@ Protect your `master` branch:
 
 ### Monitoring
 
-- Check **Actions** tab to view workflow runs
+- Check __Actions__ tab to view workflow runs
 - Failed workflows will notify contributors
 - View logs for detailed error information
 
@@ -176,8 +176,8 @@ Example for `deploy.yml`:
 
 Clear cache:
 
-1. Go to **Settings → Actions → Runners**
-2. Click **Remove** on cached items
+1. Go to __Settings → Actions → Runners__
+2. Click __Remove__ on cached items
 3. Re-run workflow
 
 ### npm audit failing

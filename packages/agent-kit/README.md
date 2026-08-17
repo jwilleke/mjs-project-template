@@ -28,7 +28,7 @@ Exits `0` even when the repo is behind — drift is the expected steady state, s
 weekly cron permanently red on a repo where nothing is broken. `2` means the check could not run.
 Pass `--fail-on-drift` to opt in to `1` on drift.
 
-In CI, `--report-issue` opens **one** tracking issue and updates it in place on later runs:
+In CI, `--report-issue` opens __one__ tracking issue and updates it in place on later runs:
 
 ```yaml
 - run: npx @jwilleke/agent-kit check . --report-issue

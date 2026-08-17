@@ -12,9 +12,9 @@ Cut a new semver release: bump `package.json`, create an annotated git tag, push
 
 If the user did not specify a bump type, ask them which one before proceeding.
 
-**Standing authorization (see AGENTS.md → Release Policy):** cut the release on any `minor` or `major` bump, or whenever the maintainer asks — without prompting for confirmation. Do not ask "should I tag/release?" for these. The only reasons to stop are the hard safety gates below (dirty tree, behind remote) or nothing to release (zero commits since the last tag). Patch-only chains may be deferred or consolidated.
+__Standing authorization (see AGENTS.md → Release Policy):__ cut the release on any `minor` or `major` bump, or whenever the maintainer asks — without prompting for confirmation. Do not ask "should I tag/release?" for these. The only reasons to stop are the hard safety gates below (dirty tree, behind remote) or nothing to release (zero commits since the last tag). Patch-only chains may be deferred or consolidated.
 
-**Versioning model:** between releases the live version is `git describe` output — `vX.Y.Z-N-g<sha>` (last tag, commits since it, abbreviated SHA). A formal cut graduates that to a clean annotated `vX.Y.Z` tag. A large `N` ("80 commits and no release") is expected, not a defect.
+__Versioning model:__ between releases the live version is `git describe` output — `vX.Y.Z-N-g<sha>` (last tag, commits since it, abbreviated SHA). A formal cut graduates that to a clean annotated `vX.Y.Z` tag. A large `N` ("80 commits and no release") is expected, not a defect.
 
 ## Steps
 
@@ -30,7 +30,7 @@ Run in parallel:
 
 - Read `package.json` `version` field.
 - Compute the next version from the requested bump (`patch` increments the third number, `minor` increments the second and zeros the third, `major` increments the first and zeros the rest).
-- Show the user: `current → next`. Then proceed without asking for confirmation — `minor` and `major` bumps carry standing authorization, and `patch` does too once requested. The **only** stop condition here is no commits since the last tag (nothing to release), handled in Step 3.
+- Show the user: `current → next`. Then proceed without asking for confirmation — `minor` and `major` bumps carry standing authorization, and `patch` does too once requested. The __only__ stop condition here is no commits since the last tag (nothing to release), handled in Step 3.
 
 ### Step 3: Summarize what's in the release
 
@@ -39,22 +39,22 @@ Run in parallel:
 
 ### Step 4: Bump the version
 
-- Run `node utility/set-version.mjs <next>` — writes the new version into `package.json` **and**
+- Run `node utility/set-version.mjs <next>` — writes the new version into `package.json` __and__
   `package-lock.json`, and nothing else.
 - Confirm the diff is version-only: `git diff --stat` should show 1 changed line in `package.json`
   and 2 in `package-lock.json`.
 - Stage both files.
 
-**The lockfile requirement, stated rather than assumed.** `package-lock.json` carries the project
-version in **two** places — the top-level `version` and `packages[""].version` — and npm rewrites
+__The lockfile requirement, stated rather than assumed.__ `package-lock.json` carries the project
+version in __two__ places — the top-level `version` and `packages[""].version` — and npm rewrites
 both on the next `npm install`. Bump only `package.json` and every release ships a lockfile one
 version behind, so every checkout shows a two-line lockfile diff after any build. Those get
 discarded by hand at each release, which trains a reflexive `git checkout -- package-lock.json`
-that will eventually throw away a *real* lockfile change. **If you replace this step with your own
-bump tool, that tool must write both fields.** This is how the step gets silently lost in a fork:
+that will eventually throw away a *real* lockfile change. __If you replace this step with your own
+bump tool, that tool must write both fields.__ This is how the step gets silently lost in a fork:
 it reads as boilerplate attached to the manual edit, so it leaves with it.
 
-**Why not `npm install --package-lock-only`.** That re-resolves the dependency tree against the
+__Why not `npm install --package-lock-only`.__ That re-resolves the dependency tree against the
 registry and can bump transitive resolutions that satisfy existing ranges — unrelated to the
 release, and badly timed: the test gate in Step 1–3 already passed against the *old* resolution, so
 the lockfile that ships is not the one that was tested. Usually a no-op; when it is not, the change

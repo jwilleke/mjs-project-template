@@ -166,10 +166,10 @@ See [project_log.md](docs/project_log.md) for the required format, historical wo
 
 ### Process Constraints
 
-- **Commit directly to master. This is the default.** There is one maintainer and no reviewers, so
+- __Commit directly to master. This is the default.__ There is one maintainer and no reviewers, so
   a self-opened, self-merged PR reviews nothing — it just splits the same explanation across a
   commit message and a PR body. Put the reasoning in the commit message and push.
-- **Open a PR only when someone other than you will actually look at it before it lands.** In
+- __Open a PR only when someone other than you will actually look at it before it lands.__ In
   practice that is two cases:
   - A downstream kit sync (`install-kit.sh --pr`) — it rewrites a repo you were not working in, so
     it needs an announcement and one revert point.
@@ -237,10 +237,10 @@ npm run typecheck        # TypeScript type checking without emit
 
 ## Release Policy
 
-- **Standing authorization to cut releases.** Cut a release on ANY `minor` or `major` version bump, or whenever the maintainer says to — without asking for confirmation. This is durable authorization; do not re-prompt "should I tag/release?" for these cases. Use the `/semver` skill.
-- **Patch bumps may be deferred or consolidated.** A chain of patch-only commits does not have to ship immediately; it can be rolled into the next minor/major or cut on request.
-- **Live version between releases is `git describe`.** Between formal cuts, the working version is `vX.Y.Z-N-g<sha>` — the last tag, the number of commits since it (`N`), and the abbreviated commit SHA. This is expected and healthy: "we have 80 commits and no release" reads as *80 commits past the last tag*, not as something broken.
-- **A formal cut graduates `git describe` to a clean tag.** Cutting a release replaces the `-N-g<sha>` suffix with a clean annotated `vX.Y.Z` tag at that commit. After the cut, `git describe` reports the clean tag again (until the next commit).
+- __Standing authorization to cut releases.__ Cut a release on ANY `minor` or `major` version bump, or whenever the maintainer says to — without asking for confirmation. This is durable authorization; do not re-prompt "should I tag/release?" for these cases. Use the `/semver` skill.
+- __Patch bumps may be deferred or consolidated.__ A chain of patch-only commits does not have to ship immediately; it can be rolled into the next minor/major or cut on request.
+- __Live version between releases is `git describe`.__ Between formal cuts, the working version is `vX.Y.Z-N-g<sha>` — the last tag, the number of commits since it (`N`), and the abbreviated commit SHA. This is expected and healthy: "we have 80 commits and no release" reads as *80 commits past the last tag*, not as something broken.
+- __A formal cut graduates `git describe` to a clean tag.__ Cutting a release replaces the `-N-g<sha>` suffix with a clean annotated `vX.Y.Z` tag at that commit. After the cut, `git describe` reports the clean tag again (until the next commit).
 
 ## Session Workflow
 
@@ -249,7 +249,7 @@ npm run typecheck        # TypeScript type checking without emit
 - Work on tasks following CODE_STANDARDS.md
 - Update `docs/project_log.md` with session log entry
 - Update this file's `last_updated` field if making significant changes
-- **Commits — always use the `/session-commit` skill.** Never run a bare `git commit` directly. `/session-commit` enforces the session log update, conventional commit format, and co-author trailer.
+- __Commits — always use the `/session-commit` skill.__ Never run a bare `git commit` directly. `/session-commit` enforces the session log update, conventional commit format, and co-author trailer.
 
 ## Notes & Context
 

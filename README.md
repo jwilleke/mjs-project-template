@@ -72,7 +72,7 @@ npm run typecheck        # TypeScript type checking without emit
 - `eslint.config.mjs` - ESLint rules (flat config)
 - `vitest.config.ts` - Test runner configuration
 - `.prettierrc.json` - Prettier formatting
-- `.markdownlint.json` - Markdown linting rules
+- `.markdownlint-cli2.jsonc` - Markdown rules, globs and ignores (one file)
 - `tsconfig.json` - TypeScript settings (ESM)
 - `tsconfig.build.json` - Build-only config
 - `.editorconfig` - Editor settings
@@ -89,8 +89,8 @@ npm run typecheck        # TypeScript type checking without emit
 
 ## Using This Template
 
-This repo serves two missions: a **Node/TypeScript starter** and the canonical home of the
-**agent kit** (commands, labels, markdown rules, GitHub templates) that any repo — Node or not —
+This repo serves two missions: a __Node/TypeScript starter__ and the canonical home of the
+__agent kit__ (commands, labels, markdown rules, GitHub templates) that any repo — Node or not —
 can install via `install-kit.sh`.
 
 ### For New Projects (Node starter)
@@ -123,7 +123,7 @@ a single tracking issue when the repo is behind the kit. It needs nothing from t
 workflow file — Actions runners already ship Node, so it works in the C++, Go, Python and Shell
 consumers as well as the Node ones.
 
-The workflow is **green when the repo is behind**, and the issue it files is graded `P2`.
+The workflow is __green when the repo is behind__, and the issue it files is graded `P2`.
 Drift is the expected steady state, so a red X would be permanent, weekly, and on a repo where
 nothing is broken; red is reserved for the check failing to run at all.
 

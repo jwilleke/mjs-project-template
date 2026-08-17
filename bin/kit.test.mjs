@@ -84,11 +84,11 @@ describe('parseMarkerVersion', () => {
 describe('parseManifest', () => {
   it('parses behaviour, path, template and group', () => {
     const rows = parseManifest(
-      ['# a comment', '', 'overwrite\t.markdownlint.jsonc\t-\tcanonical', 'create-if-absent-stamped\tTODO.md\tTODO.md.tmpl\tdocs'].join('\n')
+      ['# a comment', '', 'overwrite\t.markdownlint-cli2.jsonc\t-\tcanonical', 'create-if-absent-stamped\tTODO.md\tTODO.md.tmpl\tdocs'].join('\n')
     );
 
     expect(rows).toEqual([
-      { behavior: 'overwrite', path: '.markdownlint.jsonc', template: null, group: 'canonical' },
+      { behavior: 'overwrite', path: '.markdownlint-cli2.jsonc', template: null, group: 'canonical' },
       { behavior: 'create-if-absent-stamped', path: 'TODO.md', template: 'TODO.md.tmpl', group: 'docs' }
     ]);
   });

@@ -12,11 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No globs here on purpose. What is linted, and what is ignored, is
+      # declared once in .markdownlint-cli2.jsonc — passing them here would put
+      # a second list in a second file, which is how CHANGELOG.md came to be
+      # exempt in CI and linted locally.
       - name: Lint markdown
         uses: DavidAnson/markdownlint-cli2-action@v19
-        with:
-          globs: |
-            **/*.md
-            !node_modules/**
-            !dist/**
-            !CHANGELOG.md
