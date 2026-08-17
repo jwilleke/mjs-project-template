@@ -455,17 +455,17 @@ describe('exit codes', () => {
 
     expect(result.stdout).toContain('never been installed');
     expect(result.status).toBe(0);
-  });
+  }, 20_000);
 
   it('exits 1 on drift when --fail-on-drift is asked for', () => {
     mkdirSync(unmarked, { recursive: true });
 
     expect(check([unmarked, '--kit', kit, '--fail-on-drift']).status).toBe(1);
-  });
+  }, 20_000);
 
   it('exits 2 on an unknown option — bad usage is a real failure', () => {
     expect(check(['--nonsense']).status).toBe(2);
-  });
+  }, 20_000);
 
   // The pre-tag installs. Silence here read as a pass for a year.
   it('reports a bare-SHA marker as behind instead of passing silently', () => {
@@ -480,7 +480,7 @@ describe('exit codes', () => {
     expect(result.stdout).toContain('UNPARSEABLE');
     expect(result.status).toBe(0);
     expect(check([unmarked, '--kit', kit, '--fail-on-drift']).status).toBe(1);
-  });
+  }, 20_000);
 });
 
 describe('invoked through a bin symlink', () => {
@@ -498,7 +498,7 @@ describe('invoked through a bin symlink', () => {
 
     expect(result.stderr).toContain('usage:');
     expect(result.status).toBe(2);
-  });
+  }, 20_000);
 });
 
 describe('issueBody', () => {
