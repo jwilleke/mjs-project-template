@@ -179,6 +179,15 @@ try {
     readFileSync(syncWorkflow, 'utf8').slice(0, 60)
   );
 
+  // GITHUB_TOKEN may not push a workflow file, so the self-sync must not try:
+  // the push is rejected outright and takes the whole sync with it. v1.10.0
+  // promoted kit-sync.yml to overwrite-template and hit exactly that.
+  check(
+    'kit-sync.yml excludes .github/workflows from its own commit',
+    /git add -A -- ':!\.kit-sync' ':!\.github\/workflows'/.test(readFileSync(syncWorkflow, 'utf8')),
+    'the self-sync would try to push a workflow file'
+  );
+
   // #53: the manifest is the record of what landed. A stamp says what a file
   // claims to be; a hash says what it is.
   const manifest = JSON.parse(readFileSync(join(repo, '.agent-kit.json'), 'utf8'));
