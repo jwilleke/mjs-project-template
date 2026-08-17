@@ -11,19 +11,22 @@
 #     ./install-kit.sh --pr "/Volumes/hd2A/workspaces/github/${repo#*/}"
 #   done
 #
-# Default branch varies (grow-tent and yourphr are `main`, the rest `master`).
-# Do not assume it — install-kit.sh --pr detects it per repo.
+# Default branch varies (geohazardwatch, grow-tent, yourphr and yourphr-ts-spike are `main`,
+# the rest `master`). Do not assume it — install-kit.sh --pr detects it per repo.
 #
 # Sync state and open sync PRs: docs/sync-log.md
 
 jwilleke/deby
 jwilleke/garage-car-positioning
+jwilleke/geohazardwatch
 jwilleke/grow-nutrient-tank
 jwilleke/grow-tent
 jwilleke/mj-infra-flux
 jwilleke/mjs-ha
+jwilleke/mjs-media-handling
 jwilleke/ngdpbase
 jwilleke/yourphr
+jwilleke/yourphr-ts-spike
 jwilleke/fairways-gen2-website
 
 # Excluded — uncomment to bring back into the sync set.
