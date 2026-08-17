@@ -35,8 +35,23 @@ export function serialize(value) {
   return JSON.stringify(value, null, 2) + '\n';
 }
 
+/**
+ * Semver, with the prerelease and build parts each allowed at most once.
+ *
+ * The previous pattern was `(?:[-+][0-9A-Za-z.-]+)*` — a starred group whose
+ * separator `-` also appears inside its own character class, so a run of dashes
+ * could be partitioned between the separator and the body in exponentially many
+ * ways. `1.0.0` + 40 dashes + `!` took 2.6s; 50 took 70s (CodeQL js/redos).
+ *
+ * Splitting prerelease from build removes the ambiguity: `+` is not in the
+ * class, so the build separator can only be the separator, and neither group is
+ * quantified from outside.
+ */
 export function isValidVersion(version) {
-  return typeof version === 'string' && /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)*$/.test(version);
+  return (
+    typeof version === 'string' &&
+    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)
+  );
 }
 
 /** Return a copy of a parsed package.json with `version` set. Input is not mutated. */
