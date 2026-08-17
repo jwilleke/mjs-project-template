@@ -474,6 +474,25 @@ stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   fi
 }
 
+warn_markdownlintignore() {  # entries cli2 does not read, and never will
+  # markdownlint-cli v1 reads .markdownlintignore. markdownlint-cli2 — which the
+  # kit moved to in v1.4.0 — does not; it reads `ignores` in its own config. Any
+  # repo carrying that file therefore had its exemptions silently dropped by a
+  # kit sync, and found out when generated output started failing prose rules.
+  # jwilleke/ngdpbase lost nine entries that way, including its TypeDoc tree.
+  local f="$TARGET/.markdownlintignore" n
+  [ -f "$f" ] || return 0
+  n="$(grep -cvE '^\s*(#|$)' "$f" 2>/dev/null || echo 0)"
+  [ "${n:-0}" -gt 0 ] 2>/dev/null || return 0
+
+  echo "  NOTE: .markdownlintignore has $n entr(ies), and markdownlint-cli2 does not read that file." >&2
+  echo "        Those exemptions are NOT in effect:" >&2
+  grep -vE '^\s*(#|$)' "$f" | sed 's/^/             /' >&2
+  echo "        Anything gitignored is already exempt. For the rest, put a" >&2
+  echo "        .markdownlint-cli2.jsonc beside the directory — the kit never writes into" >&2
+  echo "        subdirectories, so it survives every sync. Then delete this file." >&2
+}
+
 fix_markdown() {           # bring the repo's markdown to the rules the sync just installed
   # The rule and the conformance have to arrive together. Pinning MD049/MD050 in
   # v1.4.0 without this left any repo with existing `**bold**` unable to commit
@@ -808,6 +827,7 @@ apply_group templates
 echo
 
 echo "Markdown (conform the repo to the rules this sync installs):"
+warn_markdownlintignore
 fix_markdown
 echo
 
