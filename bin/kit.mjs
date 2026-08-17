@@ -38,6 +38,7 @@
 
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -85,6 +86,42 @@ export function compareKitVersions(a, b) {
   }
 
   if (left.commits !== right.commits) return left.commits < right.commits ? -1 : 1;
+  return 0;
+}
+
+/**
+ * The manifest a repo carries, or null. Authoritative over the KIT:START marker.
+ *
+ * The marker stays — it delimits the managed block, so it is load-bearing
+ * structure — but its version payload is a fallback until every consumer has a
+ * manifest, and is dropped once they do.
+ */
+export function parseManifestFile(text) {
+  if (typeof text !== 'string') return null;
+  try {
+    const json = JSON.parse(text);
+    return json && typeof json.installed === 'string' ? json : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compare TAGS, ignoring commits-since.
+ *
+ * `git describe` moves on every commit to the kit, so under the old comparison
+ * every consumer went "behind" within minutes of any push — including a README
+ * typo. Drift then means a release happened, which is a fact worth a
+ * notification, at a rate of a few a year rather than continuously.
+ */
+export function compareKitTags(a, b) {
+  const left = parseKitVersion(a);
+  const right = parseKitVersion(b);
+  if (!left || !right) return null;
+
+  for (let i = 0; i < 3; i++) {
+    if (left.tag[i] !== right.tag[i]) return left.tag[i] < right.tag[i] ? -1 : 1;
+  }
   return 0;
 }
 
@@ -136,7 +173,7 @@ export function formatStaleness({ upstream, behind }) {
 }
 
 /** The human-readable report. Kept pure so its wording is testable. */
-export function formatReport({ status, local, kit, missing, collisions, target }) {
+export function formatReport({ status, local, kit, missing, collisions, modified, target }) {
   const lines = [];
 
   if (status === 'behind') {
@@ -160,6 +197,10 @@ export function formatReport({ status, local, kit, missing, collisions, target }
   if (missing.length) {
     lines.push('', 'Kit-managed files missing from this repo:');
     for (const path of missing) lines.push(`  - ${path}`);
+  }
+
+  for (const file of modified ?? []) {
+    lines.push('', `Kit-managed file ${file.state}: ${file.path}`);
   }
 
   for (const collision of collisions ?? []) {
@@ -201,6 +242,10 @@ function localPosition(targetDir, fetch = false) {
   }
 }
 
+function sha256(file) {
+  return createHash('sha256').update(readFileSync(file)).digest('hex');
+}
+
 function kitVersionFrom(kitDir) {
   try {
     return execFileSync('git', ['-C', kitDir, 'describe', '--tags', '--long'], {
@@ -237,10 +282,18 @@ async function latestKitTag() {
 }
 
 function inspect(targetDir, kitDir) {
+  // The manifest is the record; the marker is the fallback for a repo that has
+  // not been synced since manifests existed. Two sources for one fact is the
+  // thing this replaces, so the precedence is fixed and stated, not merged.
+  const recordFile = join(targetDir, '.agent-kit.json');
+  const record = existsSync(recordFile) ? parseManifestFile(readFileSync(recordFile, 'utf8')) : null;
+
   const agentsPath = join(targetDir, 'AGENTS.md');
-  const local = existsSync(agentsPath)
+  const marker = existsSync(agentsPath)
     ? parseMarkerVersion(readFileSync(agentsPath, 'utf8'))
     : null;
+  const local = record?.installed ?? marker;
+  const source = record ? '.agent-kit.json' : marker ? 'KIT:START marker' : null;
 
   const manifestPath = join(kitDir, 'kit-files.tsv');
   const manifest = existsSync(manifestPath)
@@ -266,7 +319,22 @@ function inspect(targetDir, kitDir) {
     .map((row) => ({ path: row.path, installed: suffixedPath(row.path) }))
     .filter((row) => existsSync(join(targetDir, row.installed)));
 
-  return { local, missing, collisions };
+  // What the manifest says the kit wrote, against what is on disk now. A stamp
+  // records what a file claims to be; a hash records what it is — which is what
+  // catches a partial sync, a bad merge, or a file restored from an old branch.
+  const modified = [];
+  for (const [path, entry] of Object.entries(record?.files ?? {})) {
+    const full = join(targetDir, path);
+    if (!existsSync(full)) {
+      modified.push({ path, state: 'missing' });
+      continue;
+    }
+    if (entry?.sha256 && sha256(full) !== entry.sha256) {
+      modified.push({ path, state: 'modified' });
+    }
+  }
+
+  return { local, source, marker, missing, collisions, modified };
 }
 
 async function check(argv) {
@@ -309,7 +377,7 @@ async function check(argv) {
     return 0;
   }
 
-  const { local, missing, collisions } = inspect(target, kitDir);
+  const { local, source, marker, missing, collisions, modified } = inspect(target, kitDir);
 
   // Ordered by precision: a checkout knows exactly, a packed copy carries a
   // stamp, and the tags API is the last resort because it only sees releases.
@@ -330,7 +398,8 @@ async function check(argv) {
   let status;
   if (!local) status = 'unmarked';
   else {
-    const order = compareKitVersions(local, kit);
+    // Tags, not `git describe` — see compareKitTags.
+    const order = compareKitTags(local, kit);
     if (order === null) status = 'unknown';
     else if (order < 0) status = 'behind';
     else if (order > 0) status = 'ahead';
@@ -338,13 +407,17 @@ async function check(argv) {
   }
 
   const position = localPosition(target, fetch);
-  const result = { status, local, kit, missing, collisions, target, repo, position };
+  const result = { status, local, source, marker, kit, missing, collisions, modified, target, repo, position };
 
   // `unknown` counts. It means the marker could not be parsed, so the repo
   // cannot be shown to be current — and a check that stays silent when it does
   // not know is worse than no check, because it reads as a pass.
   const behind =
-    status === 'behind' || status === 'unmarked' || status === 'unknown' || missing.length > 0;
+    status === 'behind' ||
+    status === 'unmarked' ||
+    status === 'unknown' ||
+    missing.length > 0 ||
+    modified.length > 0;
 
   // Before the report, not after — a stale checkout invalidates everything below it.
   const staleness = formatStaleness(position);

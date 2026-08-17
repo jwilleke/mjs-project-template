@@ -116,13 +116,39 @@ warning as a feature request against the kit, not as noise.
 
 ## Versioning
 
-The kit version is `git describe --tags --long` of the kit checkout at install time — e.g.
-`v1.0.0-55-gc4b69c8`. It is not semver, and it is not meant to be: it is a pointer to a commit.
+Every consumer carries `.agent-kit.json` at its root, written by `install-kit.sh` and read by
+`bin/kit.mjs`. It is the __authoritative__ record of what the kit put there:
 
-It is recorded in two places in every downstream repo:
+```json
+{
+  "schema": 1,
+  "installed": "v1.6.0",
+  "installed_ref": "v1.6.0-0-g1e15ccc",
+  "installed_at": "2026-08-17",
+  "files": {
+    ".claude/commands/pstatus.md": { "behavior": "overwrite", "sha256": "…" }
+  }
+}
+```
 
-- the `KIT:START` marker in `AGENTS.md` — this is the __authoritative__ record;
-- `kit_version` in the `AGENTS.md` frontmatter, written by `stamp_kit_version`.
+__Drift is measured on the tag, not on `git describe`.__ `git describe` moves on every commit to the
+kit, so under the old comparison every consumer went behind within minutes of any push — including a
+README typo. Comparing `installed` against the kit's latest tag makes "behind" mean a release
+happened: a few times a year, not continuously. `installed_ref` keeps the exact commit for
+provenance without participating in the comparison.
+
+__Files are hashed, not stamped.__ A stamp records what a file claims to be; a hash records what it
+is. That is what catches a partial sync, a bad merge, or a file restored from an old branch —
+none of which a version string can see.
+
+The `KIT:START` marker stays, because it delimits the managed block and is load-bearing structure.
+Its version payload is now a __fallback only__, for repos not yet synced since manifests existed, and
+is dropped once every consumer carries a manifest.
+
+The frozen `kit_version` stamps in `TODO.md`, `CLAUDE.md` and `private/project_log.md` are gone.
+`create-if-absent-stamped` substituted them once, at creation, and never again, so they were fossils
+by construction — in three consumers the only copy lived in `private/project_log.md`, which is
+gitignored, and disagreed with the marker in the same repo.
 
 There is deliberately __no hand-maintained table of who is on which version.__ `docs/sync-log.md`
 was that table, and it was retired: it declared itself non-authoritative in its own first paragraph,

@@ -2,7 +2,6 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-17"
-kit_version: "v1.5.3"
 ---
 
 # TODO

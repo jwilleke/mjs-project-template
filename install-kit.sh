@@ -407,6 +407,52 @@ stamp_kit_version() {      # write/update kit_version in AGENTS.md frontmatter
   fi
 }
 
+write_manifest() {         # .agent-kit.json — the machine-readable record of this install
+  # One fact, one home. Before this, "which kit version is this repo on?" lived in
+  # the KIT:START marker, in AGENTS.md frontmatter, and frozen at birth in TODO.md,
+  # CLAUDE.md and private/project_log.md — five places, and in most consumers no
+  # two agreed. Only the marker was ever refreshed, and it is a version string
+  # embedded in prose that a regex has to pick out.
+  #
+  # The tag, not `git describe`. `git describe` moves on every commit to the kit,
+  # so every consumer is "behind" within minutes of any push, including a README
+  # typo. Comparing tags makes drift mean a release actually happened.
+  local out="$TARGET/.agent-kit.json" tag files
+  tag="${KIT_VERSION%%-*}"
+
+  act "manifest: .agent-kit.json (installed $tag, ref $KIT_VERSION)"
+  [ "$DRY" -eq 1 ] && return 0
+
+  # Recorded per file: what the kit wrote, and the hash of what is on disk now.
+  # A stamp says what a file claims to be; a hash says what it is, which is what
+  # catches a partial sync, a bad merge, or a file restored from an old branch.
+  files=""
+  while IFS="$TAB" read -r beh path tmpl group; do
+    case "$beh" in ''|'#'*) continue ;; esac
+    case "$beh" in overwrite|overwrite-or-suffix) ;; *) continue ;; esac
+    local real="$path"
+    [ "$beh" = "overwrite-or-suffix" ] && [ -f "$TARGET/$(suffixed_path "$path")" ] && real="$(suffixed_path "$path")"
+    [ -f "$TARGET/$real" ] || continue
+    local sha
+    sha="$(shasum -a 256 "$TARGET/$real" 2>/dev/null | cut -d' ' -f1)"
+    [ -n "$files" ] && files="$files,"
+    files="$files
+    \"$real\": { \"behavior\": \"$beh\", \"sha256\": \"$sha\" }"
+  done <"$SRC/kit-files.tsv"
+
+  cat >"$out" <<JSON
+{
+  "schema": 1,
+  "source": "https://github.com/jwilleke/mjs-project-template",
+  "installed": "$tag",
+  "installed_ref": "$KIT_VERSION",
+  "installed_at": "$(date +%Y-%m-%d)",
+  "files": {$files
+  }
+}
+JSON
+}
+
 apply_group() {            # apply every kit-files.tsv row in group $1, in file order
   local want="$1" manifest="$SRC/kit-files.tsv" beh path tmpl group
   if [ ! -f "$manifest" ]; then
@@ -635,6 +681,10 @@ echo
 
 echo "GitHub templates (create-if-absent — keeps your customizations):"
 apply_group templates
+echo
+
+echo "Manifest (written last, so it records what actually landed):"
+write_manifest
 echo
 
 if [ "$PR" -eq 1 ]; then
