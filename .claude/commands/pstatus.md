@@ -106,9 +106,8 @@ PR line (always mark state; always name related issues when any):
 
 `- [#<num>](https://github.com/{owner}/{repo}/pull/<num>) — <title> *(PR · ready | draft | conflicted)[ · stale Nd]* — closes|refs|likely [#n](…) | no linked issue`
 
-__Emphasis is `*asterisk*`; bold is `__underscore__`.__ Both are pinned in
-`.markdownlint-cli2.jsonc` (MD049 asterisk, MD050 underscore) so that markdown is identical in every
-repo the kit installs into. Get the state marker wrong and the generated `TODO.md` fails
+__Read `.markdownlint-cli2.jsonc` — it is the control file for markdown style, and this command
+deliberately does not restate its rules.__ `TODO.md` is generated, so getting the style wrong fails
 `npm run lint:md` in the very repo that produced it.
 
 __Wrap any bare URL that appears in a title.__ Issue and PR titles regularly contain a raw
