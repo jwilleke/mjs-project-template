@@ -45,6 +45,30 @@ Then:
 
 ### Markdown conventions
 
-- Dash (`-`) bullets; no bare numbered lists. ATX (`#`) headings. Spaced tables (`| a | b |`).
-- Inline HTML is __not__ allowed. Long lines are fine.
-- Rules live in `.markdownlint-cli2.jsonc` — rules, globs and ignores, one file, read by the editor, CLI, CI and agents alike. Emphasis is pinned: `*italic*` and `__bold__`, identical in every repo. Only committed files are linted; anything `.gitignore`d is generated or vendored, so its source is linted instead.
+Most markdown in this repo is written by agents, so these are writing rules, not review rules —
+conform on the first draft rather than relying on `--fix`. There is no exemption mechanism and none
+is wanted: a disabled check is a check nobody revisits.
+
+| Write | Not | Rule |
+| --- | --- | --- |
+| `*italic*` | `_italic_` | MD049 |
+| `__bold__` | `**bold**` | MD050 |
+| `- item` | `* item`, `+ item` | MD004 |
+| `## Heading` | `Heading` + `---` underline | MD003 |
+| two-space list indent | four | MD007 |
+| `<https://example.com>` | a bare `https://…` | MD034 |
+| `## Heading` | `__Heading__` on its own line | MD036 |
+| one `#` per file | a second top-level heading | MD025 |
+| blank line around headings, lists and fences | none | MD022, MD031, MD032 |
+| one blank line | two or more | MD012 |
+| a trailing newline | none | MD047 |
+
+Also on: no inline HTML (MD033), no duplicate heading among siblings (MD024), no trailing whitespace
+(MD009), no trailing punctuation in headings (MD026). Deliberately off: line length (MD013), code
+fence language (MD040), first-line-must-be-heading (MD041), table pipe style (MD055–MD060).
+
+All of it lives in `.markdownlint-cli2.jsonc` — rules, globs and ignores in one file, read by the
+editor, the CLI, CI and agents alike, and identical in every repo the kit installs into. Only
+committed files are linted: anything `.gitignore`d is generated or vendored, so its source is linted
+instead. Check your work with `npm run lint:md`, or `npx markdownlint-cli2` where there is no
+`package.json`.
