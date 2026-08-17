@@ -67,7 +67,7 @@ The last four are not per-file lists, so they stay in `install-kit.sh`; the rest
 manifest.
 
 The rule that follows from the table: **fix kit files upstream, never in the consumer.** If the kit
-is wrong, it is wrong for nine repos — change it here.
+is wrong, it is wrong for twelve repos — change it here.
 
 An `overwrite` file is still replaced wholesale, but no longer silently: the installer compares the
 target's copy against the same file at the kit version stamped in that repo, and prints the lines
@@ -130,10 +130,22 @@ against the marker before relying on it:
 grep -o "KIT:START [^ ]*" /path/to/repo/AGENTS.md
 ```
 
-The set of consumers is `downstream-repos.txt`, one `owner/repo` per line, machine-readable:
+The set of consumers is `downstream-repos.json`:
 
 ```bash
-grep -vE '^\s*(#|$)' downstream-repos.txt
+jq -r '.repos[]' downstream-repos.json
+```
+
+`excluded[]` carries the repos deliberately kept out, each with its reason, so an absence is never
+mistaken for an oversight. The default branch is **not** recorded — it varies, and
+`install-kit.sh --pr` detects it per repo; storing it would be one more hand-kept fact to drift.
+
+Example — open a kit-sync PR against every repo listed:
+
+```bash
+jq -r '.repos[]' downstream-repos.json | while read -r repo; do
+  ./install-kit.sh --pr "/Volumes/hd2A/workspaces/github/${repo#*/}"
+done
 ```
 
 ## What is deliberately not distributed
@@ -146,7 +158,7 @@ each for its own reason:
 - `install-kit.sh` itself — the installer lives with the kit, so a consumer cannot self-update. This
   is the push model working as designed, not an oversight, but it does mean an operator with a
   stale clone pushes a stale kit.
-- `templates/`, `downstream-repos.txt`, `docs/sync-log.md`, `kit-files.tsv` — kit-authoring
+- `templates/`, `downstream-repos.json`, `docs/sync-log.md`, `kit-files.tsv` — kit-authoring
   material, meaningless downstream.
 - `bin/kit.mjs` — the checker runs *from* a kit checkout, not from a copy in the consumer. The
   seeded workflow checks the kit out beside the repo, so the consumer always runs the current
@@ -253,8 +265,8 @@ grep -rn "/Volumes/\|/Users/" package                                       # lo
 grep -rhoE "https?://[A-Za-z0-9./_-]+" package | sort -u                    # every host
 ```
 
-The first matters most and is the least obvious: four of the nine consumers are **private** repos, so
-naming one in a shipped template would disclose its existence. `downstream-repos.txt` names all nine
+The first matters most and is the least obvious: six of the twelve consumers are **private** repos, so
+naming one in a shipped template would disclose its existence. `downstream-repos.json` names all twelve
 and is deliberately not in the package.
 
 ### Two version numbers, deliberately
@@ -322,11 +334,14 @@ stored as the `NPM_TOKEN` repo secret.
 
 No — and the reason is in the consumer list, not in the tooling.
 
-Of the nine repos in `downstream-repos.txt`, **two have a `package.json`**
-(`jwilleke/ngdpbase`, `jwilleke/fairways-gen2-website`). The rest are Shell, C++, Python, Go, and a
-Flux/Kubernetes config repo. Distributing an agent kit through npm would require seven repos to
-adopt Node and a `package.json` they otherwise have no use for, purely as a delivery mechanism. The
-kit is bash and markdown; its dependency footprint is `bash`, `git`, `awk`, and optionally `gh`.
+Of the twelve repos in `downstream-repos.json`, **six have a `package.json`** and six do not — the
+rest are Shell, C++, Python, Go, and a Flux/Kubernetes config repo. Distributing an agent kit through
+npm would require half the fleet to adopt Node and a `package.json` they otherwise have no use for,
+purely as a delivery mechanism. The kit is bash and markdown; its dependency footprint is `bash`,
+`git`, `awk`, and optionally `gh`.
+
+That split was 2:7 when this section was written and is 6:6 now, so the argument is weaker than it
+was — but it is an argument about the *six*, and it does not improve as the fleet grows.
 
 The second reason is that packaging solves the part that is already easy. The hard part of this
 system is the **merge semantics** — which files are overwritten, which are seeded once, which are
@@ -370,5 +385,5 @@ What remains open:
 
 - `README.md` — how to run the installer, flags, and modes
 - `docs/sync-log.md` — per-repo sync state (hint; the `KIT:START` marker is the truth)
-- `downstream-repos.txt` — the consumer list
+- `downstream-repos.json` — the consumer list
 - `AGENTS.md` — when a kit sync must go through a PR
