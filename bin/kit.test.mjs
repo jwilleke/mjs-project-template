@@ -144,6 +144,7 @@ describe('parseManifest', () => {
     const known = new Set([
       'overwrite',
       'overwrite-or-suffix',
+      'overwrite-template',
       'seed',
       'create-if-absent',
       'create-if-absent-stamped',

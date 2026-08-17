@@ -25,6 +25,7 @@
 #
 # Behavior per file (kit-files.tsv column 1):
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint-cli2.jsonc)
+#   overwrite-template  overwrite REL every run from templates/<template>
 #   overwrite-or-suffix  like overwrite, but if the repo already owns that filename with its own
 #                    content, the kit's copy is installed as <name>-kit.<ext> and the repo's file
 #                    is left alone. Once suffixed, it stays suffixed in that repo.
@@ -279,6 +280,22 @@ overwrite_or_suffix() {    # overwrite REL, unless the repo already owns that na
   echo "  NOTE: $rel exists here and is not a kit copy — installing the kit's as $alt" >&2
   echo "        Your $rel is untouched. Both commands remain available." >&2
   overwrite "$rel" "$alt"
+}
+
+overwrite_template() {     # overwrite REL from templates/TMPL every run
+  # `overwrite` reads $SRC/<path>; this reads $SRC/templates/<tmpl>, for files the
+  # kit ships from a template rather than from the same path in its own tree.
+  #
+  # kit-sync.yml is here because create-if-absent made workflow bugs permanent:
+  # the copy in twelve consumers could never be replaced by the kit that wrote it,
+  # so #61 — a job going red on every push — would have stayed broken downstream
+  # forever. A repo that does not want the workflow deletes the file; the kit
+  # recreates it, which is the same trade every other overwrite file makes.
+  local rel="$1" s="$SRC/templates/$2" d="$TARGET/$1"
+  [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
+  if [ -f "$d" ] && cmp -s "$s" "$d"; then act "unchanged: $rel"; return; fi
+  act "overwrite: $rel"
+  if [ "$DRY" -eq 0 ]; then mkdir -p "$(dirname "$d")"; cp "$s" "$d"; fi
 }
 
 create_if_absent() {       # create REL from templates/TMPL only if absent
@@ -572,6 +589,7 @@ apply_group() {            # apply every kit-files.tsv row in group $1, in file 
     case "$beh" in
       overwrite)                overwrite "$path" ;;
       overwrite-or-suffix)      overwrite_or_suffix "$path" ;;
+      overwrite-template)       overwrite_template "$path" "$tmpl" ;;
       seed)                     seed "$path" ;;
       create-if-absent)         create_if_absent "$path" "$tmpl" ;;
       create-if-absent-stamped) create_if_absent_stamped "$path" "$tmpl" ;;

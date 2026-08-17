@@ -19,6 +19,7 @@
 #   seed                      copied only when absent; source is the same path in the kit
 #   create-if-absent          copied only when absent; source is templates/<template>
 #   create-if-absent-stamped  as above, substituting YYYY-MM-DD and KIT-VERSION
+#   overwrite-template        copied from templates/<template> every run; local edits are destroyed
 #   overwrite-or-suffix       as overwrite, but yields the filename to a repo that already owns
 #                             it, installing the kit copy as <name>-kit.<ext> instead
 #   managed-block             rewritten between the KIT:START / KIT:END markers only
@@ -55,10 +56,15 @@ seed	.vscode/extensions.json	-	vscode
 
 seed	.github/workflows/markdown-lint.yml	-	workflows
 # kit-sync.yml supersedes kit-check.yml: it applies the sync and opens a PR
-# rather than filing an issue asking someone to run the installer. Both are
-# create-if-absent, so a repo that customised either keeps its version; the
-# old workflow is retired by install-kit.sh once the new one exists.
-create-if-absent	.github/workflows/kit-sync.yml	kit-sync.yml.tmpl	workflows
+# rather than filing an issue asking someone to run the installer. The old
+# workflow is retired by install-kit.sh once the new one exists.
+#
+# OVERWRITTEN, not seeded. As create-if-absent, a bug in this workflow was
+# permanent in every consumer — the kit that wrote it could never replace it,
+# so #61 (red on every push) would have stayed broken downstream forever. This
+# is kit machinery, not repo configuration; a repo that does not want it deletes
+# the file, exactly as with any other overwrite file.
+overwrite-template	.github/workflows/kit-sync.yml	kit-sync.yml.tmpl	workflows
 
 seed	.github/ISSUE_TEMPLATE/bug_report.md	-	templates
 seed	.github/ISSUE_TEMPLATE/feature_request.md	-	templates
