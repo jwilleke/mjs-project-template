@@ -308,7 +308,7 @@ seed() {                   # copy REL from kit only if absent (source at the sam
 
 ensure_gitignore() {       # append missing lines, never remove
   local gi="$TARGET/.gitignore" line
-  for line in "private/" ".claude/settings.local.json" ".claude/worktrees/"; do
+  for line in "private/" ".claude/settings.local.json" ".claude/worktrees/" ".kit-sync/" ".kit-check/"; do
     if [ -f "$gi" ] && grep -qxF -- "$line" "$gi"; then act "gitignore ok: $line"; continue; fi
     act "gitignore += $line"
     if [ "$DRY" -eq 0 ]; then printf '%s\n' "$line" >>"$gi"; fi
@@ -805,6 +805,11 @@ fi
 echo "Done."
 echo "Next:"
 echo "  - utility/sync-labels.sh            # apply the standard GitHub labels to this repo"
+echo "  - Settings > Actions > General > Workflow permissions:"
+echo "      tick 'Allow GitHub Actions to create and approve pull requests'."
+echo "      kit-sync.yml cannot open its PR without it, and no 'permissions:' block"
+echo "      in the workflow can grant it. Without it the sync still pushes its"
+echo "      branch and files an issue with the compare link, rather than failing."
 echo "  - /pstatus                          # rank work + regenerate TODO.md"
 if [ "$PR" -eq 0 ]; then
   echo "  - review the changes above, then commit them on a feature branch"
