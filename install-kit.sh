@@ -25,6 +25,9 @@
 #
 # Behavior per file (kit-files.tsv column 1):
 #   overwrite        canonical tool files (.claude/commands, sync-labels.sh, .markdownlint-cli2.jsonc)
+#   overwrite-or-suffix  like overwrite, but if the repo already owns that filename with its own
+#                    content, the kit's copy is installed as <name>-kit.<ext> and the repo's file
+#                    is left alone. Once suffixed, it stays suffixed in that repo.
 #   seed             copied only when absent; source is the same path in the kit
 #   create-if-absent copied only when absent; source is templates/<template>
 #   managed-block    AGENTS.md boilerplate between <!-- KIT:START/END --> markers
@@ -211,16 +214,56 @@ template rather than in this repo — the next sync would overwrite a local fix.
 
 # --- behaviors --------------------------------------------------------------
 
-overwrite() {              # overwrite REL from kit (canonical tool file)
-  local rel="$1" s="$SRC/$1" d="$TARGET/$1"
+overwrite() {              # overwrite DEST (default: REL) from the kit's REL
+  local rel="$1" dest="${2:-$1}" s="$SRC/$1" d="$TARGET/${2:-$1}"
   [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
-  if [ -f "$d" ] && cmp -s "$s" "$d"; then act "unchanged: $rel"; return; fi
-  warn_local_file_edits "$rel"
-  act "overwrite: $rel"
+  if [ -f "$d" ] && cmp -s "$s" "$d"; then act "unchanged: $dest"; return; fi
+  # Only meaningful when source and destination share a path — a suffixed copy
+  # has no history at that path to compare against.
+  [ "$dest" = "$rel" ] && warn_local_file_edits "$rel"
+  act "overwrite: $dest"
   if [ "$DRY" -eq 0 ]; then
     mkdir -p "$(dirname "$d")"; cp "$s" "$d"
-    case "$rel" in *.sh) chmod +x "$d" ;; esac
+    case "$dest" in *.sh) chmod +x "$d" ;; esac
   fi
+}
+
+suffixed_path() {          # .claude/commands/semver.md -> .claude/commands/semver-kit.md
+  local rel="$1"
+  printf '%s-kit.%s' "${rel%.*}" "${rel##*.}"
+}
+
+overwrite_or_suffix() {    # overwrite REL, unless the repo already owns that name
+  local rel="$1" s="$SRC/$1" d="$TARGET/$1"
+  local alt; alt="$(suffixed_path "$rel")"
+  [ -f "$s" ] || { act "skip (missing in kit): $rel"; return; }
+
+  # Once a repo has been given the suffixed copy, that is the kit's file there
+  # forever. Reverting to the plain name later would clobber the repo's own
+  # command — the exact thing this behaviour exists to prevent.
+  if [ -f "$TARGET/$alt" ]; then overwrite "$rel" "$alt"; return; fi
+
+  # A name the repo does not use yet: the kit takes it.
+  if [ ! -f "$d" ]; then overwrite "$rel"; return; fi
+
+  # The name is taken. If what is there is an unmodified copy of the kit's file
+  # at the version this repo was synced at, it is ours and gets overwritten.
+  local stamped ref prev rc=1
+  stamped="$(stamped_kit_version)"
+  if [ -n "$stamped" ]; then
+    ref="$(kit_ref_of "$stamped")"
+    prev="$(mktemp "${TMPDIR:-/tmp}/kitprev.XXXXXX")"
+    if git -C "$SRC" show "$ref:$rel" >"$prev" 2>/dev/null; then
+      cmp -s "$d" "$prev" && rc=0
+    fi
+    rm -f "$prev"
+  fi
+  if [ "$rc" -eq 0 ]; then overwrite "$rel"; return; fi
+
+  # Otherwise the repo owns this name. Ship alongside, never over.
+  echo "  NOTE: $rel exists here and is not a kit copy — installing the kit's as $alt" >&2
+  echo "        Your $rel is untouched. Both commands remain available." >&2
+  overwrite "$rel" "$alt"
 }
 
 create_if_absent() {       # create REL from templates/TMPL only if absent
@@ -377,6 +420,7 @@ apply_group() {            # apply every kit-files.tsv row in group $1, in file 
     [ "$group" = "$want" ] || continue
     case "$beh" in
       overwrite)                overwrite "$path" ;;
+      overwrite-or-suffix)      overwrite_or_suffix "$path" ;;
       seed)                     seed "$path" ;;
       create-if-absent)         create_if_absent "$path" "$tmpl" ;;
       create-if-absent-stamped) create_if_absent_stamped "$path" "$tmpl" ;;

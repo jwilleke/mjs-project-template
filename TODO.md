@@ -2,7 +2,7 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-17"
-kit_version: "v1.3.1-0-g1433abd"
+kit_version: "v1.4.0-0-gbb6633f"
 ---
 
 # TODO
@@ -17,7 +17,7 @@ kit_version: "v1.3.1-0-g1433abd"
 
 ## 🟡 P2
 
-- [#55](https://github.com/jwilleke/mjs-project-template/issues/55) — [BUG] /pstatus and /session-commit tell agents to use underscore emphasis, but the kit's own .markdownlint.jsonc does not set MD049
+- [#56](https://github.com/jwilleke/mjs-project-template/issues/56) — [BUG] The kit ships command files it does not manage, so they drift — and now that drift fails the kit's own lint
 
 ## 🔵 In review
 

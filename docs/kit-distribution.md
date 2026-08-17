@@ -55,6 +55,7 @@ file's contents, is what decides whether a local edit survives.
 | Behaviour | What happens to local changes | Paths |
 | --- | --- | --- |
 | `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc` |
+| `overwrite-or-suffix` | __Preserved.__ If the repo already owns that filename with its own content, the kit installs its copy as `<name>-kit.<ext>` and leaves yours alone. Once suffixed, always suffixed. | `.claude/commands/semver.md` |
 | `managed-block` | __Destroyed inside the markers__, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
 | `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
 | `merge` | __Preserved.__ Missing lines appended, nothing removed. | `.gitignore` (adds `private/`, `.claude/settings.local.json`, `.claude/worktrees/`) |
@@ -187,12 +188,14 @@ each for its own reason:
 - `bin/kit.mjs` — the checker runs *from* a kit checkout, not from a copy in the consumer. The
   seeded workflow checks the kit out beside the repo, so the consumer always runs the current
   checker rather than a stale copy of it.
-- `.claude/commands/semver.md` and `utility/set-version.mjs` — __an inconsistency, not a decision.__
-  `/semver` is a real agent command that consumers would benefit from, but adding it to the
-  overwrite list would clobber forks that built their own release tooling (`jwilleke/ngdpbase` did
-  exactly that). Left out until someone decides which way it should go.
-- `.claude/commands/update-agents.md`, `.claude/README.md` — never added to the list; no considered
-  reason found, probably an omission.
+- `.claude/README.md` — never added to the list; no considered reason found, probably an omission.
+
+`/semver`, `utility/set-version.mjs` and `/update-agents` __were__ on this list and are now
+distributed — see [#56](https://github.com/jwilleke/mjs-project-template/issues/56). `/semver` was
+held back because shipping it would clobber forks that built their own release tooling
+(`jwilleke/ngdpbase` bumps `src/utils/version.ts`; `jwilleke/mjs-ha` tags date-stamped snapshots).
+That was a real objection to `overwrite`, not to distribution, so it ships as
+`overwrite-or-suffix`: repos that own the name keep it and receive `semver-kit.md` alongside.
 
 ## How a repo learns it is behind
 
@@ -350,8 +353,10 @@ stored as the `NPM_TOKEN` repo secret.
   `fairways-gen2-website` can depend on the package and get PRs; the other seven have no
   `package.json` and stay on the tracking issue. That asymmetry is the profile split still to be
   decided.
-- __Partial command coverage__ — four of the six `.claude/commands/*.md` files sync; `/semver` and
-  `/update-agents` do not, so downstream agents follow different rules depending on the command.
+- __The kit has no declared namespace.__ Nothing states which command filenames are the kit's, so a
+  repo naming its own command `semver.md` cannot know it is claiming a name the kit also uses, and
+  `install-kit.sh` cannot tell a retired kit command from a repo's own file. `overwrite-or-suffix`
+  handles the collision it has already met; it does not declare the namespace.
 
 ## Should this be an npm package?
 

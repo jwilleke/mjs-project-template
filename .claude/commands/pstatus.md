@@ -140,7 +140,7 @@ for one piece of work inflates the apparent backlog and makes the file read as t
 not been written yet.
 
 State the absence rather than deleting it silently: a band with no remaining open items says so,
-e.g. `_None._` An empty band and a band whose work is only awaiting merge of a PR listed in another
+e.g. `*None.*` An empty band and a band whose work is only awaiting merge of a PR listed in another
 band are different — the PR's placement is the truth; do not leave a ghost issue line.
 
 Verify before finishing — every count must be 1:
