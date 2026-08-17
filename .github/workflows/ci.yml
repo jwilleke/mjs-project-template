@@ -15,7 +15,13 @@ jobs:
         node-version: [20.x, 22.x]
 
     steps:
+      # Tags, not just the tip. bin/kit.mjs resolves the kit version with
+      # `git describe --tags`, and on a shallow checkout that fails and it falls
+      # back to fetching the tags API — turning a unit test into a network call
+      # that intermittently blew the 5s timeout.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
