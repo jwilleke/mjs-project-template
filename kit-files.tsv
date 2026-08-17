@@ -54,7 +54,11 @@ create-if-absent-stamped	private/project_log.md	project_log.md.tmpl	docs
 seed	.vscode/extensions.json	-	vscode
 
 seed	.github/workflows/markdown-lint.yml	-	workflows
-create-if-absent	.github/workflows/kit-check.yml	kit-check.yml.tmpl	workflows
+# kit-sync.yml supersedes kit-check.yml: it applies the sync and opens a PR
+# rather than filing an issue asking someone to run the installer. Both are
+# create-if-absent, so a repo that customised either keeps its version; the
+# old workflow is retired by install-kit.sh once the new one exists.
+create-if-absent	.github/workflows/kit-sync.yml	kit-sync.yml.tmpl	workflows
 
 seed	.github/ISSUE_TEMPLATE/bug_report.md	-	templates
 seed	.github/ISSUE_TEMPLATE/feature_request.md	-	templates
