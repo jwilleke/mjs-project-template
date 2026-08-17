@@ -26,9 +26,9 @@ related GitHub issues. The personal log is __never committed__.
 - Apply `needs-triage` to any open issue with no placement label (`P0` / `P1` / `P2` / `deferred` /
   `in-review`), exactly as `/pstatus` does. Two commands that regenerate the same file from the same
   labels must not disagree about what an unlabeled issue means.
-- Use `*asterisk*` emphasis and `__underscore__` bold, and wrap any bare URL appearing in a
-  __title__ in angle brackets (`<https://…>`). All three are markdownlint rules — MD049, MD050 and
-  MD034 — and each turns the lint job red on a file nobody hand-edited.
+- Follow `.markdownlint-cli2.jsonc`, the control file for markdown style — including for any bare
+  URL that arrives inside an issue or PR title. `TODO.md` is generated, so a violation turns the lint
+  job red on a file nobody hand-edited.
 - Stage and commit `TODO.md` if it changed: `docs: refresh TODO from issue labels`.
 
 ### Step 4: Journal the session (local only — NOT committed)
