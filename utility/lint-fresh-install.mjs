@@ -157,6 +157,18 @@ try {
     'the workflow now requires a PAT'
   );
 
+  // Four consumers carried a .markdownlintignore whose entries markdownlint-cli2
+  // silently stopped honouring when v1.4.0 moved to it — 25 exemptions dropped
+  // without a word, surfacing later as generated output failing prose rules.
+  writeFileSync(join(repo, '.markdownlintignore'), '# a comment\ndocs/api/generated/**\n');
+  const unhonoured = run(join(root, 'install-kit.sh'), ['--dry-run', repo]);
+  check(
+    'an unhonoured .markdownlintignore is reported',
+    /markdownlint-cli2 does not read that file/.test(unhonoured.stderr),
+    unhonoured.stderr
+  );
+  rmSync(join(repo, '.markdownlintignore'), { force: true });
+
   // #61: as create-if-absent, a bug in this workflow was permanent downstream —
   // the kit that wrote it could never replace it.
   writeFileSync(syncWorkflow, '# a stale copy with the bug in it\n');
