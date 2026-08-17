@@ -2,15 +2,14 @@
 title: TODO
 description: Priority bands for mjs-project-template.
 last_updated: "2026-08-17"
-kit_version: "v1.1.0-1-g4952cdc"
+kit_version: "v1.2.1-1-gb87e855"
 ---
 
 # TODO
 
 ## 🔴 P0 — Security & Critical
 
-_None._ No open Dependabot alerts, no code scanning analysis, and `npm audit` reports 0
-vulnerabilities across 348 dependencies.
+_None._
 
 ## 🟠 P1
 
@@ -33,4 +32,4 @@ _None._
 
 ## ❓ Needs triage
 
-_None._
+- [#53](https://github.com/jwilleke/mjs-project-template/issues/53) — [EPIC] .agent-kit.json — one machine-readable manifest for kit state
