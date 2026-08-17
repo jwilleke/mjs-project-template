@@ -1,11 +1,35 @@
 ---
 title: Project Log
 description: Session history for mjs-project-template.
-last_updated: "2026-06-16"
+last_updated: "2026-08-17"
 kit_version: "v1.0.0-9-gae575c2"
 ---
 
 # Project Log
+
+## 2026-08-17-01
+
+- Agent: Claude
+- Subject: Stop Kit Check reporting healthy repos as failures
+- Current Issue: #49, #50, #51, #52
+- Work Done:
+  - `bin/kit.mjs` exits 0 on drift; `--fail-on-drift` restores gating. Exit 2 reserved for the check
+    being unable to run, including `--report-issue` failing to file the issue that carries the news
+  - Drift issue created labelled `P2` + `kit` (create-only, so a human regrade sticks); falls back to
+    filing unlabelled on a 422 from an undefined label. `--label` / `--no-labels` override
+  - `utility/sync-labels.sh` defines the `kit` label; applied to this repo
+  - Managed AGENTS.md heading renamed to `## Agent Kit Protocols` so it cannot collide with a repo's
+    own section below KIT:END; `install-kit.sh` also warns on any remaining collision at sync time
+  - Added `utility/lint-fresh-install.mjs` (wired into `npm run lint`): installs into an empty repo
+    and asserts lint, gitignore ordering, `git add -A` safety, idempotence, and the collision warning
+  - Bumped root and `@jwilleke/agent-kit` to 1.2.0
+- Commits: fcb791b, 2fcf86d
+- Files Modified:
+  - `bin/kit.mjs`, `bin/kit.test.mjs`
+  - `install-kit.sh`, `utility/sync-labels.sh`, `utility/lint-fresh-install.mjs`
+  - `templates/agents-boilerplate.md`, `templates/kit-check.yml.tmpl`
+  - `README.md`, `docs/kit-distribution.md`, `packages/agent-kit/README.md`
+  - `package.json`, `packages/agent-kit/package.json`, `TODO.md`
 
 Rules for the log entry:
 
