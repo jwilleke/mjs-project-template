@@ -17,7 +17,6 @@ last_updated: "2026-08-18"
 ## 🟡 P2
 
 - [#65](https://github.com/jwilleke/mjs-project-template/issues/65) — [BUG] yourphr carries an inert .markdownlint.jsonc, and syncing it would rewrite three files it should not
-- [#64](https://github.com/jwilleke/mjs-project-template/issues/64) — [CHORE] Two consumers still call markdownlint v1, so their two linters disagree about what is exempt
 - [#63](https://github.com/jwilleke/mjs-project-template/issues/63) — [BUG] 25 tags have no GitHub Release, so the Releases page says nothing shipped since v1.1.0
 
 ## 🔵 In review
