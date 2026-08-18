@@ -16,6 +16,7 @@ last_updated: "2026-08-18"
 
 ## 🟡 P2
 
+- [#66](https://github.com/jwilleke/mjs-project-template/issues/66) — [FEATURE] There is no way to retire a consumer — removing it from a list does nothing
 - [#65](https://github.com/jwilleke/mjs-project-template/issues/65) — [BUG] yourphr carries an inert .markdownlint.jsonc, and syncing it would rewrite three files it should not
 - [#63](https://github.com/jwilleke/mjs-project-template/issues/63) — [BUG] 25 tags have no GitHub Release, so the Releases page says nothing shipped since v1.1.0
 
