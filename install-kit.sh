@@ -485,12 +485,21 @@ warn_markdownlintignore() {  # entries cli2 does not read, and never will
   n="$(grep -cvE '^\s*(#|$)' "$f" 2>/dev/null || echo 0)"
   [ "${n:-0}" -gt 0 ] 2>/dev/null || return 0
 
-  echo "  NOTE: .markdownlintignore has $n entr(ies), and markdownlint-cli2 does not read that file." >&2
-  echo "        Those exemptions are NOT in effect:" >&2
+  echo "  NOTE: .markdownlintignore has $n entr(ies), which markdownlint-cli2 does not read:" >&2
   grep -vE '^\s*(#|$)' "$f" | sed 's/^/             /' >&2
-  echo "        Anything gitignored is already exempt. For the rest, put a" >&2
+  if uses_markdownlint_v1; then
+    # The file is still doing real work here, just not for cli2 — so the two
+    # linters in this repo disagree about what is exempt. Deleting it breaks the
+    # v1 caller, which is a worse outcome than the disagreement.
+    echo "        This repo still calls the v1 markdownlint binary, which DOES read them, so" >&2
+    echo "        your two linters disagree about what is exempt. Do not delete this file until" >&2
+    echo "        those callers move to markdownlint-cli2." >&2
+  else
+    echo "        Nothing here reads them, so they are not in effect." >&2
+  fi
+  echo "        Anything gitignored is already exempt to cli2. For the rest, put a" >&2
   echo "        .markdownlint-cli2.jsonc beside the directory — the kit never writes into" >&2
-  echo "        subdirectories, so it survives every sync. Then delete this file." >&2
+  echo "        subdirectories, so it survives every sync." >&2
 }
 
 fix_markdown() {           # bring the repo's markdown to the rules the sync just installed
