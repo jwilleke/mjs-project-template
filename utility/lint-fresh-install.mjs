@@ -183,6 +183,28 @@ try {
   );
   rmSync(join(repo, '.markdownlintignore'), { force: true });
 
+  // The v1 detector inverted silently once: `grep -q` took SIGPIPE, pipefail
+  // turned that into a failed pipeline, and it answered "no" for every repo — so
+  // the legacy config was retired from repos that still needed it, and kept in
+  // repos that did not, where it suppressed the kit's pinned emphasis rules.
+  writeFileSync(join(repo, 'package.json'), '{ "scripts": { "lint:md": "markdownlint \\"**/*.md\\"" } }\n');
+  writeFileSync(join(repo, '.markdownlint.jsonc'), '{}\n');
+  run(join(root, 'install-kit.sh'), [repo]);
+  check(
+    'the legacy config survives where a v1 caller remains',
+    existsSync(join(repo, '.markdownlint.jsonc')),
+    'it was retired out from under the v1 binary'
+  );
+
+  writeFileSync(join(repo, 'package.json'), '{ "scripts": { "lint:md": "markdownlint-cli2" } }\n');
+  run(join(root, 'install-kit.sh'), [repo]);
+  check(
+    'the legacy config is retired once nothing reads it',
+    !existsSync(join(repo, '.markdownlint.jsonc')),
+    'it outlived its last caller'
+  );
+  rmSync(join(repo, 'package.json'), { force: true });
+
   // #61: as create-if-absent, a bug in this workflow was permanent downstream —
   // the kit that wrote it could never replace it.
   writeFileSync(syncWorkflow, '# a stale copy with the bug in it\n');

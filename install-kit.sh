@@ -384,16 +384,26 @@ supersede_markdownlint() { # .markdownlint.json → .markdownlint.jsonc
 }
 
 uses_markdownlint_v1() {   # does anything here still call the v1 `markdownlint` binary?
-  # `markdownlint` as a word, not `markdownlint-cli2`. Checked in the places a
-  # repo actually invokes it from; the kit manages none of them.
-  grep -rlE '(^|[^-[:alnum:]])markdownlint([^-]|$)' \
+  # Line-wise, not file-wise. The previous version piped candidate FILES through
+  # `grep -lv markdownlint-cli2`, which lists any file containing a line that is
+  # not that — nearly every file — so it answered yes for repos that only ever
+  # called cli2. jwilleke/yourphr was kept on the legacy config for that reason,
+  # and the legacy config silently suppressed the kit's pinned emphasis rules
+  # there: 6,782 violations invisible behind it.
+  #
+  # Take the lines mentioning markdownlint, drop the ones mentioning cli2, and
+  # see whether anything is left.
+  # `grep -c`, not `grep -q`: -q exits on the first match, the upstream greps take
+  # SIGPIPE, and `set -o pipefail` turns that into a failed pipeline — so the
+  # detector answered "no" every time regardless of content.
+  local hits
+  hits="$(grep -rhE 'markdownlint' \
     "$TARGET/package.json" "$TARGET/.lintstagedrc" "$TARGET/.lintstagedrc.json" \
     "$TARGET/.husky" "$TARGET/.github/workflows" 2>/dev/null |
-    xargs -r grep -lvE 'markdownlint-cli2' >/dev/null 2>&1 && return 0
+    grep -vE 'markdownlint-cli2' |
+    grep -c 'markdownlint' || true)"
 
-  grep -rqE '(^|[^-[:alnum:]])markdownlint([^-2]|$)' \
-    "$TARGET/package.json" "$TARGET/.lintstagedrc" "$TARGET/.lintstagedrc.json" \
-    "$TARGET/.husky" "$TARGET/.github/workflows" 2>/dev/null
+  [ "${hits:-0}" -gt 0 ] 2>/dev/null
 }
 
 retire_deprecated() {      # remove files the kit no longer ships

@@ -1,6 +1,6 @@
 {
   "name": "@jwilleke/agent-kit",
-  "version": "1.11.2",
+  "version": "1.11.3",
   "description": "Agent commands and document formats for repos in any language, with a drift checker",
   "keywords": [
     "claude",
