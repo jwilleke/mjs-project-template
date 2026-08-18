@@ -325,7 +325,12 @@ seed() {                   # copy REL from kit only if absent (source at the sam
 
 ensure_gitignore() {       # append missing lines, never remove
   local gi="$TARGET/.gitignore" line
-  for line in "private/" ".claude/settings.local.json" ".claude/worktrees/" ".kit-sync/" ".kit-check/"; do
+  # .continue/ and .agents/ hold agent skills installed by tooling, not repo
+  # content — tracked in none of the twelve, present wherever someone installed a
+  # plugin. Unignored they are linted as prose: a vendored skill README put 22
+  # MD033 errors into every local run in jwilleke/ngdpbase.
+  for line in "private/" ".claude/settings.local.json" ".claude/worktrees/" \
+              ".kit-sync/" ".kit-check/" ".continue/" ".agents/"; do
     if [ -f "$gi" ] && grep -qxF -- "$line" "$gi"; then act "gitignore ok: $line"; continue; fi
     act "gitignore += $line"
     if [ "$DRY" -eq 0 ]; then printf '%s\n' "$line" >>"$gi"; fi
