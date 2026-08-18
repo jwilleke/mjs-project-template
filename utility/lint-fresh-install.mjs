@@ -164,7 +164,7 @@ try {
   const unhonoured = run(join(root, 'install-kit.sh'), ['--dry-run', repo]);
   check(
     'an unhonoured .markdownlintignore is reported',
-    /markdownlint-cli2 does not read that file/.test(unhonoured.stderr),
+    /which markdownlint-cli2 does not read/.test(unhonoured.stderr),
     unhonoured.stderr
   );
   rmSync(join(repo, '.markdownlintignore'), { force: true });
