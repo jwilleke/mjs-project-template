@@ -1,7 +1,7 @@
 ---
 title: TODO
 description: Priority bands for mjs-project-template.
-last_updated: "2026-08-17"
+last_updated: "2026-08-18"
 ---
 
 # TODO
@@ -12,11 +12,12 @@ last_updated: "2026-08-17"
 
 ## 🟠 P1
 
-- [#61](https://github.com/jwilleke/mjs-project-template/issues/61) — [BUG] Kit Sync goes red on every push where Actions cannot open PRs, and git add -A swallows its own .kit-sync checkout
+- [#62](https://github.com/jwilleke/mjs-project-template/issues/62) — [BUG] The self-sync cannot deliver its own workflow, and the loop has never been observed closing
 
 ## 🟡 P2
 
-*None.*
+- [#64](https://github.com/jwilleke/mjs-project-template/issues/64) — [CHORE] Two consumers still call markdownlint v1, so their two linters disagree about what is exempt
+- [#63](https://github.com/jwilleke/mjs-project-template/issues/63) — [BUG] 25 tags have no GitHub Release, so the Releases page says nothing shipped since v1.1.0
 
 ## 🔵 In review
 
