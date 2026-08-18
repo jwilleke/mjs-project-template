@@ -117,11 +117,11 @@ jobs:
 
           git checkout -b "$branch"
 
-          # Two exclusions, for different reasons.
-          #
-          # .kit-sync — the kit checkout lives inside this work tree, and a blank
-          # `git add -A` stages it as an embedded git repository, putting a gitlink
-          # to the kit in every sync commit.
+          # .kit-sync is NOT excluded here. install-kit.sh puts it in .gitignore,
+          # which is enough — and naming an already-ignored path in a pathspec
+          # makes `git add` exit non-zero ("Use -f if you really want to add
+          # them"), which under `bash -e` kills the step. Belt and braces turned
+          # out to be belt versus braces.
           #
           # .github/workflows — GITHUB_TOKEN may not push changes to a workflow
           # file. The push is rejected outright ("refusing to allow a GitHub App to
@@ -129,7 +129,7 @@ jobs:
           # would fail the whole sync over a file the job cannot deliver anyway.
           # The kit owns this workflow, so a local `install-kit.sh --pr` run by a
           # human updates it; the self-sync delivers everything else.
-          git add -A -- ':!.kit-sync' ':!.github/workflows'
+          git add -A -- ':!.github/workflows'
 
           if git diff --cached --quiet; then
             echo "::notice::The only pending kit change is under .github/workflows/, which"
