@@ -22,7 +22,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # `write`, not `read`: the job now creates the GitHub release as well as
+  # publishing, and gh release create needs it.
+  contents: write
   # Lets npm authenticate by OIDC (trusted publishing) instead of a token.
   # Token auth is the fallback while the trusted publisher is unconfigured.
   id-token: write
@@ -80,6 +82,29 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # A cut is a tag, a package AND a GitHub release — AGENTS.md says so and
+      # /semver does all three. Done by hand, the third step was skipped every
+      # time: 26 tags and 1 release, so the Releases page claimed nothing had
+      # shipped since v1.1.0 while twenty-odd versions were on npm, including two
+      # security fixes. Doing it here means the three can no longer disagree.
+      - name: Create the GitHub release
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="v${{ steps.decide.outputs.version }}"
+
+          if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "::notice::$tag is not tagged; publishing without a release."
+            exit 0
+          fi
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists."
+            exit 0
+          fi
+
+          gh release create "$tag" --title "$tag" --generate-notes --verify-tag
 
       - name: Summary
         run: |
