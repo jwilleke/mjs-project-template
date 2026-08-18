@@ -116,18 +116,56 @@ version is recorded, what is deliberately not distributed, and why the kit is no
 see [docs/kit-distribution.md](docs/kit-distribution.md). Read it before changing anything under
 `templates/` or `.claude/commands/`; those files fan out to every downstream repo.
 
-#### Telling a repo it is behind
+#### What a repo needs to qualify
 
-`install-kit.sh` seeds `.github/workflows/kit-check.yml`, which runs weekly and opens (then updates)
-a single tracking issue when the repo is behind the kit. It needs nothing from the repo but the
-workflow file — Actions runners already ship Node, so it works in the C++, Go, Python and Shell
-consumers as well as the Node ones.
+Almost nothing, and nothing about its language. The kit installs into C++, Go, Python, Shell and
+Flux repos as readily as Node ones — half the current consumers have no `package.json`.
 
-The workflow is __green when the repo is behind__, and the issue it files is graded `P2`.
-Drift is the expected steady state, so a red X would be permanent, weekly, and on a repo where
-nothing is broken; red is reserved for the check failing to run at all.
+__To install:__ `bash`, `git` and `awk` __on your machine__, not in the target. The target can be an
+empty directory.
 
-Run it by hand against any repo from a kit checkout:
+__To install with `--pr`__, the target must additionally be a git repo, have an `origin` remote, and
+have a __clean working tree__ — the sync has to be the only change in the PR. You also need an
+authenticated `gh`. A repo reachable only over SSH without `gh` must be synced without `--pr`.
+
+__To keep itself up to date afterwards,__ three things, all on GitHub's side:
+
+1. __Actions enabled__, so the seeded `kit-sync.yml` can run.
+2. __Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and
+   approve pull requests."__ It is off by default in many repos and organisations, and no
+   `permissions:` block in a workflow can grant it. Without it the sync still applies cleanly and
+   pushes its branch — it files an issue with a compare link instead of failing.
+3. __Nothing else.__ No PAT, no GitHub App, no secret to rotate. `GITHUB_TOKEN` only, scoped to the
+   repo and expiring with the job.
+
+At runtime the job uses `node`, `npx`, `git` and `gh`, all of which GitHub runners already ship. That
+is why the checker is dependency-free Node: a C++ or Go repo runs it without adopting a runtime.
+
+__The one real constraint__ is markdown. A repo's existing files must satisfy the kit's rules, and
+the sync brings them into line for you — `install-kit.sh` runs `markdownlint-cli2 --fix` over the
+target using the config it just installed. What that cannot repair is content nobody authored:
+vendored libraries, generated API docs, scraped pages. Those take a `.markdownlint-cli2.jsonc` beside
+them, which the kit never writes into and which therefore survives every sync. The installer names
+the offending directories when it finds them.
+
+#### Keeping a repo up to date
+
+`install-kit.sh` seeds `.github/workflows/kit-sync.yml`. On a push to the default branch, or on
+demand, the repo checks itself out, checks the kit out beside it, and — if it is behind — __runs the
+installer and opens a pull request__ labelled `P2`. Merging it is the only manual step.
+
+There is no cron. A schedule fires while nobody is looking, and GitHub disables scheduled workflows
+after 60 days of repository inactivity, so it stops firing in exactly the dormant repos that drift
+furthest.
+
+Drift is measured on __tags__, not commits. A consumer is behind when a release has been cut, not
+every time anything lands here — otherwise twelve repos would open a pull request over a typo fix.
+
+The workflow itself is a thin stub; its body is `utility/kit-sync.sh`, an ordinary kit file. That
+split exists because `GITHUB_TOKEN` may not push a file under `.github/workflows/`, so logic held in
+the workflow could only ever be updated by a human syncing every consumer by hand.
+
+Run the checker by hand against any repo from a kit checkout:
 
 ```bash
 node bin/kit.mjs check /path/to/repo          # 0 even when behind; 2 if it could not check
