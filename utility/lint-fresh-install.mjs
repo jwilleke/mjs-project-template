@@ -137,10 +137,12 @@ try {
     readFileSync(join(repo, '.gitignore'), 'utf8').includes('.kit-sync/'),
     readFileSync(join(repo, '.gitignore'), 'utf8')
   );
+  // Naming an already-ignored path in a pathspec makes `git add` exit non-zero,
+  // which under `bash -e` kills the step. .gitignore alone is the exclusion.
   check(
-    'kit-sync.yml never stages the kit checkout',
-    /git add -A -- ':!\.kit-sync'/.test(readFileSync(syncWorkflow, 'utf8')),
-    'a blank `git add -A` reappeared'
+    'kit-sync.yml does not also exclude the kit checkout by pathspec',
+    !/':!\.kit-sync'/.test(readFileSync(syncWorkflow, 'utf8')),
+    'the pathspec that conflicts with .gitignore is back'
   );
   // A repo that has not ticked "Allow GitHub Actions to create and approve pull
   // requests" would otherwise go red on every push, for a reason that means
@@ -184,7 +186,7 @@ try {
   // promoted kit-sync.yml to overwrite-template and hit exactly that.
   check(
     'kit-sync.yml excludes .github/workflows from its own commit',
-    /git add -A -- ':!\.kit-sync' ':!\.github\/workflows'/.test(readFileSync(syncWorkflow, 'utf8')),
+    /git add -A -- ':!\.github\/workflows'/.test(readFileSync(syncWorkflow, 'utf8')),
     'the self-sync would try to push a workflow file'
   );
 
