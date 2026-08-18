@@ -250,6 +250,19 @@ Three deliberate choices:
 The one thing `GITHUB_TOKEN` cannot do is modify a file under `.github/workflows/`. Seeded workflows
 are `create-if-absent`, so this only bites when a repo is missing one — the push then fails loudly.
 
+### The workflow is a stub; its body ships as an ordinary kit file
+
+`.github/workflows/kit-sync.yml` contains triggers, permissions and two checkouts — nothing else.
+The logic lives in `utility/kit-sync.sh`, an `overwrite` file the sync delivers like any other.
+
+That split exists because of the limitation below. Five defects in this mechanism each cost a manual
+round across twelve repos, and every one was in the logic rather than the trigger: a red job where
+Actions may not open PRs, `git add -A` staging the kit checkout, pushing a workflow the token may
+not touch, a pathspec fighting its own `.gitignore`. Held in the script, the next one ships with the
+next sync.
+
+Change the workflow file only for triggers, permissions or the checkout steps.
+
 ### The self-sync cannot deliver its own workflow
 
 `GITHUB_TOKEN` may not push a file under `.github/workflows/`. The push is rejected outright —

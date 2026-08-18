@@ -41,6 +41,12 @@ overwrite	.claude/commands/update-agents.md	-	canonical
 overwrite	.markdownlint-cli2.jsonc	-	canonical
 overwrite	utility/set-version.mjs	-	canonical
 
+# The body of the Kit Sync workflow. Held here, not in the workflow file, because
+# GITHUB_TOKEN may not push a workflow — so logic in .github/workflows/ can only
+# be updated by a human syncing every consumer, while this ships like any other
+# overwrite file. Every defect the sync has produced was in this logic.
+overwrite	utility/kit-sync.sh	-	canonical
+
 # /semver is a real command consumers benefit from, but the name is already
 # taken in repos that built their own release tooling (jwilleke/ngdpbase bumps
 # src/utils/version.ts; jwilleke/mjs-ha tags date-stamped snapshots). Those

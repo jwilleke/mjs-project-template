@@ -124,6 +124,18 @@ try {
   // to arrive — and it has to be valid YAML, which nothing else here checks.
   const syncWorkflow = join(repo, '.github/workflows/kit-sync.yml');
   check('the self-sync workflow is seeded', existsSync(syncWorkflow));
+  // The whole point of the split: logic lives in a file the sync can deliver.
+  check(
+    'the sync body ships as an ordinary kit file',
+    existsSync(join(repo, 'utility/kit-sync.sh')),
+    'utility/kit-sync.sh was not installed'
+  );
+  check(
+    'kit-sync.yml stays thin, so it rarely needs a manual round',
+    readFileSync(syncWorkflow, 'utf8').split('\n').length < 90,
+    `kit-sync.yml is ${readFileSync(syncWorkflow, 'utf8').split('\n').length} lines`
+  );
+
   check(
     'kit-sync.yml has no cron — it must not fire while nobody is looking',
     !/^[ \t]*schedule:/m.test(readFileSync(syncWorkflow, 'utf8')),
@@ -141,7 +153,7 @@ try {
   // which under `bash -e` kills the step. .gitignore alone is the exclusion.
   check(
     'kit-sync.yml does not also exclude the kit checkout by pathspec',
-    !/':!\.kit-sync'/.test(readFileSync(syncWorkflow, 'utf8')),
+    !/':!\.kit-sync'/.test(readFileSync(join(repo, 'utility/kit-sync.sh'), 'utf8')),
     'the pathspec that conflicts with .gitignore is back'
   );
   // A repo that has not ticked "Allow GitHub Actions to create and approve pull
@@ -149,7 +161,7 @@ try {
   // neither "checked" nor "could not run".
   check(
     'kit-sync.yml degrades rather than failing when it may not open a PR',
-    /not permitted to create or approve pull requests/.test(readFileSync(syncWorkflow, 'utf8')),
+    /not permitted to create or approve pull requests/.test(readFileSync(join(repo, 'utility/kit-sync.sh'), 'utf8')),
     'the permission failure is no longer handled'
   );
 
@@ -186,7 +198,7 @@ try {
   // promoted kit-sync.yml to overwrite-template and hit exactly that.
   check(
     'kit-sync.yml excludes .github/workflows from its own commit',
-    /git add -A -- ':!\.github\/workflows'/.test(readFileSync(syncWorkflow, 'utf8')),
+    /git add -A -- ':!\.github\/workflows'/.test(readFileSync(join(repo, 'utility/kit-sync.sh'), 'utf8')),
     'the self-sync would try to push a workflow file'
   );
 
