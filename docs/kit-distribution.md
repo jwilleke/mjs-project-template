@@ -69,7 +69,7 @@ The last four are not per-file lists, so they stay in `install-kit.sh`; the rest
 manifest.
 
 The rule that follows from the table: __fix kit files upstream, never in the consumer.__ If the kit
-is wrong, it is wrong for twelve repos — change it here.
+is wrong, it is wrong for fifteen repos — change it here.
 
 An `overwrite` file is still replaced wholesale, but no longer silently: the installer compares the
 target's copy against the same file at the kit version stamped in that repo, and prints the lines
@@ -383,8 +383,8 @@ grep -rn "/Volumes/\|/Users/" package                                       # lo
 grep -rhoE "https?://[A-Za-z0-9./_-]+" package | sort -u                    # every host
 ```
 
-The first matters most and is the least obvious: six of the twelve consumers are __private__ repos, so
-naming one in a shipped template would disclose its existence. `downstream-repos.json` names all twelve
+The first matters most and is the least obvious: most of the fifteen consumers are __private__ repos, so
+naming one in a shipped template would disclose its existence. `downstream-repos.json` names them all
 and is deliberately not in the package.
 
 ### Two version numbers, deliberately
@@ -453,7 +453,7 @@ stored as the `NPM_TOKEN` repo secret.
 
 No — and the reason is in the consumer list, not in the tooling.
 
-Of the twelve repos in `downstream-repos.json`, __six have a `package.json`__ and six do not — the
+Of the fifteen repos in `downstream-repos.json`, __six have a `package.json`__ and the rest do not — the
 rest are Shell, C++, Python, Go, and a Flux/Kubernetes config repo. Distributing an agent kit through
 npm would require half the fleet to adopt Node and a `package.json` they otherwise have no use for,
 purely as a delivery mechanism. The kit is bash and markdown; its dependency footprint is `bash`,

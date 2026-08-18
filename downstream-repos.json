@@ -8,9 +8,12 @@
     "jwilleke/geohazardwatch",
     "jwilleke/grow-nutrient-tank",
     "jwilleke/grow-tent",
+    "jwilleke/js-rocket",
+    "jwilleke/js-rocket-avionics",
     "jwilleke/mj-infra-flux",
     "jwilleke/mjs-ha",
     "jwilleke/mjs-media-handling",
+    "jwilleke/mjs-network",
     "jwilleke/ngdpbase",
     "jwilleke/yourphr",
     "jwilleke/yourphr-ts-spike"
@@ -19,11 +22,6 @@
     {
       "repo": "jwilleke/jwilleke",
       "reason": "profile repo, not a project",
-      "since": "2026-07-27"
-    },
-    {
-      "repo": "jwilleke/js-rocket",
-      "reason": "3D-printing project, not a software project; no issues to rank, never kitted",
       "since": "2026-07-27"
     },
     {
