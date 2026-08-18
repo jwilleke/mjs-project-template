@@ -12,7 +12,7 @@ last_updated: "2026-08-18"
 
 ## 🟠 P1
 
-- [#62](https://github.com/jwilleke/mjs-project-template/issues/62) — [BUG] The self-sync cannot deliver its own workflow, and the loop has never been observed closing
+*None.*
 
 ## 🟡 P2
 
