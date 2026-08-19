@@ -36,6 +36,19 @@ function run(command, args, options = {}) {
   return result;
 }
 
+// js/file-system-race (#69): testing a path with existsSync and then writing it
+// later is a check-then-use pair, and CodeQL flags the write even when — as here
+// — the path is inside a temp repo this harness alone creates and deletes. Read
+// the file instead: the read IS the evidence it was seeded, so there is no
+// window between the two operations to reason about.
+function readOrNull(path) {
+  try {
+    return readFileSync(path, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
 function check(label, ok, detail) {
   if (ok) {
     console.log(`  ok   ${label}`);
@@ -123,7 +136,11 @@ try {
   // #54: the repo must be able to sync itself, so the workflow that does it has
   // to arrive — and it has to be valid YAML, which nothing else here checks.
   const syncWorkflow = join(repo, '.github/workflows/kit-sync.yml');
-  check('the self-sync workflow is seeded', existsSync(syncWorkflow));
+  check(
+    'the self-sync workflow is seeded',
+    readOrNull(syncWorkflow) !== null,
+    'kit-sync.yml was not installed'
+  );
   // The whole point of the split: logic lives in a file the sync can deliver.
   check(
     'the sync body ships as an ordinary kit file',
