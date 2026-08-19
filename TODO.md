@@ -24,7 +24,7 @@ last_updated: "2026-08-19"
 
 ## 🔵 In review
 
-- [#69](https://github.com/jwilleke/mjs-project-template/issues/69) — [security] js/file-system-race — TOCTOU in utility/lint-fresh-install.mjs
+*None.*
 
 ## ⏸ Deferred
 
