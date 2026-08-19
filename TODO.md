@@ -8,7 +8,6 @@ last_updated: "2026-08-19"
 
 ## 🔴 P0 — Security & Critical
 
-- [#69](https://github.com/jwilleke/mjs-project-template/issues/69) — [security] js/file-system-race — TOCTOU in utility/lint-fresh-install.mjs
 - [#53](https://github.com/jwilleke/mjs-project-template/issues/53) — [EPIC] .agent-kit.json — one machine-readable manifest for kit state
 
 ## 🟠 P1
@@ -25,7 +24,7 @@ last_updated: "2026-08-19"
 
 ## 🔵 In review
 
-*None.*
+- [#69](https://github.com/jwilleke/mjs-project-template/issues/69) — [security] js/file-system-race — TOCTOU in utility/lint-fresh-install.mjs
 
 ## ⏸ Deferred
 
