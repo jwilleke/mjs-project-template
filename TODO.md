@@ -32,4 +32,4 @@ last_updated: "2026-08-19"
 
 ## ❓ Needs triage
 
-*None.*
+- [#72](https://github.com/jwilleke/mjs-project-template/pull/72) — fix: correct misleading test gate claim in semver.md *(PR · ready)* — closes [#71](https://github.com/jwilleke/mjs-project-template/issues/71)
