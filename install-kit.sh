@@ -411,7 +411,13 @@ retire_deprecated() {      # remove files the kit no longer ships
   # v1 `markdownlint` binary would be left with no config at all and silently
   # fall back to stock defaults (MD013 at 80 columns, MD040 on), which is how a
   # sync into jwilleke/ngdpbase produced 100+ errors and blocked its own commit.
-  if uses_markdownlint_v1; then
+  # The dependency alone is not enough. jwilleke/mjs-network and
+  # jwilleke/geohazardwatch both carry a vestigial `markdownlint-cli` in
+  # devDependencies, every caller already on markdownlint-cli2, and no
+  # .markdownlint.jsonc at all. The NOTE told the operator a file was being kept
+  # that does not exist, and sent them looking for v1 callers that do not
+  # either. Ask whether there is anything to keep before saying it is kept (#67).
+  if [ -f "$TARGET/.markdownlint.jsonc" ] && uses_markdownlint_v1; then
     echo "  NOTE: keeping .markdownlint.jsonc — this repo still calls the v1 \`markdownlint\` binary," >&2
     echo "        which cannot read .markdownlint-cli2.jsonc. Move those callers to" >&2
     echo "        \`markdownlint-cli2\`, then delete .markdownlint.jsonc." >&2
@@ -496,9 +502,10 @@ warn_markdownlintignore() {  # entries cli2 does not read, and never will
     # The file is still doing real work here, just not for cli2 — so the two
     # linters in this repo disagree about what is exempt. Deleting it breaks the
     # v1 caller, which is a worse outcome than the disagreement.
-    echo "        This repo still calls the v1 markdownlint binary, which DOES read them, so" >&2
-    echo "        your two linters disagree about what is exempt. Do not delete this file until" >&2
-    echo "        those callers move to markdownlint-cli2." >&2
+    echo "        This repo declares markdownlint-cli — the v1 binary, which DOES read them — so" >&2
+    echo "        if anything still invokes it your two linters disagree about what is exempt." >&2
+    echo "        Check for callers before deleting this file; a declared-but-unused dependency" >&2
+    echo "        is common, and then these entries are simply dead (#67)." >&2
   else
     echo "        Nothing here reads them, so they are not in effect." >&2
   fi

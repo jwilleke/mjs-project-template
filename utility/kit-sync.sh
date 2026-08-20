@@ -63,6 +63,14 @@ branch="chore/kit-sync-$version"
 #
 # .github/workflows is excluded because GITHUB_TOKEN may not push it; the whole
 # push is rejected otherwise. A human running install-kit.sh --pr delivers those.
+# kit-status.json and kit-lint.txt are this script's own scratch output, written
+# to the repo root and both read back above. Nothing gitignores them, so `git
+# add -A` swept them into the sync commit: jwilleke/deby carried both on master
+# from the v1.11.1 sync until an unrelated session caught it, and mj-infra-flux
+# PR #175 shipped them too, spotted only because a clean duplicate PR existed to
+# compare against (#68). Neither file is needed past this point.
+rm -f kit-status.json kit-lint.txt
+
 git checkout -b "$branch"
 git add -A -- ':!.github/workflows'
 

@@ -221,6 +221,19 @@ try {
     'it outlived its last caller'
   );
   rmSync(join(repo, 'package.json'), { force: true });
+  // #67: a declared-but-unused markdownlint-cli, with no .markdownlint.jsonc on
+  // disk, made the installer announce it was keeping a file that was not there —
+  // and tell the operator to migrate callers that did not exist. Seen in
+  // jwilleke/mjs-network and jwilleke/geohazardwatch. The two checks above both
+  // write the file first, so neither covers this.
+  writeFileSync(join(repo, 'package.json'), '{ "devDependencies": { "markdownlint-cli": "^0.49.1" } }\n');
+  const noLegacy = run(join(root, 'install-kit.sh'), [repo]);
+  check(
+    'no legacy-config NOTE when there is no legacy config to keep',
+    !/keeping \.markdownlint\.jsonc/.test(noLegacy.stderr),
+    noLegacy.stderr
+  );
+  rmSync(join(repo, 'package.json'), { force: true });
 
   // #61: as create-if-absent, a bug in this workflow was permanent downstream —
   // the kit that wrote it could never replace it.
