@@ -103,6 +103,12 @@ moving an epic out can leave `P0` reading `*None.*` while a `P0`-labeled epic is
 it — that is the intended trade, not a bug. The epic is visible in its own band, which is the
 point.
 
+__Regenerate only what is above `<!-- KIT:END -->`.__ Where `TODO.md` carries the marker,
+everything below it is the repo's own — a local band, a note, a link table — and `/pstatus` must
+leave it byte-for-byte alone. The bands go above it. The TODO linter stops reading there too, so
+content below the marker is never judged against the band rules. A repo without the marker is
+linted and regenerated end to end, as before.
+
 __There is no separate `🔀 Open PRs` band.__ Every open PR appears exactly once under the same
 priority band as issues. A flat PR-only section hid deps work from the ranked backlog (Dependabot
 PRs sat at the bottom while P1 coding looked "empty").

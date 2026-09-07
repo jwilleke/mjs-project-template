@@ -29,6 +29,8 @@ related GitHub issues. The personal log is __never committed__.
 - Follow `.markdownlint-cli2.jsonc`, the control file for markdown style — including for any bare
   URL that arrives inside an issue or PR title. `TODO.md` is generated, so a violation turns the lint
   job red on a file nobody hand-edited.
+- Where `TODO.md` carries `<!-- KIT:END -->`, regenerate only the bands above it and leave
+  everything below untouched — that content belongs to the repo, not the kit.
 - Stage and commit `TODO.md` if it changed: `docs: refresh TODO from issue labels`.
 
 ### Step 4: Journal the session (local only — NOT committed)

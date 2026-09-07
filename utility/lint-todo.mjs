@@ -41,28 +41,49 @@ export const BANDS = [
 
 const ABSENT = '*None.*';
 
+// #75: everything below KIT:END is the repo's own. The kit defines the bands; a
+// repo that wants its own sections — a local band, a note, a link table — puts
+// them after the marker, and nothing here has an opinion about them. The bands
+// must all appear above it.
+const KIT_END = '<!-- KIT:END -->';
+const KIT_START = '<!-- KIT:START';
+
 // `- [#12](https://github.com/o/r/issues/12) — title …`
 const ITEM = /^- \[#(\d+)\]\((https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/(?:issues|pull)\/(\d+))\) — \S/;
 
 export function lintTodo(text) {
   const problems = [];
-  const lines = text.split('\n');
-  const say = (n, message) => problems.push(`TODO.md:${n} ${message}`);
+  const all = text.split('\n');
+
+  // Where the markers are present they define the kit's region, and only that
+  // region is linted. Above KIT:START is /wrap's resume pointer; below KIT:END
+  // is whatever the repo wants. Judging either would make the markers a lie —
+  // and the resume block above them is exactly what took master red for 18 days
+  // before the linter became advisory (#77).
+  const kitStart = all.findIndex((line) => line.trim().startsWith(KIT_START));
+  const kitEnd = all.findIndex((line) => line.trim() === KIT_END);
+  const from = kitStart === -1 ? 0 : kitStart + 1;
+  const to = kitEnd === -1 ? all.length : kitEnd;
+  const lines = all.slice(from, to);
+  // Report against the real file, not the slice.
+  const say = (n, message) => problems.push(`TODO.md:${n + from} ${message}`);
 
   let i = 0;
-  if (lines[0] === '---') {
-    i = lines.indexOf('---', 1);
-    if (i < 0) return ['TODO.md:1 frontmatter opens with --- but never closes'];
-    i += 1;
-  }
-  while (lines[i] !== undefined && (lines[i].trim() === '' || lines[i].trim().startsWith('<!--'))) i++;
+  if (kitStart === -1) {
+    if (lines[0] === '---') {
+      i = lines.indexOf('---', 1);
+      if (i < 0) return ['TODO.md:1 frontmatter opens with --- but never closes'];
+      i += 1;
+    }
+    while (lines[i] !== undefined && (lines[i].trim() === '' || lines[i].trim().startsWith('<!--'))) i++;
 
-  // `# TODO` or `# TODO — owner/repo`; the suffix is a repo's own choice.
-  if (!(lines[i] ?? '').startsWith('# TODO')) {
-    say(i + 1, `expected a "# TODO" heading, found ${JSON.stringify(lines[i] ?? '')}`);
-    return problems;
+    // `# TODO` or `# TODO — owner/repo`; the suffix is a repo's own choice.
+    if (!(lines[i] ?? '').startsWith('# TODO')) {
+      say(i + 1, `expected a "# TODO" heading, found ${JSON.stringify(lines[i] ?? '')}`);
+      return problems;
+    }
+    i++;
   }
-  i++;
 
   const seen = new Map();
   const found = [];

@@ -6,6 +6,8 @@ last_updated: "2026-09-07"
 
 # TODO
 
+<!-- KIT:START — managed by mjs-project-template; add your own sections below KIT:END -->
+
 ## 🔴 P0 — Security & Critical
 
 *None.*
@@ -35,3 +37,5 @@ last_updated: "2026-09-07"
 ## ❓ Needs triage
 
 - [#74](https://github.com/jwilleke/mjs-project-template/issues/74) — [FEATURE] Make Don't Repeat Yourself (DRY) a first-class agent protocol
+
+<!-- KIT:END -->
