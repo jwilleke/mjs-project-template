@@ -9,15 +9,17 @@ last_updated: "2026-09-07"
 <!-- RESUME:START -->
 ## ▶ Resume here — 2026-09-07
 
-- Last worked on: closed all 6 open issues (#66, #74, #70, #75, #53, #63) and cut v1.12.0
+- Last worked on: closed all 6 open issues, cut v1.12.0, resynced+merged 3 consumers, gave AGENTS.md a GitHub Issues section
 - Branch / state: master, clean, nothing unpushed, no stashes, tagged v1.12.0
-- Running / in-flight: none — all CI green on a758c50 (CI, Deploy, Markdown Lint, CodeQL, Release agent-kit); @jwilleke/agent-kit@1.12.0 is on npm
+- Running / in-flight: none — CodeQL was still finishing on f1705ed (docs-only, nothing gates on it); CI, Deploy and Markdown Lint all green
 - Parked / half-done: none
 - Next steps:
-  - Resync the 3 stale downstream sync PRs rather than merging them — see below
-  - Fix the /semver gap: step 4 bumps only root package.json + lockfile, but this repo keeps packages/agent-kit/package.json in lockstep and release-kit.yml publishes off it. Bumped by hand this cut; teach set-version.mjs or semver.md about it
-  - Consider issues for --retire --pr and for auto-removal from downstream-repos.json — both raised on #66, neither tracked
-- Blockers / significant notes: garage-car-positioning#30, grow-nutrient-tank#26 and grow-tent#13 are all OPEN and CLEAN but cut at v1.11.4-5-g17d7aa6 — 40+ commits stale, predating every fix in v1.12.0. Resync, do not merge. Also: 4 consumers sit at kit v1.11.1 (garage-car-positioning, grow-nutrient-tank, grow-tent, mjs-media-handling) while the other 11 are at v1.11.4; none has v1.12.0 yet.
+  - #78 (P1) — decide how much of the new GitHub Issues section belongs in templates/agents-boilerplate.md, and fix epic.md's `- [ ] #NNN` checklist. Operator has said templates over-constrain, so the scope is a judgement call, not a copy
+  - Sync mjs-media-handling: last consumer at kit v1.11.1, its August sync PR was CLOSED not merged, so nothing is pending and it will not self-heal
+  - Push the other 11 consumers from v1.11.4 to v1.12.0 when convenient
+  - Fix the /semver lockstep gap: step 4 bumps only root package.json + lockfile, but release-kit.yml publishes off packages/agent-kit/package.json. Bumped by hand for v1.12.0; teach set-version.mjs or semver.md about it before the next cut
+  - Untracked: issues for `--retire --pr` and for auto-removal from downstream-repos.json (both raised on #66)
+- Blockers / significant notes: none. Fleet kit versions — v1.12.0: grow-tent, grow-nutrient-tank, garage-car-positioning. v1.11.4: the other 11. v1.11.1: mjs-media-handling. All stale sync PRs are resolved (two closed as superseded, one merged before its replacement landed on top).
 <!-- RESUME:END -->
 
 <!-- KIT:START — managed by mjs-project-template; add your own sections below KIT:END -->
