@@ -41,6 +41,30 @@ jobs:
       - name: Test with coverage
         run: npm run test:coverage
 
+  # Runs install-kit.sh into an empty repo twice (contents, then idempotency).
+  # It is the slowest check by an order of magnitude and the only one that tests
+  # what a consumer actually receives, so it gets its own runner rather than
+  # sitting in lint-and-test's serial path and delaying unit feedback.
+  lint-install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint a fresh install
+        run: npm run lint:install
+
   security-audit:
     runs-on: ubuntu-latest
 

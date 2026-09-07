@@ -1,6 +1,6 @@
 ---
 project_state: "template"
-last_updated: "2026-06-20"
+last_updated: "2026-09-07"
 agent_priority_level: "medium"
 blockers: []
 requires_human_review: ["major architectural changes", "security policy modifications", "deployment to production"]
@@ -212,7 +212,7 @@ npm run build            # Build project (TypeScript -> dist/)
 npm start                # Run built project
 
 # Code Quality
-npm run lint             # Lint code AND markdown
+npm run lint             # Lint code, templates and TODO bands
 npm run lint:fix         # Auto-fix lint issues
 npm run format           # Format with Prettier
 
@@ -223,7 +223,8 @@ npm run test:coverage    # Coverage report
 
 # Individual linting
 npm run lint:code        # ESLint only
-npm run lint:md          # Markdown only
+npm run lint:md          # Markdown only (own CI job; not in `npm run lint`)
+npm run lint:install     # Install the kit into a temp repo and check it (own CI job)
 npm run typecheck        # TypeScript type checking without emit
 ```
 
