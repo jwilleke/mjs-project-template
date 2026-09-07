@@ -12,7 +12,6 @@ last_updated: "2026-09-07"
 
 ## 🟠 P1
 
-- [#73](https://github.com/jwilleke/mjs-project-template/pull/73) — chore(deps-dev): bump @humanfs/node from 0.16.7 to 0.16.8 *(PR · ready)* — likely [#76](https://github.com/jwilleke/mjs-project-template/issues/76)
 - [#75](https://github.com/jwilleke/mjs-project-template/issues/75) — Changes to /pstatus
 
 ## 🟡 P2
@@ -23,7 +22,7 @@ last_updated: "2026-09-07"
 
 ## 🔵 In review
 
-*None.*
+- [#76](https://github.com/jwilleke/mjs-project-template/issues/76) — [SECURITY] @humanfs/node — recursive copy follows symlinks outside the source tree (medium)
 
 ## ⏸ Deferred
 
