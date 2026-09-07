@@ -385,6 +385,17 @@ try {
     agentsAfter
   );
 
+  check(
+    '--retire strips the kit_version stamp, which the kit maintained every sync',
+    !/^kit_version:/m.test(agentsAfter),
+    agentsAfter
+  );
+  check(
+    '--retire leaves the rest of the frontmatter intact',
+    /^project_state:/m.test(agentsAfter) && /^agent_autonomy_level:/m.test(agentsAfter),
+    agentsAfter
+  );
+
   const retireAgain = run(join(root, 'install-kit.sh'), ['--retire', repo]);
   check(
     '--retire is idempotent — a repo already retired is not an error',
