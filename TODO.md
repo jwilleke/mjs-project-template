@@ -8,6 +8,10 @@ last_updated: "2026-09-07"
 
 ## 🔴 P0 — Security & Critical
 
+*None.*
+
+## 🟣 Epics
+
 - [#53](https://github.com/jwilleke/mjs-project-template/issues/53) — [EPIC] .agent-kit.json — one machine-readable manifest for kit state
 
 ## 🟠 P1

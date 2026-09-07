@@ -21,7 +21,7 @@ related GitHub issues. The personal log is __never committed__.
 ### Step 3: Refresh `TODO.md` and commit it
 
 - Regenerate `TODO.md` from the current GitHub issue labels (same banding as `/pstatus`:
-  P0 / P1 / P2 / Deferred / Needs triage). The `▶ Resume here` pointer is owned by `/wrap`; no need
+  P0 / Epics / P1 / P2 / In review / Deferred / Needs triage). The `▶ Resume here` pointer is owned by `/wrap`; no need
   to preserve it here. If `/pstatus` was just run, it is already current.
 - Apply `needs-triage` to any open issue with no placement label (`P0` / `P1` / `P2` / `deferred` /
   `in-review`), exactly as `/pstatus` does. Two commands that regenerate the same file from the same

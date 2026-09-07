@@ -26,8 +26,12 @@
 import { readFileSync, realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const BANDS = [
+// Exported so lint-todo.test.mjs and any future consumer read the list from here
+// rather than keeping a second copy. The band list was written in eight places
+// across the repo and one copy was already stale — see issue #74.
+export const BANDS = [
   '## 🔴 P0 — Security & Critical',
+  '## 🟣 Epics',
   '## 🟠 P1',
   '## 🟡 P2',
   '## 🔵 In review',
@@ -125,7 +129,7 @@ export function lintTodo(text) {
   const ordered = found.filter((b) => BANDS.includes(b));
   const expected = BANDS.filter((b) => ordered.includes(b));
   if (ordered.join('|') !== expected.join('|')) {
-    problems.push('TODO.md: bands are out of order — P0, P1, P2, In review, Deferred, Needs triage');
+    problems.push('TODO.md: bands are out of order — P0, Epics, P1, P2, In review, Deferred, Needs triage');
   }
 
   return problems;

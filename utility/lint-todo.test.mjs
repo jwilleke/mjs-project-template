@@ -1,15 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
-import { lintTodo } from './lint-todo.mjs';
-
-const BANDS = [
-  '## 🔴 P0 — Security & Critical',
-  '## 🟠 P1',
-  '## 🟡 P2',
-  '## 🔵 In review',
-  '## ⏸ Deferred',
-  '## ❓ Needs triage'
-];
+// BANDS comes from the linter, not a copy. A second list here would drift, and
+// this suite exists because drift in exactly this shape went unnoticed.
+import { BANDS, lintTodo } from './lint-todo.mjs';
 
 /** A valid file, with `overrides` replacing a band's body. */
 function todo(overrides = {}) {

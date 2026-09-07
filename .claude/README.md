@@ -44,7 +44,7 @@ Ranked briefing that surfaces security first, ranks open work by priority, regen
 #### What it shows
 
 - Open security signals (Dependabot / code-scanning) bridged into tracking issues
-- Open issues grouped into bands: P0 / P1 / P2 / In review / Deferred / Needs triage
+- Open issues grouped into bands: P0 / Epics / P1 / P2 / In review / Deferred / Needs triage
 - A single "Do this next" recommendation
 
 When to use: To decide what to work on in the current session, and again right before `/session-commit`.
