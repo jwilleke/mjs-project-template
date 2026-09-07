@@ -22,7 +22,7 @@ last_updated: "2026-09-07"
 
 ## 🔵 In review
 
-- [#76](https://github.com/jwilleke/mjs-project-template/issues/76) — [SECURITY] @humanfs/node — recursive copy follows symlinks outside the source tree (medium)
+*None.*
 
 ## ⏸ Deferred
 
