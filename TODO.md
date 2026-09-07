@@ -22,7 +22,7 @@ last_updated: "2026-09-07"
 
 ## 🟡 P2
 
-- [#63](https://github.com/jwilleke/mjs-project-template/issues/63) — [BUG] 25 tags have no GitHub Release, so the Releases page says nothing shipped since v1.1.0
+*None.*
 
 ## 🔵 In review
 
