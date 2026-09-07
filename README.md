@@ -139,6 +139,14 @@ __To keep itself up to date afterwards,__ three things, all on GitHub's side:
 3. __Nothing else.__ No PAT, no GitHub App, no secret to rotate. `GITHUB_TOKEN` only, scoped to the
    repo and expiring with the job.
 
+__One case needs a nudge:__ if the default branch has __required status checks__, the sync PR can
+never merge on its own. `GITHUB_TOKEN` does not start workflow runs for events it creates, so the
+required checks never run and the PR sits mergeable-but-blocked — with nothing red to notice, since
+the checks that do appear (CodeQL, GitGuardian) trigger independently and pass. The sync detects
+this and spells it out in the PR body. To unblock, make the checks fire under a user token: close
+and reopen the PR if those workflows list `reopened` among their `pull_request` types, otherwise
+push any commit to the branch. No admin bypass is needed.
+
 At runtime the job uses `node`, `npx`, `git` and `gh`, all of which GitHub runners already ship. That
 is why the checker is dependency-free Node: a C++ or Go repo runs it without adopting a runtime.
 

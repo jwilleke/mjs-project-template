@@ -41,3 +41,33 @@ describe('kit-sync.sh staging', () => {
     expect(script).toMatch(/git add -A -- ':!\.github\/workflows'/);
   });
 });
+
+// #70: a base branch with required status checks can never merge this PR, because
+// GITHUB_TOKEN does not start workflow runs for events it creates. The sync cannot
+// fix that; these assert it does not stay silent about it.
+describe('kit-sync.sh required-status-check warning', () => {
+  it('asks the API which checks the base branch requires', () => {
+    expect(script).toContain('required_status_checks');
+    expect(script).toMatch(/branches\/\$BASE\/protection/);
+  });
+
+  it('does not fail the sync when the branch has no protection', () => {
+    // An unprotected branch 404s here. Without the redirect and the `?` on
+    // `.contexts[]?`, `set -e` would abort a sync that had nothing wrong with it.
+    // The call spans a line continuation, so match the statement, not one line.
+    expect(script).toMatch(/required_status_checks[\s\S]{0,120}2>\/dev\/null/);
+    expect(script).toContain('.contexts[]?');
+  });
+
+  it('names the unblock steps, not just the problem', () => {
+    expect(script).toContain('cannot merge on its own');
+    expect(script).toContain('close and reopen this PR');
+    expect(script).toMatch(/push any commit/);
+  });
+
+  it('adds the warning only when checks are actually required', () => {
+    const guard = script.split('\n').findIndex((l) => l.includes('if [ -n "$required" ]'));
+
+    expect(guard).toBeGreaterThan(-1);
+  });
+});

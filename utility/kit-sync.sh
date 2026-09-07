@@ -89,6 +89,18 @@ if gh pr view "$branch" --json number >/dev/null 2>&1; then
   exit 0
 fi
 
+# #70: a base branch with required status checks can never merge this PR.
+# GITHUB_TOKEN does not start workflow runs for events it creates, so the required
+# checks never run, and the PR sits MERGEABLE but BLOCKED with no failure to notice
+# — the checks that DO appear (CodeQL, GitGuardian) trigger independently and go
+# green, which makes it look healthy. The sync cannot fix this; it can stop being
+# silent about it. jwilleke/yourphr#562 sat blocked for a day this way.
+required=""
+if contexts="$(gh api "repos/{owner}/{repo}/branches/$BASE/protection/required_status_checks" \
+                 --jq '.contexts[]?' 2>/dev/null)" && [ -n "$contexts" ]; then
+  required="$(printf '%s' "$contexts" | sed 's/^/- `/; s/$/`/')"
+fi
+
 body="Automated kit sync applied by \`install-kit.sh\` from
 [mjs-project-template](https://github.com/jwilleke/mjs-project-template).
 
@@ -103,6 +115,28 @@ changes stay between the \`KIT:START\` / \`KIT:END\` markers. If something here 
 upstream in the template — the next sync would overwrite a local fix.
 
 Changes under \`.github/workflows/\` are not included: \`GITHUB_TOKEN\` may not push them."
+
+if [ -n "$required" ]; then
+  body="$body
+
+---
+
+**This PR cannot merge on its own.** \`$BASE\` requires these status checks:
+
+$required
+
+None of them will run here. GitHub does not start workflow runs for pull requests opened by
+\`GITHUB_TOKEN\`, so the required checks stay pending forever and this PR sits blocked with
+nothing red to notice.
+
+To unblock it, make the checks fire under a user token:
+
+- close and reopen this PR — works only if those workflows list \`reopened\` among their
+  \`pull_request\` types
+- otherwise push any commit to \`$branch\`
+
+No admin bypass is needed either way."
+fi
 
 # P2 on creation: /pstatus places a PR by its own label first, and an unlabelled
 # one lands in Needs triage in every repo on every release.
