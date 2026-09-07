@@ -15,6 +15,12 @@
 //   4. every item is a link line whose visible number matches its URL
 //   5. no issue or PR is referenced twice in the file
 //
+// Advisory only: it reports and always exits 0. The band rules are a formatting
+// convention for a generated file, and a convention that can fail a build costs
+// more than it protects — see issue #77, where the resume block /wrap is
+// documented to write took master red for 18 days and held up a security fix
+// for four. Nothing forces this output to be read; that is the accepted trade.
+//
 // Usage: node utility/lint-todo.mjs [path]   (default: TODO.md)
 
 import { readFileSync, realpathSync } from 'node:fs';
@@ -134,8 +140,8 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
   if (problems.length) {
     for (const problem of problems) console.error(problem);
     console.error(`\n${path} does not follow the band rules in .claude/commands/pstatus.md`);
-    process.exit(1);
+    console.error('This is advisory — it does not fail the build. Fix it on the next /pstatus.');
+  } else {
+    console.log(`${path} follows the band rules`);
   }
-
-  console.log(`${path} follows the band rules`);
 }
