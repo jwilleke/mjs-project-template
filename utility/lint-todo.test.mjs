@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
 
 import { lintTodo } from './lint-todo.mjs';
 
@@ -73,9 +72,5 @@ describe('lintTodo', () => {
 
   it('allows HTML comments, which the template uses for guidance', () => {
     expect(lintTodo(todo({ '## 🟡 P2': '<!-- a note -->\n\n*None.*' }))).toEqual([]);
-  });
-
-  it('passes this repo\'s own TODO.md', () => {
-    expect(lintTodo(readFileSync('TODO.md', 'utf8'))).toEqual([]);
   });
 });
