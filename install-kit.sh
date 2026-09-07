@@ -7,10 +7,17 @@
 #
 # Usage:
 #   install-kit.sh [--dry-run] [--pr] [target-dir]
+#   install-kit.sh --retire [--dry-run] [target-dir]
 #                                                # target-dir defaults to the current directory
 #
 # Sync modes:
 #   (default)    apply the kit in place, leaving the changes uncommitted for you to review
+#   --retire     stop a repo receiving the kit: delete .github/workflows/kit-sync.yml.
+#                Nothing else is required for a repo to go quiet — the workflow lives inside
+#                the consumer and fires on push regardless of any list here, so dropping a
+#                repo from downstream-repos.json does not stop it (#66). Installs nothing.
+#                Does NOT yet remove the managed files, the AGENTS.md block, or
+#                .agent-kit.json; that is the rest of #66.
 #   --pr         apply on a `chore/kit-sync-<version>` branch, then commit, push, and open a PR.
 #                Requires an authenticated `gh`, an `origin` remote, and a clean working tree.
 #                A kit sync rewrites files in a repo whose owner did not initiate the change, so it
@@ -38,7 +45,9 @@
 #   unignore         .gitignore — narrow a blanket `.claude/` ignore (keeps settings.local.json ignored)
 #   migrate          docs/project_log.md → private/project_log.md (once)
 #   supersede        remove .markdownlint.json in favor of .markdownlint.jsonc
-#   retire           delete files the kit no longer ships (old commands, .markdownlint.jsonc)
+#   retire           delete files the kit no longer ships (old commands, .markdownlint.jsonc).
+#                    Note this is per-FILE and unrelated to the --retire flag, which retires a
+#                    whole consumer.
 #
 # Requires: bash, git, awk. (Run utility/sync-labels.sh separately for GitHub labels.)
 #           --pr additionally requires the `gh` CLI, authenticated.
@@ -49,15 +58,23 @@ set -euo pipefail
 
 DRY=0
 PR=0
+RETIRE=0
 TARGET=""
 for a in "$@"; do
   case "$a" in
     --dry-run) DRY=1 ;;
     --pr)      PR=1 ;;
+    --retire)  RETIRE=1 ;;
     -*) echo "unknown flag: $a" >&2; exit 2 ;;
     *) TARGET="$a" ;;
   esac
 done
+
+if [ "$RETIRE" -eq 1 ] && [ "$PR" -eq 1 ]; then
+  echo "--retire does not support --pr yet — it removes one file, in place, for you to commit." >&2
+  echo "  (opening the retire as a PR is the rest of #66)" >&2
+  exit 2
+fi
 
 TAB="$(printf '\t')"
 
@@ -780,6 +797,32 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   fi
 }
 
+retire_consumer() {        # --retire: stop this repo receiving the kit (#66, slice 1)
+  # Removing the workflow is the whole of the behaviour change. kit-sync.yml lives
+  # INSIDE the consumer and fires on push, so it is the only thing that decides
+  # whether a repo still receives the kit; downstream-repos.json only steers
+  # operator-driven sweeps and has no authority over it. Everything else the kit
+  # owns is inert once the workflow is gone.
+  local rel=".github/workflows/kit-sync.yml"
+  local old="$TARGET/$rel"
+
+  if [ ! -f "$old" ]; then
+    echo "  $rel is not present — this repo already receives nothing."
+    echo
+    echo "Nothing to do."
+    exit 0
+  fi
+
+  act "remove: $rel (this repo will no longer receive the kit)"
+  if [ "$DRY" -eq 0 ]; then
+    if git -C "$TARGET" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
+      git -C "$TARGET" rm -q "$rel"
+    else
+      rm -f "$old"
+    fi
+  fi
+}
+
 # --- run --------------------------------------------------------------------
 
 warn_target_behind_remote() {  # never assume the target checkout is current
@@ -801,6 +844,32 @@ warn_target_behind_remote() {  # never assume the target checkout is current
   echo "           Pull first, or use --pr, which branches from the remote instead." >&2
   echo >&2
 }
+
+if [ "$RETIRE" -eq 1 ]; then
+  # The kit source repo owns kit-sync.yml as a product, not as a consumer of it.
+  if [ "$SRC" = "$TARGET" ]; then
+    echo "--retire refuses to run against the kit source repo itself: $SRC" >&2
+    exit 2
+  fi
+
+  echo "Retiring consumer"
+  echo "  repo: $TARGET"
+  [ "$DRY" -eq 1 ] && echo "  MODE: dry-run — no changes will be written"
+  echo
+
+  warn_target_behind_remote
+  retire_consumer
+  echo
+
+  echo "Done."
+  echo "Next:"
+  echo "  - commit the deletion and push it — the workflow keeps running until it lands"
+  echo "  - remove the repo from downstream-repos.json in mjs-project-template"
+  echo "  - the kit files already installed here are now inert; removing them is the"
+  echo "    rest of #66 and is not done by this flag"
+  if [ "$DRY" -eq 1 ]; then echo "  (re-run without --dry-run to apply the change above)"; fi
+  exit 0
+fi
 
 echo "Installing agent kit"
 echo "  from: $SRC"

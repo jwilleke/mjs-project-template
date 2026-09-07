@@ -308,6 +308,46 @@ try {
     readFileSync(own, 'utf8').includes('This repo has its own release command'),
     again.stdout
   );
+
+  // --retire (#66). The flag deletes a file in a repo the operator is not working
+  // in, so it is checked here rather than left to a manual run: what it removes,
+  // what it must not touch, and that it refuses the kit source repo — where
+  // kit-sync.yml is a product, not a subscription.
+  const workflow = join(repo, '.github/workflows/kit-sync.yml');
+  check('the install seeded kit-sync.yml, so there is something to retire', existsSync(workflow));
+
+  const retireDry = run(join(root, 'install-kit.sh'), ['--retire', '--dry-run', repo]);
+  check(
+    '--retire --dry-run leaves the workflow in place',
+    retireDry.status === 0 && existsSync(workflow),
+    retireDry.stdout
+  );
+
+  const retire = run(join(root, 'install-kit.sh'), ['--retire', repo]);
+  check('--retire exits 0', retire.status === 0, retire.stderr);
+  check('--retire removes kit-sync.yml', !existsSync(workflow), retire.stdout);
+  check(
+    '--retire touches nothing else it does not own',
+    existsSync(join(repo, '.claude/commands/pstatus.md')) && existsSync(join(repo, 'TODO.md')),
+    retire.stdout
+  );
+
+  const retireAgain = run(join(root, 'install-kit.sh'), ['--retire', repo]);
+  check(
+    '--retire is idempotent — a repo already retired is not an error',
+    retireAgain.status === 0,
+    retireAgain.stderr
+  );
+
+  const retireSelf = run(join(root, 'install-kit.sh'), ['--retire', root]);
+  // The source repo has no kit-sync.yml of its own — it ships kit-sync.yml.tmpl —
+  // so the guard is what is being checked here, not a surviving file.
+  check(
+    '--retire refuses the kit source repo',
+    retireSelf.status === 2 && /refuses to run against the kit source repo/.test(retireSelf.stderr),
+    retireSelf.stderr
+  );
+
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }
