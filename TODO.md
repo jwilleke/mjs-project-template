@@ -30,4 +30,5 @@ last_updated: "2026-09-07"
 
 ## ❓ Needs triage
 
+- [#77](https://github.com/jwilleke/mjs-project-template/issues/77) — [BUG] /wrap commits a TODO.md that lint-todo rejects, leaving master red until the next /pstatus
 - [#74](https://github.com/jwilleke/mjs-project-template/issues/74) — [FEATURE] Make Don't Repeat Yourself (DRY) a first-class agent protocol
