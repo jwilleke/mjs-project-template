@@ -22,7 +22,7 @@ last_updated: "2026-09-07"
 
 ## 🔵 In review
 
-- [#77](https://github.com/jwilleke/mjs-project-template/issues/77) — [BUG] /wrap commits a TODO.md that lint-todo rejects, leaving master red until the next /pstatus
+*None.*
 
 ## ⏸ Deferred
 
