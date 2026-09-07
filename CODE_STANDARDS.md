@@ -81,7 +81,7 @@ Key rules:
 Run linting:
 
 ```bash
-npm run lint          # Runs both code and markdown linting
+npm run lint          # ESLint, templates and TODO bands (not markdown)
 npm run lint:code     # ESLint only
 ```
 
@@ -224,7 +224,7 @@ The pre-commit hook runs via lint-staged:
 Run the full lint manually:
 
 ```bash
-npm run lint          # Runs both code and markdown linting
+npm run lint          # ESLint, templates and TODO bands (not markdown)
 ```
 
 ## Package Standards
@@ -266,11 +266,11 @@ Quick checklist:
 
 Before submitting code for review:
 
-- [ ] Code passes linting (`npm run lint` - includes both code and markdown)
+- [ ] Code passes linting (`npm run lint`)
 - [ ] Code is formatted (`npm run format`)
 - [ ] Tests pass and coverage is adequate
 - [ ] TypeScript compiles without errors
-- [ ] Markdown files pass linting (included in `npm run lint`)
+- [ ] Markdown files pass linting (`npm run lint:md`; also its own CI job)
 - [ ] No console.log statements in production code
 - [ ] Commit message follows [conventions](#git-commit-messages)
 - [ ] [AGENTS.md](./AGENTS.md) updated if applicable

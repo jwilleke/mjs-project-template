@@ -9,7 +9,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
-    "lint": "npm run lint:code && npm run lint:md && npm run lint:templates && npm run lint:todo && npm run lint:install",
+    "lint": "npm run lint:code && npm run lint:templates && npm run lint:todo",
     "lint:code": "eslint src/ bin/ utility/",
     "lint:md": "markdownlint-cli2",
     "lint:md:fix": "markdownlint-cli2 --fix",

@@ -23,7 +23,7 @@ cp .env.example .env     # Edit with your values
 ### Verify
 
 ```bash
-npm run lint             # Lint code + markdown
+npm run lint             # Lint code, templates and TODO bands
 npm run typecheck        # TypeScript type checking
 npm run test             # Run tests
 npm run build            # Build project
@@ -35,14 +35,15 @@ npm run build            # Build project
 npm run dev              # Start development server (tsx)
 npm run build            # Build project (TypeScript -> dist/)
 npm start                # Run built project
-npm run lint             # Lint code AND markdown
+npm run lint             # Lint code, templates and TODO bands
 npm run lint:fix         # Auto-fix lint issues
 npm run format           # Format with Prettier
 npm run test             # Run tests (Vitest)
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
 npm run lint:code        # ESLint only
-npm run lint:md          # Markdown only
+npm run lint:md          # Markdown only (own CI job; not in `npm run lint`)
+npm run lint:install     # Install the kit into a temp repo and check it (own CI job)
 npm run typecheck        # TypeScript type checking without emit
 ```
 
