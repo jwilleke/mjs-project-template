@@ -195,13 +195,7 @@ See [project_log.md](docs/project_log.md) for the required format, historical wo
 - Eagerness - Do not jump into implementation or change files unless clearly instructed. When intent is ambiguous, default to research and recommendations rather than action. Only proceed with edits when the user explicitly requests them.
 - No speculation - Never speculate about code you have not opened. Read relevant files BEFORE answering questions. Never make claims about code before investigating.
 - Parallel tool calls - If calling multiple tools with no dependencies between them, make all independent calls in parallel. Never use placeholders or guess missing parameters.
-- Issue decomposition - NEVER put "Steps", "Phases", or numbered sequences inside a single GitHub issue. Break each step into its own issue and link them using GitHub relationships:
-  - `closes #N` / `fixes #N` — this issue resolves another
-  - `blocked by #N` — cannot start until N is closed
-  - `relates to #N` — context link, no hard dependency
-  - Example: a 3-phase migration = 3 issues with "blocked by" chains, not one issue with "Phase 1 / Phase 2 / Phase 3" headings.
-- Issue/PR links — Never use a bare `#N` reference alone. Always pair it with the full GitHub URL: `[#333](https://github.com/owner/repo/issues/333)`. This applies in commit messages, PR descriptions, comments, and any agent output. Use `/issues/N` for issues and `/pull/N` for PRs.
-- Awaiting approval — When work is complete but requires human sign-off before closing, apply the `in-review` label and leave a comment on the issue/PR that states: what was done, what the human needs to verify, and what action closes it. Never self-close an issue or PR.
+- Issues — see [GitHub Issues](#github-issues) below for decomposition, epics and sub-issues, linking, and approval. Those rules are stated once, there.
 
 ## Commands
 
@@ -261,6 +255,58 @@ Add any additional notes, context, or information that agents should know here. 
 - Database schema or API contracts
 - Team communication channels or review processes
 - Performance benchmarks or SLA requirements
+
+## GitHub Issues
+
+The issue tracker is the durable record. These rules exist because the alternative — a decision in a
+chat log, a plan in one issue's body — cannot be queried, assigned, or blocked on.
+
+### Decomposition
+
+NEVER put "Steps", "Phases", or numbered sequences inside a single GitHub issue. Break each step into
+its own issue and link them. A 3-phase migration is 3 issues with dependencies, not one issue with
+"Phase 1 / Phase 2 / Phase 3" headings.
+
+### Epics and sub-issues
+
+An epic is a container, not a worklist. It holds the goal, the scope and the acceptance criteria; the
+work lives in its children.
+
+- __Attach every child as a real GitHub sub-issue.__ Use the sub-issue relationship, not a checklist
+  of `#N` in the body. A markdown checkbox tracks nothing, blocks nothing, and does not appear on the
+  child at all — the parent shows no progress and the child shows no parent. `gh issue edit` has no
+  flag for this; it is the API:
+
+  ```bash
+  # attach child ISSUE_ID to parent N (sub_issue_id is the issue's numeric id, not its number)
+  child_id=$(gh api "/repos/{owner}/{repo}/issues/<child-number>" --jq .id)
+  gh api --method POST "/repos/{owner}/{repo}/issues/<parent-number>/sub_issues" \
+    -F "sub_issue_id=$child_id"
+  ```
+
+- __The epic is blocked by its sub-issues.__ Do not close an epic while any child is open, and do not
+  start work directly on an epic that has open children — the child is where it belongs.
+- __Order siblings with `blocked by #N`__ where one genuinely cannot start until another closes. Note
+  this is a text convention, not a GitHub relationship: it renders as a mention and enforces nothing,
+  so it records intent for a reader rather than gating anything.
+- __Verify before closing an epic:__ `gh api "/repos/{owner}/{repo}/issues/<n>/sub_issues"` returns
+  the children and their state. An empty array on an epic means the decomposition was never recorded.
+
+### Linking
+
+- `closes #N` / `fixes #N` — this issue or PR resolves another.
+- `blocked by #N` — cannot start until N closes (convention; see above).
+- `relates to #N` — context link, no hard dependency.
+- Never use a bare `#N` alone. Always pair it with the full URL:
+  `[#333](https://github.com/owner/repo/issues/333)`. This applies in commit messages, PR
+  descriptions, comments, and any agent output. Use `/issues/N` for issues and `/pull/N` for PRs.
+
+### Approval and closing
+
+- When work is complete but needs human sign-off, apply `in-review` and comment with what was done,
+  what the human needs to verify, and what action closes it. Never self-close an issue or PR.
+- Always remove `in-review` when closing. A closed item keeping the label makes it stop meaning
+  "awaiting a decision", and the queue it drives stops being trustworthy.
 
 ## GitHub Workflow
 
