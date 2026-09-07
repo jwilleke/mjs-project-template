@@ -10,7 +10,7 @@ Related documents:
 
 ## Guiding Principles
 
-- DRY (Don't Repeat Yourself) - Every piece of knowledge should have a single, unambiguous, authoritative representation. Refactor repeated logic into reusable components.
+- DRY (Don't Repeat Yourself) - Refactor repeated logic into reusable components. This is the code-level half of the kit's __Don't Repeat Yourself__ protocol in `AGENTS.md`, which is the authoritative statement — see it for the knowledge and work halves rather than restating them here.
 - Iterate progressively - Start with core features only. Gather feedback.
 - No secrets in Git - NEVER put unencrypted secrets in Git or other CMS systems.
 - GitHub CLI - Primary method for interacting with GitHub.
