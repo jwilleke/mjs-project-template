@@ -313,6 +313,8 @@ try {
   // in, so it is checked here rather than left to a manual run: what it removes,
   // what it must not touch, and that it refuses the kit source repo — where
   // kit-sync.yml is a product, not a subscription.
+  appendFileSync(join(repo, 'AGENTS.md'), '\n## Repo notes\n\nRETIRE-KEEPS-THIS\n');
+
   const workflow = join(repo, '.github/workflows/kit-sync.yml');
   check('the install seeded kit-sync.yml, so there is something to retire', existsSync(workflow));
 
@@ -326,10 +328,61 @@ try {
   const retire = run(join(root, 'install-kit.sh'), ['--retire', repo]);
   check('--retire exits 0', retire.status === 0, retire.stderr);
   check('--retire removes kit-sync.yml', !existsSync(workflow), retire.stdout);
+  // The rest of #66: what the kit owns goes, what the repo owns stays.
   check(
-    '--retire touches nothing else it does not own',
-    existsSync(join(repo, '.claude/commands/pstatus.md')) && existsSync(join(repo, 'TODO.md')),
+    '--retire removes the kit-owned canonical files',
+    !existsSync(join(repo, '.claude/commands/pstatus.md')) &&
+      !existsSync(join(repo, '.markdownlint-cli2.jsonc')) &&
+      !existsSync(join(repo, 'utility/kit-sync.sh')),
     retire.stdout
+  );
+  check(
+    '--retire removes .agent-kit.json, so discovery does not re-propose the repo',
+    !existsSync(join(repo, '.agent-kit.json')),
+    retire.stdout
+  );
+  check(
+    "--retire keeps create-if-absent files, which are the repo's own once written",
+    existsSync(join(repo, 'TODO.md')) &&
+      existsSync(join(repo, 'CLAUDE.md')) &&
+      existsSync(join(repo, 'private/project_log.md')),
+    retire.stdout
+  );
+  check(
+    '--retire keeps seed files',
+    existsSync(join(repo, '.github/ISSUE_TEMPLATE/bug_report.md')) &&
+      existsSync(join(repo, '.github/workflows/markdown-lint.yml')) &&
+      existsSync(join(repo, '.vscode/extensions.json')),
+    retire.stdout
+  );
+
+  // overwrite-or-suffix: the earlier collision check left this repo owning
+  // semver.md, so the kit's copy is semver-kit.md. Removing the plain name here
+  // would clobber the file that behaviour exists to protect.
+  check(
+    "--retire removes the kit's -kit copy and leaves the repo's own command",
+    !existsSync(join(repo, '.claude/commands/semver-kit.md')) &&
+      (readOrNull(join(repo, '.claude/commands/semver.md')) ?? '').includes(
+        'This repo has its own release command'
+      ),
+    retire.stdout
+  );
+
+  const agentsAfter = readOrNull(join(repo, 'AGENTS.md')) ?? '';
+  check(
+    '--retire strips the AGENTS.md managed block',
+    !agentsAfter.includes('KIT:START') && !agentsAfter.includes('KIT:END'),
+    agentsAfter
+  );
+  check(
+    '--retire preserves the repo content below KIT:END',
+    agentsAfter.includes('RETIRE-KEEPS-THIS'),
+    agentsAfter
+  );
+  check(
+    '--retire leaves no doubled blank line at the seam',
+    !/\n\n\n/.test(agentsAfter),
+    agentsAfter
   );
 
   const retireAgain = run(join(root, 'install-kit.sh'), ['--retire', repo]);

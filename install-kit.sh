@@ -12,12 +12,19 @@
 #
 # Sync modes:
 #   (default)    apply the kit in place, leaving the changes uncommitted for you to review
-#   --retire     stop a repo receiving the kit: delete .github/workflows/kit-sync.yml.
-#                Nothing else is required for a repo to go quiet — the workflow lives inside
-#                the consumer and fires on push regardless of any list here, so dropping a
-#                repo from downstream-repos.json does not stop it (#66). Installs nothing.
-#                Does NOT yet remove the managed files, the AGENTS.md block, or
-#                .agent-kit.json; that is the rest of #66.
+#   --retire     retire a consumer: it stops receiving the kit, and what the kit owns is
+#                removed. Installs nothing. (#66)
+#                Removing .github/workflows/kit-sync.yml is what actually stops the
+#                behaviour — the workflow lives inside the consumer and fires on push
+#                regardless of any list here, so dropping a repo from downstream-repos.json
+#                does not stop it. Then the kit-owned files go: every `overwrite` and
+#                `overwrite-template` row of kit-files.tsv, the AGENTS.md managed block
+#                (everything below KIT:END is preserved), and .agent-kit.json, without
+#                which manifest discovery would re-propose the repo on the next sweep.
+#                KEPT: create-if-absent files (TODO.md, CLAUDE.md, private/project_log.md)
+#                and seed files (issue templates, markdown-lint.yml, .vscode/extensions.json)
+#                are the repo's own once written. For overwrite-or-suffix, a repo that owns
+#                the plain name keeps it and only the kit's -kit copy is removed.
 #   --pr         apply on a `chore/kit-sync-<version>` branch, then commit, push, and open a PR.
 #                Requires an authenticated `gh`, an `origin` remote, and a clean working tree.
 #                A kit sync rewrites files in a repo whose owner did not initiate the change, so it
@@ -797,7 +804,87 @@ ensure_agents_block() {    # managed boilerplate block in AGENTS.md
   fi
 }
 
-retire_consumer() {        # --retire: stop this repo receiving the kit (#66, slice 1)
+RETIRE_REMOVED=0
+
+remove_path() {            # delete REL from TARGET, staging it when tracked
+  local rel="$1" old="$TARGET/$1"
+  [ -f "$old" ] || return 1
+  if [ "$DRY" -eq 0 ]; then
+    # -f because a file that is staged but not yet committed differs from HEAD,
+    # and plain `git rm` refuses that rather than deleting it. Falling back to a
+    # plain rm keeps the deletion happening even where git will not stage it.
+    if git -C "$TARGET" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
+      git -C "$TARGET" rm -q -f "$rel" 2>/dev/null || rm -f "$old"
+    else
+      rm -f "$old"
+    fi
+    # Report what happened, not what was attempted: a caller that prints
+    # "removed" over a file still on disk is worse than no message at all.
+    [ -f "$old" ] && return 1
+  fi
+  RETIRE_REMOVED=$((RETIRE_REMOVED + 1))
+  return 0
+}
+
+retire_managed_files() {   # --retire: remove what the kit owns, and only that
+  # Driven from kit-files.tsv so this cannot disagree with what the installer
+  # writes. Only the behaviors where the kit owns the CONTENT are removed:
+  #   overwrite / overwrite-template  the kit rewrites these every sync
+  #   overwrite-or-suffix             see below — the repo may own the plain name
+  # create-if-absent* and seed files are the repo's own once written, and #66 is
+  # explicit that they stay: TODO.md, CLAUDE.md, private/project_log.md, the
+  # issue templates, markdown-lint.yml, .vscode/extensions.json.
+  local manifest="$SRC/kit-files.tsv" beh path tmpl group alt
+  while IFS="$TAB" read -r beh path tmpl group; do
+    case "$beh" in ''|'#'*) continue ;; esac
+    case "$beh" in
+      overwrite|overwrite-template)
+        if remove_path "$path"; then act "remove kit-owned: $path"; fi
+        ;;
+      overwrite-or-suffix)
+        # If the suffixed copy exists, THAT is the kit's file here and the plain
+        # name is the repo's own command — removing it would clobber the very
+        # file overwrite-or-suffix exists to protect.
+        alt="$(suffixed_path "$path")"
+        if [ -f "$TARGET/$alt" ]; then
+          if remove_path "$alt"; then act "remove kit-owned: $alt (your $path is untouched)"; fi
+        else
+          if remove_path "$path"; then act "remove kit-owned: $path"; fi
+        fi
+        ;;
+    esac
+  done <"$manifest"
+}
+
+retire_agents_block() {    # --retire: drop the managed block, keep the repo's own AGENTS.md
+  local d="$TARGET/AGENTS.md"
+  [ -f "$d" ] || return 0
+  grep -qF "$START_PREFIX" "$d" || return 0
+
+  act "remove AGENTS.md managed block (everything below KIT:END preserved)"
+  RETIRE_REMOVED=$((RETIRE_REMOVED + 1))
+  [ "$DRY" -eq 1 ] && return 0
+
+  # Drop START..END inclusive. If the block sat between two blank lines, one of
+  # them would be left doubled at the seam — MD012 in the repo's own lint run.
+  awk -v prefix="$START_PREFIX" -v end="$END" '
+    substr($0, 1, length(prefix)) == prefix { skip = 1; next }
+    skip && $0 == end { skip = 0; seam = 1; next }
+    skip { next }
+    seam && $0 == "" && lastblank { seam = 0; next }
+    { seam = 0; lastblank = ($0 == ""); print }
+  ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
+}
+
+retire_manifest() {        # --retire: remove .agent-kit.json
+  # Left in place, manifest-based discovery (#53) finds the repo again and
+  # re-proposes it on every sweep — the exact loop #66 exists to break.
+  if remove_path ".agent-kit.json"; then
+    act "remove kit-owned: .agent-kit.json (discovery will not re-propose this repo)"
+  fi
+}
+
+retire_consumer() {        # --retire: stop this repo receiving the kit (#66)
   # Removing the workflow is the whole of the behaviour change. kit-sync.yml lives
   # INSIDE the consumer and fires on push, so it is the only thing that decides
   # whether a repo still receives the kit; downstream-repos.json only steers
@@ -808,18 +895,8 @@ retire_consumer() {        # --retire: stop this repo receiving the kit (#66, sl
 
   if [ ! -f "$old" ]; then
     echo "  $rel is not present — this repo already receives nothing."
-    echo
-    echo "Nothing to do."
-    exit 0
-  fi
-
-  act "remove: $rel (this repo will no longer receive the kit)"
-  if [ "$DRY" -eq 0 ]; then
-    if git -C "$TARGET" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
-      git -C "$TARGET" rm -q "$rel"
-    else
-      rm -f "$old"
-    fi
+  else
+    if remove_path "$rel"; then act "remove: $rel (this repo will no longer receive the kit)"; fi
   fi
 }
 
@@ -858,16 +935,28 @@ if [ "$RETIRE" -eq 1 ]; then
   echo
 
   warn_target_behind_remote
+
+  echo "Stop receiving the kit:"
   retire_consumer
+  echo
+
+  echo "Remove what the kit owns (your own files are left alone):"
+  RETIRE_REMOVED=0
+  retire_managed_files
+  retire_agents_block
+  retire_manifest
+  if [ "$RETIRE_REMOVED" -eq 0 ]; then echo "  nothing left to remove — the kit owns no files here"; fi
   echo
 
   echo "Done."
   echo "Next:"
-  echo "  - commit the deletion and push it — the workflow keeps running until it lands"
+  echo "  - review the deletions, then commit and push them — the workflow keeps"
+  echo "    running until its removal lands"
   echo "  - remove the repo from downstream-repos.json in mjs-project-template"
-  echo "  - the kit files already installed here are now inert; removing them is the"
-  echo "    rest of #66 and is not done by this flag"
-  if [ "$DRY" -eq 1 ]; then echo "  (re-run without --dry-run to apply the change above)"; fi
+  echo "  - kept on purpose: TODO.md, CLAUDE.md, private/project_log.md, the issue"
+  echo "    templates, markdown-lint.yml and .vscode/extensions.json are yours once"
+  echo "    written, and AGENTS.md keeps everything that was below KIT:END"
+  if [ "$DRY" -eq 1 ]; then echo "  (re-run without --dry-run to apply the changes above)"; fi
   exit 0
 fi
 
