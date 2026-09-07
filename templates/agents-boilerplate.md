@@ -7,6 +7,15 @@ same wording a repo naturally picks for its own agent section below `KIT:END` �
 headings in one file, and `markdownlint` MD024 fails on it. The kit owns one heading string in every
 repo that installs it, so that string says whose it is.
 
+### Don't Repeat Yourself
+
+Two halves of one rule. Both fire before you write anything.
+
+- __Knowledge: one representation.__ Every fact — a rule, a decision, a version, a list — has exactly one authoritative home. Point at it; never restate it. A second copy is not redundancy, it is a future contradiction: the copies drift, and nothing tells you which one is current. Before writing a fact down, find where it already lives. If it lives in two places already, that is a defect worth fixing, not a pattern to follow.
+- __Work: check it is not already done.__ Before starting, read the `▶ Resume here` block in `TODO.md`, recent `git log`, and the related GitHub issue. Repeating finished work is the most common avoidable mistake.
+
+The long form is the operator's [Do NOT Repeat Yourself (DRY)](https://jminim4.nerdsbythehour.com:3000/view/Do%20NOT%20Repeat%20Yourself%20(DRY)) page. It is not copied here on purpose — copying it would be the very defect this protocol names. The kit owns this paragraph; the page owns the rest.
+
 ### Session continuity
 
 - Before starting, read the `▶ Resume here` block at the top of `TODO.md` (committed, so it syncs across machines) and recent `git log`. That is where the last session left off — repeating finished work is the most common avoidable mistake.
