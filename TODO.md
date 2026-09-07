@@ -32,7 +32,7 @@ last_updated: "2026-09-07"
 
 ## 🟠 P1
 
-*None.*
+- [#78](https://github.com/jwilleke/mjs-project-template/issues/78) — [FEATURE] The shipped kit does not carry the epic/sub-issue rule AGENTS.md now states
 
 ## 🟡 P2
 
