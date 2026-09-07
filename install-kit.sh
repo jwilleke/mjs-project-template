@@ -19,7 +19,8 @@
 #                regardless of any list here, so dropping a repo from downstream-repos.json
 #                does not stop it. Then the kit-owned files go: every `overwrite` and
 #                `overwrite-template` row of kit-files.tsv, the AGENTS.md managed block
-#                (everything below KIT:END is preserved), and .agent-kit.json, without
+#                (everything below KIT:END is preserved), the kit_version stamp in that
+#                file's frontmatter, and .agent-kit.json, without
 #                which manifest discovery would re-propose the repo on the next sweep.
 #                KEPT: create-if-absent files (TODO.md, CLAUDE.md, private/project_log.md)
 #                and seed files (issue templates, markdown-lint.yml, .vscode/extensions.json)
@@ -876,6 +877,28 @@ retire_agents_block() {    # --retire: drop the managed block, keep the repo's o
   ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
 }
 
+retire_kit_stamp() {       # --retire: drop kit_version from AGENTS.md frontmatter
+  # stamp_kit_version rewrites this line on every sync, so it is kit-maintained
+  # state, not repo content — left behind it says a retired repo is still being
+  # managed at a version it will never receive again. Only the leading
+  # frontmatter is touched; a kit_version mentioned in the repo's own prose below
+  # is theirs.
+  local d="$TARGET/AGENTS.md"
+  [ -f "$d" ] || return 0
+  head -1 "$d" | grep -qx -- '---' || return 0
+  grep -q '^kit_version:' "$d" || return 0
+
+  act "remove AGENTS.md frontmatter: kit_version (this repo is no longer at a kit version)"
+  RETIRE_REMOVED=$((RETIRE_REMOVED + 1))
+  [ "$DRY" -eq 1 ] && return 0
+
+  awk '
+    /^---$/ { c++ }
+    c == 1 && /^kit_version:/ { next }
+    { print }
+  ' "$d" >"$d.kit.tmp" && mv "$d.kit.tmp" "$d"
+}
+
 retire_manifest() {        # --retire: remove .agent-kit.json
   # Left in place, manifest-based discovery (#53) finds the repo again and
   # re-proposes it on every sweep — the exact loop #66 exists to break.
@@ -944,6 +967,7 @@ if [ "$RETIRE" -eq 1 ]; then
   RETIRE_REMOVED=0
   retire_managed_files
   retire_agents_block
+  retire_kit_stamp
   retire_manifest
   if [ "$RETIRE_REMOVED" -eq 0 ]; then echo "  nothing left to remove — the kit owns no files here"; fi
   echo
