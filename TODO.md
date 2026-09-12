@@ -37,11 +37,14 @@ last_updated: "2026-09-12"
 
 ## 🟡 P2
 
-- [#79](https://github.com/jwilleke/mjs-project-template/issues/79) — [FEATURE] kit-sync never checks whether Actions may open a PR, so a misconfigured consumer strands a branch every sync
+*None.*
 
 ## 🔵 In review
 
-*None.*
+- [#85](https://github.com/jwilleke/mjs-project-template/issues/85) — [SECURITY] smol-toml — denial of service via malformed TOML
+- [#82](https://github.com/jwilleke/mjs-project-template/pull/82) — chore(deps-dev): bump js-yaml from 4.3.1 to 4.3.2 *(PR · ready)* — likely [#84](https://github.com/jwilleke/mjs-project-template/issues/84) *(redundant — the bump is already on master; close both)*
+- [#81](https://github.com/jwilleke/mjs-project-template/issues/81) — [FEATURE] /pstatus Epics band never fires downstream — no `epic` label is synced or applied, and `deferred` precedence is unstated
+- [#79](https://github.com/jwilleke/mjs-project-template/issues/79) — [FEATURE] kit-sync never checks whether Actions may open a PR, so a misconfigured consumer strands a branch every sync
 
 ## ⏸ Deferred
 
@@ -49,7 +52,6 @@ last_updated: "2026-09-12"
 
 ## ❓ Needs triage
 
-- [#82](https://github.com/jwilleke/mjs-project-template/pull/82) — chore(deps-dev): bump js-yaml from 4.3.1 to 4.3.2 *(PR · ready)* — no linked issue
-- [#81](https://github.com/jwilleke/mjs-project-template/issues/81) — [FEATURE] /pstatus Epics band never fires downstream — no `epic` label is synced or applied, and `deferred` precedence is unstated
+*None.*
 
 <!-- KIT:END -->
