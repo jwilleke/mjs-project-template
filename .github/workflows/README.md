@@ -28,7 +28,12 @@ Triggered on: Push to `master` or `develop`, Pull Requests
    - Checks for known security issues
    - Runs in parallel with other checks
 
-3. Build
+3. Secret Scan
+   - Runs gitleaks over the tree with `.gitleaks.toml`: the default secret rules plus internal
+     hostnames (a URL with an explicit port, a file-share URL)
+   - The pre-commit hook runs the same rules on staged changes
+
+4. Build
    - Builds the TypeScript project
    - Uploads build artifacts for verification
 

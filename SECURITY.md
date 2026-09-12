@@ -28,6 +28,8 @@ Critical Rule: Never commit passwords, API keys, tokens, or other secrets to ver
 - Private encryption keys
 - AWS access keys
 - Payment processor keys
+- Internal hostnames, ports and file-share paths on a private network — use `localhost` or an
+  `example.com` host in docs, and name an internal page rather than linking it
 - Any sensitive configuration
 
 ### How to Handle Secrets

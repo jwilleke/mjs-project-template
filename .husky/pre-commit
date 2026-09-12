@@ -1,1 +1,15 @@
+# Secret and internal-host scan of the staged changes (#83). Staged only, so it
+# costs nothing on an ordinary commit. Rules: .gitleaks.toml. CI scans the tree
+# too, so a machine without gitleaks is warned here and still caught there.
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks git --staged --no-banner --redact -c .gitleaks.toml >/dev/null 2>&1; then
+    echo "BLOCKED: gitleaks found a secret or an internal host in the staged changes:" >&2
+    gitleaks git --staged --no-banner --redact -v -c .gitleaks.toml 2>&1 | grep -v '^$' >&2
+    echo "A false positive belongs in .gitleaks.toml as an allowlist, with a comment saying why." >&2
+    exit 1
+  fi
+else
+  echo "pre-commit: gitleaks not found, skipping the secret scan (brew install gitleaks)" >&2
+fi
+
 npx lint-staged
