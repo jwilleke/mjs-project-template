@@ -62,7 +62,8 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "smol-toml": "1.7.2"
   },
   "engines": {
     "node": ">=20.0.0",
