@@ -14,7 +14,7 @@ Two halves of one rule. Both fire before you write anything.
 - __Knowledge: one representation.__ Every fact — a rule, a decision, a version, a list — has exactly one authoritative home. Point at it; never restate it. A second copy is not redundancy, it is a future contradiction: the copies drift, and nothing tells you which one is current. Before writing a fact down, find where it already lives. If it lives in two places already, that is a defect worth fixing, not a pattern to follow.
 - __Work: check it is not already done.__ Before starting, read the `▶ Resume here` block in `TODO.md`, recent `git log`, and the related GitHub issue. Repeating finished work is the most common avoidable mistake.
 
-The long form is the operator's [Do NOT Repeat Yourself (DRY)](https://wiki.example.com/view/Do%20NOT%20Repeat%20Yourself%20(DRY)) page. It is not copied here on purpose — copying it would be the very defect this protocol names. The kit owns this paragraph; the page owns the rest.
+The long form is the operator's __Do NOT Repeat Yourself (DRY)__ page. It lives on a private wiki, so it is named here, not linked. It is not copied here on purpose — copying it would be the very defect this protocol names. The kit owns this paragraph; the page owns the rest.
 
 ### Session continuity
 
