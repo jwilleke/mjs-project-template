@@ -1,7 +1,7 @@
 ---
 title: TODO
 description: Priority bands for mjs-project-template.
-last_updated: "2026-09-07"
+last_updated: "2026-09-12"
 ---
 
 # TODO
@@ -25,7 +25,7 @@ last_updated: "2026-09-07"
 
 ## 🔴 P0 — Security & Critical
 
-*None.*
+- [#83](https://github.com/jwilleke/mjs-project-template/issues/83) — [SECURITY] The AGENTS boilerplate discloses an internal hostname — in every synced repo and in history
 
 ## 🟣 Epics
 
@@ -37,7 +37,7 @@ last_updated: "2026-09-07"
 
 ## 🟡 P2
 
-*None.*
+- [#79](https://github.com/jwilleke/mjs-project-template/issues/79) — [FEATURE] kit-sync never checks whether Actions may open a PR, so a misconfigured consumer strands a branch every sync
 
 ## 🔵 In review
 
@@ -49,6 +49,7 @@ last_updated: "2026-09-07"
 
 ## ❓ Needs triage
 
-*None.*
+- [#82](https://github.com/jwilleke/mjs-project-template/pull/82) — chore(deps-dev): bump js-yaml from 4.3.1 to 4.3.2 *(PR · ready)* — no linked issue
+- [#81](https://github.com/jwilleke/mjs-project-template/issues/81) — [FEATURE] /pstatus Epics band never fires downstream — no `epic` label is synced or applied, and `deferred` precedence is unstated
 
 <!-- KIT:END -->
