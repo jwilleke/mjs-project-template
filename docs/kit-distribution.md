@@ -288,6 +288,21 @@ so nothing is lost. It prints the compare link and files one issue — reused, n
 which setting to tick. Red stays reserved for a sync that could not be produced or did not lint,
 because a job that goes red on every push forever is one people stop reading.
 
+That makes the setting invisible from the workflow's side: a repo with it off costs a stranded
+branch per sync and nothing goes red. The workflow cannot check it up front either — the endpoint
+needs repo-admin scope, which `GITHUB_TOKEN` is never granted. The operator's `gh` token has it, so
+the check lives where the operator runs: `install-kit.sh` reads the setting and says whether it is on,
+off, or could not be read. For the whole fleet at once
+([#79](https://github.com/jwilleke/mjs-project-template/issues/79)):
+
+```bash
+jq -r '.repos[]' downstream-repos.json | while read -r repo; do
+  v=$(gh api "/repos/$repo/actions/permissions/workflow" \
+        --jq '.can_approve_pull_request_reviews' 2>/dev/null)
+  printf '%-34s %s\n' "$repo" "${v:-unknown}"
+done
+```
+
 ## How a repo learns it is behind
 
 `bin/kit.mjs check` compares a repo's `KIT:START` marker against the kit's current version and

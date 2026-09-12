@@ -945,6 +945,22 @@ warn_target_behind_remote() {  # never assume the target checkout is current
   echo >&2
 }
 
+actions_may_open_prs() {  # prints true / false / unknown — never fails the run
+  # #79: "Allow GitHub Actions to create and approve pull requests". With it off,
+  # kit-sync.yml pushes a branch and files an issue on every sync instead of
+  # opening its PR, and nothing else reports it — mjs-network had it off,
+  # silently, after opening sync PRs fine in the past. Only here can we read it:
+  # the endpoint needs repo-admin scope, which the operator's gh token has and
+  # the workflow's GITHUB_TOKEN never does. So a non-200 (no gh, no remote, a
+  # 403) is "unknown", not "off": say what we could not read, never guess.
+  local v=""
+  if command -v gh >/dev/null 2>&1; then
+    v="$(cd "$TARGET" && gh api "repos/{owner}/{repo}/actions/permissions/workflow" \
+           --jq '.can_approve_pull_request_reviews' 2>/dev/null || true)"
+  fi
+  case "$v" in true|false) echo "$v" ;; *) echo unknown ;; esac
+}
+
 if [ "$RETIRE" -eq 1 ]; then
   # The kit source repo owns kit-sync.yml as a product, not as a consumer of it.
   if [ "$SRC" = "$TARGET" ]; then
@@ -1046,11 +1062,22 @@ fi
 echo "Done."
 echo "Next:"
 echo "  - utility/sync-labels.sh            # apply the standard GitHub labels to this repo"
-echo "  - Settings > Actions > General > Workflow permissions:"
-echo "      tick 'Allow GitHub Actions to create and approve pull requests'."
-echo "      kit-sync.yml cannot open its PR without it, and no 'permissions:' block"
-echo "      in the workflow can grant it. Without it the sync still pushes its"
-echo "      branch and files an issue with the compare link, rather than failing."
+case "$(actions_may_open_prs)" in
+  true)
+    echo "  - (checked) Actions may create pull requests here, so kit-sync.yml can open its PR" ;;
+  false)
+    echo "  WARNING: this repo does NOT allow GitHub Actions to create pull requests." >&2
+    echo "           Every kit sync will push its branch and file an issue instead of a PR." >&2
+    echo "  - Settings > Actions > General > Workflow permissions:"
+    echo "      tick 'Allow GitHub Actions to create and approve pull requests'."
+    echo "      No 'permissions:' block in the workflow can grant it." ;;
+  *)
+    echo "  - Settings > Actions > General > Workflow permissions (could not read it from here):"
+    echo "      tick 'Allow GitHub Actions to create and approve pull requests'."
+    echo "      kit-sync.yml cannot open its PR without it, and no 'permissions:' block"
+    echo "      in the workflow can grant it. Without it the sync still pushes its"
+    echo "      branch and files an issue with the compare link, rather than failing." ;;
+esac
 echo "  - /pstatus                          # rank work + regenerate TODO.md"
 if [ "$PR" -eq 0 ]; then
   echo "  - review the changes above, then commit them on a feature branch"
