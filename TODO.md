@@ -9,12 +9,11 @@ last_updated: "2026-09-13"
 <!-- RESUME:START -->
 ## ▶ Resume here — 2026-09-13
 
-- Last worked on: #83 hostname leak — boilerplate fixed, history purged and force-pushed, v1.13.0 released (npm clean), all 10 consumers synced and merged, gitleaks scan in CI; closed #79 #81 #84 #85
+- Last worked on: #83 hostname leak (CLOSED) — boilerplate fixed, history purged and force-pushed, v1.13.0 released, npm 1.12.0 unpublished, all 10 consumers synced and merged, gitleaks scan in CI; closed #79 #81 #84 #85
 - Branch / state: master, clean after this commit; history was REWRITTEN on 2026-09-13 (master 94f5b0b) — every pre-rewrite SHA is gone from branches and tags
 - Running / in-flight: none — CI, CodeQL, Deploy, Markdown Lint green on 94f5b0b; no open PRs
 - Parked / half-done: none
 - Next steps:
-  - #83: decide whether to close now (history caveat accepted) or after npm 1.12.0 — `npm login`, then `npm unpublish @jwilleke/agent-kit@1.12.0` (or `npm deprecate … "Superseded by 1.13.0"`)
   - Re-clone this repo on every other machine before working there
   - Sync the 4 consumers not on v1.13.0 (fairways-gen2-website, yourphr, yourphr-ts-spike at v1.11.4; mjs-media-handling at v1.11.1) — they never carried the link, just behind
   - Fix the /semver lockstep gap: set-version.mjs bumps only the root package, but release-kit.yml publishes off packages/agent-kit/package.json — hand-bumped again for v1.13.0
@@ -26,7 +25,7 @@ last_updated: "2026-09-13"
 
 ## 🔴 P0 — Security & Critical
 
-- [#83](https://github.com/jwilleke/mjs-project-template/issues/83) — [SECURITY] The AGENTS boilerplate discloses an internal hostname — in every synced repo and in history
+*None.*
 
 ## 🟣 Epics
 
