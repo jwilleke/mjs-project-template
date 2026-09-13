@@ -1,24 +1,25 @@
 ---
 title: TODO
 description: Priority bands for mjs-project-template.
-last_updated: "2026-09-12"
+last_updated: "2026-09-13"
 ---
 
 # TODO
 
 <!-- RESUME:START -->
-## ▶ Resume here — 2026-09-07
+## ▶ Resume here — 2026-09-13
 
-- Last worked on: closed all 6 open issues, cut v1.12.0, resynced+merged 3 consumers, gave AGENTS.md a GitHub Issues section
-- Branch / state: master, clean, nothing unpushed, no stashes, tagged v1.12.0
-- Running / in-flight: none — CodeQL was still finishing on f1705ed (docs-only, nothing gates on it); CI, Deploy and Markdown Lint all green
+- Last worked on: #83 hostname leak — boilerplate fixed, history purged and force-pushed, v1.13.0 released (npm clean), all 10 consumers synced and merged, gitleaks scan in CI; closed #79 #81 #84 #85
+- Branch / state: master, clean after this commit; history was REWRITTEN on 2026-09-13 (master 94f5b0b) — every pre-rewrite SHA is gone from branches and tags
+- Running / in-flight: none — CI, CodeQL, Deploy, Markdown Lint green on 94f5b0b; no open PRs
 - Parked / half-done: none
 - Next steps:
-  - Sync mjs-media-handling: last consumer at kit v1.11.1, its August sync PR was CLOSED not merged, so nothing is pending and it will not self-heal
-  - Push the other 11 consumers from v1.11.4 to v1.12.0 when convenient
-  - Fix the /semver lockstep gap: step 4 bumps only root package.json + lockfile, but release-kit.yml publishes off packages/agent-kit/package.json. Bumped by hand for v1.12.0; teach set-version.mjs or semver.md about it before the next cut
-  - Untracked: issues for `--retire --pr` and for auto-removal from downstream-repos.json (both raised on #66)
-- Blockers / significant notes: standing decision 2026-09-07 — NO templates added or changed. #78 closed on it: the epic/sub-issue rule lives in AGENTS.md only, consumers do not carry it, and epic.md keeps its `- [ ] #NNN` checklist despite contradicting the rule. Accepted, not overlooked. Fleet kit versions — v1.12.0: grow-tent, grow-nutrient-tank, garage-car-positioning. v1.11.4: the other 11. v1.11.1: mjs-media-handling. All stale sync PRs are resolved (two closed as superseded, one merged before its replacement landed on top).
+  - #83: decide whether to close now (history caveat accepted) or after npm 1.12.0 — `npm login`, then `npm unpublish @jwilleke/agent-kit@1.12.0` (or `npm deprecate … "Superseded by 1.13.0"`)
+  - Re-clone this repo on every other machine before working there
+  - Sync the 4 consumers not on v1.13.0 (fairways-gen2-website, yourphr, yourphr-ts-spike at v1.11.4; mjs-media-handling at v1.11.1) — they never carried the link, just behind
+  - Fix the /semver lockstep gap: set-version.mjs bumps only the root package, but release-kit.yml publishes off packages/agent-kit/package.json — hand-bumped again for v1.13.0
+  - Untracked (carried over): issues for `--retire --pr` and auto-removal from downstream-repos.json (raised on #66)
+- Blockers / significant notes: standing decision 2026-09-07 — no issue templates added or changed (#78). Operator decided 2026-09-13 NOT to file a GitHub Support request — old commits stay viewable by direct hash, and the fork aditya226-sharma/mjs-project-template keeps pre-August history. Local branches feat/install-kit-pr-mode, feat/pstatus-pr-issue-links, fix/pstatus-resume-and-template are pre-rewrite history — never push them. private/purge-83.sh and private/downstream-83.sh contain the host strings; never commit them.
 <!-- RESUME:END -->
 
 <!-- KIT:START — managed by mjs-project-template; add your own sections below KIT:END -->
@@ -41,10 +42,7 @@ last_updated: "2026-09-12"
 
 ## 🔵 In review
 
-- [#85](https://github.com/jwilleke/mjs-project-template/issues/85) — [SECURITY] smol-toml — denial of service via malformed TOML
-- [#82](https://github.com/jwilleke/mjs-project-template/pull/82) — chore(deps-dev): bump js-yaml from 4.3.1 to 4.3.2 *(PR · ready)* — likely [#84](https://github.com/jwilleke/mjs-project-template/issues/84) *(redundant — the bump is already on master; close both)*
-- [#81](https://github.com/jwilleke/mjs-project-template/issues/81) — [FEATURE] /pstatus Epics band never fires downstream — no `epic` label is synced or applied, and `deferred` precedence is unstated
-- [#79](https://github.com/jwilleke/mjs-project-template/issues/79) — [FEATURE] kit-sync never checks whether Actions may open a PR, so a misconfigured consumer strands a branch every sync
+*None.*
 
 ## ⏸ Deferred
 
