@@ -54,7 +54,7 @@ file's contents, is what decides whether a local edit survives.
 
 | Behaviour | What happens to local changes | Paths |
 | --- | --- | --- |
-| `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc` |
+| `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `work-alone.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc` |
 | `overwrite-template` | __Destroyed.__ Copied from `templates/<template>` every run. | `.github/workflows/kit-sync.yml` |
 | `overwrite-or-suffix` | __Preserved.__ If the repo already owns that filename with its own content, the kit installs its copy as `<name>-kit.<ext>` and leaves yours alone. Once suffixed, always suffixed. | `.claude/commands/semver.md` |
 | `managed-block` | __Destroyed inside the markers__, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
@@ -385,8 +385,8 @@ npx @jwilleke/agent-kit check /path/to/repo
 
 ### What ships, and why it is safe to ship
 
-The package contains only kit content: the four commands, six templates, `kit-files.tsv`,
-`kit-version.txt`, the checker, and a README. Sixteen files.
+The package contains only kit content: the six commands, eight templates, `kit-files.tsv`,
+`kit-version.txt`, the checker, a README, and `package.json`. Nineteen files.
 
 Publishing makes those bytes permanent and world-readable, so the contents were audited rather than
 assumed before the first release, and that audit is worth repeating whenever the manifest grows:
