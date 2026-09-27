@@ -77,6 +77,29 @@ When to use: At the end of a session to document progress for the next agent or 
 /update-agents
 ```
 
+### `/work-alone`
+
+File: `commands/work-alone.md`
+
+Progresses open issues in priority order while the operator is away, doing only reversible work (branches, draft PRs, issue comments). Anything consequential — merge, release, force-push, outbound send, an open design choice — is parked for the operator.
+
+#### What it writes
+
+`private/agent-work-alone.md`, created on first use, one session block per run with four required sections:
+
+- Stuck (needs the operator)
+- Decisions made without the operator
+- Other abnormalities observed
+- New issues filed
+
+When to use: Before stepping away, or from a routine that runs while you are out. Arguments: `max=<n>`, `label=<name>`, or specific `#<n>` issues.
+
+#### Example usage
+
+```
+/work-alone max=2 label=P1
+```
+
 ## Typical Workflow
 
 1. Start session: Use `/context` to understand project state

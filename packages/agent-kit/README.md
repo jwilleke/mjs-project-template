@@ -48,7 +48,7 @@ human regrade sticks.
 | Path | What it is |
 | --- | --- |
 | `bin/kit.mjs` | the checker; no dependencies |
-| `commands/` | agent slash commands (`pstatus`, `wrap`, `context`, `session-commit`) |
+| `commands/` | agent slash commands (`pstatus`, `wrap`, `context`, `session-commit`, `update-agents`, `work-alone`) |
 | `templates/` | `AGENTS.md` boilerplate, `TODO.md`, `CLAUDE.md`, project log, kit-check workflow |
 | `kit-files.tsv` | which files the kit manages, and how |
 | `kit-version.txt` | the kit commit this package was built from |
