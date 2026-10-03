@@ -54,7 +54,7 @@
     "eslint-plugin-regexp": "^3.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
-    "markdownlint-cli2": "^0.23.2",
+    "markdownlint-cli2": "^0.23.3",
     "prettier": "^3.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",
