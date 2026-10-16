@@ -104,7 +104,7 @@ placement signals goes in the band of the __first__ that applies, highest first:
    that carries it alongside any signal above goes where that signal says.
 
 __An item is an epic if it is labeled `epic` or its title starts `[EPIC]`__ (case-insensitive).
-The title is enough on its own: the kit's `epic.md` issue template sets the prefix but not the label,
+The title is enough on its own: `epic.md` as earlier kits seeded it set the prefix but not the label,
 and older repos have epics filed before the label existed. Do not wait for a relabel to place them.
 
 __An epic goes in the Epics band, whatever its priority label.__ An epic is a container for
