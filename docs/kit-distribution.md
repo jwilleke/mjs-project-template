@@ -287,6 +287,15 @@ Three deliberate choices:
   `GITHUB_TOKEN`, so a PR it opens gets no checks. Rather than wait for checks that will never
   arrive, the job runs the kit's own markdown lint against the change it just made and refuses to
   open the PR if it fails. An issue is filed only in that case.
+- __It then starts the PR's checks itself__
+  ([#92](https://github.com/jwilleke/mjs-project-template/issues/92)). `GITHUB_TOKEN` may not start
+  runs by opening a PR, but it may dispatch them. After opening (or finding) the PR, the sync runs
+  `gh workflow run --ref <sync branch>` for every workflow triggered by both `pull_request` and
+  `workflow_dispatch` — the check workflows, never a deploy or release workflow, which have no
+  `pull_request` trigger. The run reports on the PR's head commit, so the PR shows real checks.
+  The kit's `markdown-lint.yml` and `secret-scan.yml` accept `workflow_dispatch`; a repo's own check
+  workflow joins in by adding it. This needs `actions: write` in `kit-sync.yml`, which, being a
+  workflow, reaches each repo only at its next human-run `install-kit.sh --pr`.
 
 The one thing `GITHUB_TOKEN` cannot do is modify a file under `.github/workflows/`. Seeded workflows
 are `create-if-absent`, so this only bites when a repo is missing one — the push then fails loudly.

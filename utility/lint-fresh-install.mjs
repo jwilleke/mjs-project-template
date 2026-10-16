@@ -189,6 +189,19 @@ try {
     'the permission failure is no longer handled'
   );
 
+  // #92: the sync dispatches the PR's check workflows, which needs actions: write
+  // and a check workflow that accepts workflow_dispatch.
+  check(
+    'kit-sync.yml may dispatch the PR checks (actions: write)',
+    /^[ \t]*actions:[ \t]*write[ \t]*$/m.test(readFileSync(syncWorkflow, 'utf8')),
+    'actions: write is missing from kit-sync.yml'
+  );
+  check(
+    'the seeded markdown-lint.yml accepts workflow_dispatch',
+    /^[ \t]*workflow_dispatch:/m.test(readFileSync(join(repo, '.github/workflows/markdown-lint.yml'), 'utf8')),
+    'markdown-lint.yml has no workflow_dispatch trigger'
+  );
+
   check(
     'kit-sync.yml asks for no secret beyond GITHUB_TOKEN',
     !/secrets\.(?!GITHUB_TOKEN)/.test(readFileSync(syncWorkflow, 'utf8')),

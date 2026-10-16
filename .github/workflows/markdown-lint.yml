@@ -5,6 +5,9 @@ on:
     branches: [master, main]
   pull_request:
     branches: [master, main]
+  # Lets Kit Sync start this check on its own PR, which GITHUB_TOKEN-created
+  # PRs otherwise never get (#92).
+  workflow_dispatch:
 
 jobs:
   markdown-lint:
