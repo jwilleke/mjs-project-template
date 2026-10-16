@@ -1,15 +1,20 @@
 # gitleaks configuration — the default secret rules, plus two for internal hosts.
 #
-# #83: the kit boilerplate linked a wiki on the operator's private network by its
-# real hostname and port, and every synced repo copied it. No default rule looks
-# for hostnames, so nothing caught it. These two rules cover the shapes that
-# actually leaked, WITHOUT naming any host: a rule listing the hostname would
-# publish it again in this public file.
+# Seeded by mjs-project-template's agent kit (#96) and then owned by this repo:
+# the kit never overwrites it, so add allowlists here freely.
 #
-# Run by the pre-commit hook (staged changes) and by CI (the whole tree).
+# mjs-project-template#83: the kit boilerplate linked a wiki on the operator's
+# private network by its real hostname and port, and every synced repo copied
+# it. No default rule looks for hostnames, so nothing caught it. These two rules
+# cover the shapes that actually leaked, WITHOUT naming any host: a rule listing
+# the hostname would publish it again in a public file.
+# https://github.com/jwilleke/mjs-project-template/issues/83
+#
+# Run by the pre-commit hook (staged changes) and by
+# .github/workflows/secret-scan.yml (the whole tree).
 # A false positive belongs in an allowlist below, with a comment saying why.
 
-title = "mjs-project-template"
+title = "gitleaks"
 
 [extend]
 useDefault = true

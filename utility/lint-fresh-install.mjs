@@ -141,6 +141,13 @@ try {
     readOrNull(syncWorkflow) !== null,
     'kit-sync.yml was not installed'
   );
+  // #96: the secret gate. The workflow reads .gitleaks.toml, so both must land.
+  check(
+    'the secret gate is installed (secret-scan.yml + .gitleaks.toml)',
+    existsSync(join(repo, '.github/workflows/secret-scan.yml')) &&
+      existsSync(join(repo, '.gitleaks.toml')),
+    'secret-scan.yml or .gitleaks.toml was not installed'
+  );
   // The whole point of the split: logic lives in a file the sync can deliver.
   check(
     'the sync body ships as an ordinary kit file',

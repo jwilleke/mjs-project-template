@@ -54,11 +54,11 @@ file's contents, is what decides whether a local edit survives.
 
 | Behaviour | What happens to local changes | Paths |
 | --- | --- | --- |
-| `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `work-alone.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc` |
+| `overwrite` | __Destroyed.__ Copied wholesale from the kit every run. | `.claude/commands/pstatus.md`, `session-commit.md`, `context.md`, `wrap.md`, `work-alone.md`, `utility/sync-labels.sh`, `.markdownlint-cli2.jsonc`, `.github/workflows/secret-scan.yml` |
 | `overwrite-template` | __Destroyed.__ Copied from `templates/<template>` every run. | `.github/workflows/kit-sync.yml` |
 | `overwrite-or-suffix` | __Preserved.__ If the repo already owns that filename with its own content, the kit installs its copy as `<name>-kit.<ext>` and leaves yours alone. Once suffixed, always suffixed. | `.claude/commands/semver.md` |
 | `managed-block` | __Destroyed inside the markers__, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
-| `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
+| `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.gitleaks.toml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
 | `merge` | __Preserved.__ Missing lines appended, nothing removed. | `.gitignore` (adds `private/`, `.claude/settings.local.json`, `.claude/worktrees/`) |
 | `unignore` | Removes a blanket `.claude/` or `CLAUDE.md` ignore so kit files get tracked; `.claude/settings.local.json` stays ignored | `.gitignore` |
 | `migrate` | One-time move, runs before create-if-absent | `docs/project_log.md` → `private/project_log.md` |
@@ -199,6 +199,47 @@ jq -r '.repos[]' downstream-repos.json | while read -r repo; do
   ./install-kit.sh --pr "/Volumes/hd2A/workspaces/github/${repo#*/}"
 done
 ```
+
+## The secret gate
+
+Every synced repo gets the same two-layer secret scan
+([#96](https://github.com/jwilleke/mjs-project-template/issues/96)):
+
+- `.github/workflows/secret-scan.yml` — __overwrite__. gitleaks over the checked-out tree on every
+  push and PR. The gitleaks version and its SHA-256 are pinned in the file, so overwriting keeps
+  them identical kit-wide; bump them here and the next `install-kit.sh --pr` carries the bump.
+  Being a workflow, it reaches a repo only through a human-run sync — the self-sync cannot push it
+  (see below).
+- `.gitleaks.toml` — __seed__. The default rules plus two internal-host rules. Seeded once, then
+  the repo's own: infra repos legitimately hold private-range IPs and in-cluster service names, and
+  those exceptions are allowlists in this file, each with a comment saying why.
+
+The first sync can turn the new check red. That is the gate working: it found something already
+in the tree. Fix it, or allowlist it with a reason — do not delete the workflow.
+
+### The pre-commit layer is not distributed
+
+`.husky/pre-commit` is the repo's own (it usually runs `lint-staged` and whatever else the repo
+needs), so the kit does not write it. A repo that uses husky should add the staged scan itself, at
+the top of the hook:
+
+```sh
+# Secret and internal-host scan of the staged changes. Rules: .gitleaks.toml.
+# CI scans the tree too, so a machine without gitleaks is warned here and still caught there.
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks git --staged --no-banner --redact -c .gitleaks.toml >/dev/null 2>&1; then
+    echo "BLOCKED: gitleaks found a secret or an internal host in the staged changes:" >&2
+    gitleaks git --staged --no-banner --redact -v -c .gitleaks.toml 2>&1 | grep -v '^$' >&2
+    echo "A false positive belongs in .gitleaks.toml as an allowlist, with a comment saying why." >&2
+    exit 1
+  fi
+else
+  echo "pre-commit: gitleaks not found, skipping the secret scan (brew install gitleaks)" >&2
+fi
+```
+
+A machine-wide hook is no substitute: husky sets a repo-level `core.hooksPath`, which bypasses
+any global hook entirely.
 
 ## What is deliberately not distributed
 

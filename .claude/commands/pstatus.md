@@ -42,7 +42,7 @@ recommends what to do next. It does not start work.
 
 ### Step 2: Bridge scanner alerts → issues (idempotent)
 
-For each open Dependabot / code-scanning / GitGuardian alert:
+For each open Dependabot / code-scanning / ecosystem-audit finding:
 
 - Look for an existing tracking issue (search issue bodies for the marker
   `scanner-alert:<source>:<id>`).

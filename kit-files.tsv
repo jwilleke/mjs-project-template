@@ -62,6 +62,14 @@ create-if-absent-stamped	private/project_log.md	project_log.md.tmpl	docs
 seed	.vscode/extensions.json	-	vscode
 
 seed	.github/workflows/markdown-lint.yml	-	workflows
+
+# The secret gate (#96). The workflow is overwritten so the pinned gitleaks
+# version and checksum stay identical kit-wide; .gitleaks.toml is seeded because
+# each repo needs its own allowlists (infra repos legitimately carry private-range
+# IPs and in-cluster service names). The config is listed first: the workflow
+# reads it, so a repo must never hold the workflow without it.
+seed	.gitleaks.toml	-	workflows
+overwrite	.github/workflows/secret-scan.yml	-	workflows
 # kit-sync.yml supersedes kit-check.yml: it applies the sync and opens a PR
 # rather than filing an issue asking someone to run the installer. The old
 # workflow is retired by install-kit.sh once the new one exists.
