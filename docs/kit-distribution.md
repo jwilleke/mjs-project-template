@@ -179,7 +179,7 @@ tree, so both now warn when the target trails its upstream — but the warning i
 substitute for asking the remote.
 
 Narrative about a sync — what broke, what was skipped and why — is session history and belongs in
-`docs/project_log.md`, not in a state file. Two files recording the same events drift apart, and the
+`private/project_log.md`, not in a state file. Two files recording the same events drift apart, and the
 drift is silent.
 
 The set of consumers is `downstream-repos.json`:

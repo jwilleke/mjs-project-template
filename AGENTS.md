@@ -1,6 +1,6 @@
 ---
 project_state: "template"
-last_updated: "2026-09-07"
+last_updated: "2026-10-16"
 agent_priority_level: "medium"
 blockers: []
 requires_human_review: ["major architectural changes", "security policy modifications", "deployment to production"]
@@ -33,7 +33,7 @@ See YAML frontmatter above for current project state.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Single Source of Truth: Project structure, directory conventions, technology stack
 - [SECURITY.md](./SECURITY.md) - Single Source of Truth: Secret management, dependency security, authentication, encryption
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Single Source of Truth: Development workflow, branching strategy, pull request process
-- [project_log.md](docs/project_log.md) - Single Source of Truth: Historical record of work done, next steps, session tracking
+- `private/project_log.md` (gitignored, local only) - Single Source of Truth: Historical record of work done, next steps, session tracking
 
 ### Auxiliary Documentation
 
@@ -128,7 +128,7 @@ These may be done initially or as the project progresses.
 
 ## Project Log
 
-See [project_log.md](docs/project_log.md) for the required format, historical work record, and tracking next steps.
+See `private/project_log.md` (gitignored, local only) for the required format, historical work record, and tracking next steps.
 
 ## Agent Priority Matrix
 
@@ -240,9 +240,9 @@ npm run typecheck        # TypeScript type checking without emit
 ## Session Workflow
 
 - Read this file (AGENTS.md)
-- Check `docs/project_log.md` for recent work
+- Check `private/project_log.md` for recent work
 - Work on tasks following CODE_STANDARDS.md
-- Update `docs/project_log.md` with session log entry
+- Update `private/project_log.md` with session log entry
 - Update this file's `last_updated` field if making significant changes
 - __Commits — always use the `/session-commit` skill.__ Never run a bare `git commit` directly. `/session-commit` enforces the session log update, conventional commit format, and co-author trailer.
 

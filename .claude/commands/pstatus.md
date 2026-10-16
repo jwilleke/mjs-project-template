@@ -77,8 +77,7 @@ __`TODO.md` carries no history.__ It is a snapshot of what is open *right now* â
 happened this session, no dated changelog, and no section for work in other repos. If an item is
 closed or merged, it simply stops appearing; that disappearance is the only record `TODO.md` keeps.
 
-Session history belongs in `docs/project_log.md` (or `private/project_log.md` where the repo keeps
-it there), written by `/session-commit` and `/wrap`. Never in `TODO.md`. Two files recording the
+Session history belongs in `private/project_log.md` (gitignored), written by `/session-commit` and `/wrap`. Never in `TODO.md`. Two files recording the
 same events drift apart, and the drift is silent: the ranked backlog starts reading as a status
 report and the operator has to work out which half is current.
 
