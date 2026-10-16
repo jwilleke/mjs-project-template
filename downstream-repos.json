@@ -14,7 +14,9 @@
     "jwilleke/mjs-ha",
     "jwilleke/mjs-media-handling",
     "jwilleke/mjs-network",
+    "jwilleke/ngdp-accounting-addons",
     "jwilleke/ngdpbase",
+    "jwilleke/ngdpbase-addons",
     "jwilleke/yourphr",
     "jwilleke/yourphr-ts-spike"
   ],
