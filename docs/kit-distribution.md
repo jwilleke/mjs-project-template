@@ -483,7 +483,7 @@ a workflow break, it is major.
 Bump `version` in `packages/agent-kit/package.json` and push. That is the whole procedure — no tag,
 no manual publish. `.github/workflows/release-kit.yml` asks the registry whether that exact version
 exists: `404` means release it, `200` means stop. Any other response fails the job rather than
-guessing, and a missing `NPM_TOKEN` skips the release instead of failing every push.
+guessing.
 
 The version field is therefore the only release control. Pushes that change kit content without
 touching it are no-ops, which is the intended behaviour: content moves continuously, releases are
@@ -492,8 +492,10 @@ deliberate.
 A published version is permanent — npm allows unpublishing only within 72 hours, and the name is
 claimed for good on first release.
 
-One-time setup: an npm __automation__ token (they bypass 2FA, which interactive publishing does not)
-stored as the `NPM_TOKEN` repo secret.
+No token. The package uses npm __trusted publishing__: its settings on npmjs.com name this repo and
+`release-kit.yml` as the publisher, and the job authenticates by OIDC (`id-token: write`). Every
+version since 1.13.0 was published that way, with provenance. There is no secret to store, rotate or
+renew; if publishing ever fails with an auth error, check the trusted publisher entry on npmjs.com.
 
 ## Known gaps
 
