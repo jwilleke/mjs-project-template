@@ -69,6 +69,8 @@ seed	.github/workflows/markdown-lint.yml	-	workflows
 # IPs and in-cluster service names). The config is listed first: the workflow
 # reads it, so a repo must never hold the workflow without it.
 seed	.gitleaks.toml	-	workflows
+# GitGuardian ignores test paths (#106); seeded because test layouts differ per repo.
+seed	.gitguardian.yaml	-	workflows
 overwrite	.github/workflows/secret-scan.yml	-	workflows
 # kit-sync.yml supersedes kit-check.yml: it applies the sync and opens a PR
 # rather than filing an issue asking someone to run the installer. The old

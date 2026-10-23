@@ -143,9 +143,10 @@ try {
   );
   // #96: the secret gate. The workflow reads .gitleaks.toml, so both must land.
   check(
-    'the secret gate is installed (secret-scan.yml + .gitleaks.toml)',
+    'the secret gate is installed (secret-scan.yml + .gitleaks.toml + .gitguardian.yaml)',
     existsSync(join(repo, '.github/workflows/secret-scan.yml')) &&
-      existsSync(join(repo, '.gitleaks.toml')),
+      existsSync(join(repo, '.gitleaks.toml')) &&
+      existsSync(join(repo, '.gitguardian.yaml')),
     'secret-scan.yml or .gitleaks.toml was not installed'
   );
   // The whole point of the split: logic lives in a file the sync can deliver.

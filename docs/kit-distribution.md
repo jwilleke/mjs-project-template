@@ -58,7 +58,7 @@ file's contents, is what decides whether a local edit survives.
 | `overwrite-template` | __Destroyed.__ Copied from `templates/<template>` every run. | `.github/workflows/kit-sync.yml` |
 | `overwrite-or-suffix` | __Preserved.__ If the repo already owns that filename with its own content, the kit installs its copy as `<name>-kit.<ext>` and leaves yours alone. Once suffixed, always suffixed. | `.claude/commands/semver.md` |
 | `managed-block` | __Destroyed inside the markers__, preserved outside them | `AGENTS.md` between `KIT:START` and `KIT:END` |
-| `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.gitleaks.toml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
+| `create-if-absent` | __Preserved.__ Written only when the file does not exist. | `TODO.md`, `CLAUDE.md`, `private/project_log.md`, `.vscode/extensions.json`, `.github/workflows/markdown-lint.yml`, `.gitleaks.toml`, `.gitguardian.yaml`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md` |
 | `merge` | __Preserved.__ Missing lines appended, nothing removed. | `.gitignore` (adds `private/`, `.claude/settings.local.json`, `.claude/worktrees/`) |
 | `unignore` | Removes a blanket `.claude/` or `CLAUDE.md` ignore so kit files get tracked; `.claude/settings.local.json` stays ignored | `.gitignore` |
 | `migrate` | One-time move, runs before create-if-absent | `docs/project_log.md` → `private/project_log.md` |
@@ -213,6 +213,12 @@ Every synced repo gets the same two-layer secret scan
 - `.gitleaks.toml` — __seed__. The default rules plus two internal-host rules. Seeded once, then
   the repo's own: infra repos legitimately hold private-range IPs and in-cluster service names, and
   those exceptions are allowlists in this file, each with a comment saying why.
+- `.gitguardian.yaml` — __seed__
+  ([#106](https://github.com/jwilleke/mjs-project-template/issues/106)). Tells the GitGuardian app
+  to ignore test paths, where its generic password detector flags runtime-generated test
+  credentials by shape. Safe only under the boilerplate rule that test credentials are never
+  literal; gitleaks has no path exclusions, so tests are still scanned. The app reads the file from
+  the default branch.
 
 The first sync can turn the new check red. That is the gate working: it found something already
 in the tree. Fix it, or allowlist it with a reason — do not delete the workflow.
