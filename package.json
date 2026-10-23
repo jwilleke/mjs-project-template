@@ -49,17 +49,17 @@
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.12",
     "eslint": "^9.39.4",
     "eslint-plugin-regexp": "^3.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "markdownlint-cli2": "^0.23.3",
+    "markdownlint-cli2": "^0.24.0",
     "prettier": "^3.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.58.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   },
   "overrides": {
     "esbuild": "0.28.1",
