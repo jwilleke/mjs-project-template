@@ -10,7 +10,7 @@ last_updated: "2026-10-23"
 
 ## 🔴 P0 — Security & Critical
 
-- [#100](https://github.com/jwilleke/mjs-project-template/issues/100) — [SECURITY] braces — stack-exhaustion DoS through deeply nested patterns
+*None.*
 
 ## 🟣 Epics
 
@@ -30,7 +30,7 @@ last_updated: "2026-10-23"
 
 ## ⏸ Deferred
 
-*None.*
+- [#100](https://github.com/jwilleke/mjs-project-template/issues/100) — [SECURITY] braces — stack-exhaustion DoS through deeply nested patterns
 
 ## ❓ Needs triage
 
