@@ -17,8 +17,7 @@
     "jwilleke/ngdp-accounting-addons",
     "jwilleke/ngdpbase",
     "jwilleke/ngdpbase-addons",
-    "jwilleke/yourphr",
-    "jwilleke/yourphr-ts-spike"
+    "jwilleke/yourphr"
   ],
   "excluded": [
     {
@@ -30,6 +29,11 @@
       "repo": "theak/jackery-homeassistant",
       "reason": "upstream fork, no push access",
       "permanent": true
+    },
+    {
+      "repo": "jwilleke/yourphr-ts-spike",
+      "reason": "archived (read-only); the v1.14.0 sync push was refused with 403",
+      "since": "2026-10-23"
     }
   ]
 }
