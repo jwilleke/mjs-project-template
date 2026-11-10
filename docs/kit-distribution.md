@@ -210,7 +210,9 @@ Every synced repo gets the same two-layer secret scan
   them identical kit-wide; bump them here and the next `install-kit.sh --pr` carries the bump. The
   tarball is kept in the Actions cache keyed on that version, so a GitHub release outage does not
   fail the scan ([#110](https://github.com/jwilleke/mjs-project-template/issues/110)); the checksum
-  is verified on cached and fresh downloads alike.
+  is verified on cached and fresh downloads alike. If the checksum check ever fails, delete the
+  `gitleaks-*` cache entry (Actions → Caches) or bump the key, because a bad entry fails every run
+  until then.
   Being a workflow, it reaches a repo only through a human-run sync — the self-sync cannot push it
   (see below).
 - `.gitleaks.toml` — __seed__. The default rules plus two internal-host rules. Seeded once, then
