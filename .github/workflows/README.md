@@ -31,6 +31,8 @@ Triggered on: Push to `master` or `develop`, Pull Requests
 3. Secret Scan
    - Runs gitleaks over the tree with `.gitleaks.toml`: the default secret rules plus internal
      hostnames (a URL with an explicit port, a file-share URL)
+   - The gitleaks tarball is cached (`actions/cache`, keyed on version, OS and arch) so a GitHub
+     release outage does not fail the scan; the SHA-256 check runs on every run
    - The pre-commit hook runs the same rules on staged changes
 
 4. Build
